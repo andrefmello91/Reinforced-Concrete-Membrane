@@ -1,0 +1,8 @@
+﻿################################################################################
+# Este arquivo .gitignore foi criado automaticamente pelo Microsoft(R) Visual Studio.
+################################################################################
+
+/.vs/Reinforced-Concrete-Membrane/v16
+/Membrane/bin/Debug
+/Membrane/obj/Debug
+/packages
