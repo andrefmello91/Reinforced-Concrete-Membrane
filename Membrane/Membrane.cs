@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using MathNet.Numerics;
 using MathNet.Numerics.LinearAlgebra;
-using MathNet.Numerics.RootFinding;
 using Material;
 using MathNet.Numerics.Data.Text;
 

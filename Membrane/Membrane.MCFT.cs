@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using MathNet.Numerics;
-using MathNet.Numerics.LinearAlgebra;
-using MathNet.Numerics.RootFinding;
+﻿using MathNet.Numerics.LinearAlgebra;
 using Material;
 using Parameters = Material.Concrete.ModelParameters;
-using Behavior = Material.Concrete.ModelBehavior;
+using Behavior   = Material.Concrete.ModelBehavior;
 
 namespace Membrane
 {
