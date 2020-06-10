@@ -7,7 +7,7 @@ using MathNet.Numerics.Data.Text;
 
 namespace Membrane
 {
-    public abstract partial class Membrane
+    public abstract class Membrane
     {
         // Properties
         public Concrete.Biaxial               Concrete               { get; set; }
@@ -39,25 +39,25 @@ namespace Membrane
         }
 
         // Solver settings
-        private int    NumLoadSteps  = 100;
-        private int    MaxIterations = 1000;
-        private double Tolerance     = 1E-3;
+        public int    NumLoadSteps  { get; set; }
+        public int    MaxIterations { get; set; }
+        public double Tolerance     { get; set; }
 
         // Get steel parameters
-        private double fyx  => Reinforcement.Steel.X.YieldStress;
-        private double Esxi => Reinforcement.Steel.X.ElasticModule;
-        private double fyy  => Reinforcement.Steel.Y.YieldStress;
-        private double Esyi => Reinforcement.Steel.Y.ElasticModule;
+        public double fyx  => Reinforcement.Steel.X.YieldStress;
+        public double Esxi => Reinforcement.Steel.X.ElasticModule;
+        public double fyy  => Reinforcement.Steel.Y.YieldStress;
+        public double Esyi => Reinforcement.Steel.Y.ElasticModule;
 
         // Get reinforcement
-        private double phiX => Reinforcement.BarDiameter.X;
-        private double phiY => Reinforcement.BarDiameter.Y;
-        private double psx  => Reinforcement.Ratio.X;
-        private double psy  => Reinforcement.Ratio.Y;
+        public double phiX => Reinforcement.BarDiameter.X;
+        public double phiY => Reinforcement.BarDiameter.Y;
+        public double psx  => Reinforcement.Ratio.X;
+        public double psy  => Reinforcement.Ratio.Y;
 
         // Calculate crack spacings
-        private double smx => phiX / (5.4 * psx);
-        private double smy => phiY / (5.4 * psy);
+        public double smx => phiX / (5.4 * psx);
+        public double smy => phiY / (5.4 * psy);
 
         // Get current Stiffness
         public Matrix<double> Stiffness => ConcreteStiffness + ReinforcementStiffness;
@@ -68,8 +68,13 @@ namespace Membrane
         public abstract void Analysis(Vector<double> appliedStrains, int loadStep = 0, int iteration = 0);
 
         // Solver for known stresses
-        public virtual void Solver(Vector<double> stresses)
+        public virtual void Solver(Vector<double> stresses, int numLoadSteps = 100, int maxIterations = 1000, double tolerance = 1E-3)
         {
+			// Get settings
+			NumLoadSteps  = numLoadSteps;
+			MaxIterations = maxIterations;
+			Tolerance     = tolerance;
+
             // Get initial stresses
             var sig0 = (double)1 / NumLoadSteps * stresses;
 
@@ -298,7 +303,7 @@ namespace Membrane
         }
 
         // Calculate slopes related to reinforcement
-        private (double X, double Y) ReinforcementAngles(double theta1) => Reinforcement.Angles(theta1);
+        public (double X, double Y) ReinforcementAngles(double theta1) => Reinforcement.Angles(theta1);
 
         // Crack check procedure
         public double CrackCheck(double? theta2 = null)
@@ -350,7 +355,7 @@ namespace Membrane
         }
 
         // Calculate maximum shear on crack
-        private double MaximumShearOnCrack(double theta2, double ec1)
+        public double MaximumShearOnCrack(double theta2, double ec1)
         {
 	        // Calculate thetaC sine and cosine
 	        var (cosTheta, sinTheta) = DirectionCosines(theta2);
@@ -366,7 +371,7 @@ namespace Membrane
         }
 
         // Calculate maximum shear on crack
-        private double MaximumShearOnCrack(double w)
+        public double MaximumShearOnCrack(double w)
         {
 	        double
 		        fc    = Concrete.fc,
@@ -378,7 +383,7 @@ namespace Membrane
         }
 
         // Calculate reference length
-        private double ReferenceLength(double? thetaC1 = null)
+        public double ReferenceLength(double? thetaC1 = null)
         {
 	        if (!thetaC1.HasValue)
 		        thetaC1 = PrincipalAngles.theta1;
