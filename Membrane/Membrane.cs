@@ -14,14 +14,6 @@ namespace Membrane
         public Reinforcement.Biaxial          Reinforcement          { get; }
         public (bool S, string Message)       Stop                   { get; set; }
         public Vector<double>                 Strains                { get; set; }
-        public (double theta1, double theta2) PrincipalAngles        { get; set; }
-        public Matrix<double>                 ConcreteStiffness      { get; set; }
-        public Matrix<double>                 ReinforcementStiffness { get; set; }
-        public Vector<double>                 ConcreteStresses       { get; set; }
-        public Vector<double>                 ReinforcementStresses  { get; set; }
-
-		// Abstract properties
-		public abstract Vector<double> ConcreteStrains { get; }
 
         // Constructor
         public Membrane(Concrete.Biaxial concrete, Reinforcement.Biaxial reinforcement, double panelWidth)
@@ -37,11 +29,6 @@ namespace Membrane
             // Set initial strains
             Strains = Vector<double>.Build.Dense(3);
         }
-
-        // Solver settings
-        public int    NumLoadSteps  { get; set; }
-        public int    MaxIterations { get; set; }
-        public double Tolerance     { get; set; }
 
         // Get steel parameters
         public double fyx  => Reinforcement.Steel.X.YieldStress;
@@ -60,39 +47,30 @@ namespace Membrane
         public double smy => phiY / (5.4 * psy);
 
         // Get current Stiffness
-        public Matrix<double> Stiffness => ConcreteStiffness + ReinforcementStiffness;
+        public Matrix<double> Stiffness => Concrete.Stiffness + Reinforcement.Stiffness;
 
         // Get current stresses
-        public Vector<double> Stresses  => ConcreteStresses + ReinforcementStresses;
+        public Vector<double> Stresses  => Concrete.Stresses + Reinforcement.Stresses;
 
-        public abstract void Analysis(Vector<double> appliedStrains, int loadStep = 0, int iteration = 0);
+        public abstract void Calculate(Vector<double> appliedStrains, int loadStep = 0, int iteration = 0);
 
         // Solver for known stresses
         public virtual void Solver(Vector<double> stresses, int numLoadSteps = 100, int maxIterations = 1000, double tolerance = 1E-3)
         {
-			// Get settings
-			NumLoadSteps  = numLoadSteps;
-			MaxIterations = maxIterations;
-			Tolerance     = tolerance;
-
             // Get initial stresses
-            var sig0 = (double)1 / NumLoadSteps * stresses;
+            var f0 = (double)1 / numLoadSteps * stresses;
 
             // Calculate initial stiffness
             var D = InitialStiffness();
 
             // Calculate e0
-            var ei = D.Solve(sig0);
+            var ei = D.Solve(f0);
 
             // Initiate matrices
-            var epsCMatrix = Matrix<double>.Build.Dense(NumLoadSteps, 3);
-            var epsMatrix = Matrix<double>.Build.Dense(NumLoadSteps, 3);
-            var e1Matrix = Matrix<double>.Build.Dense(NumLoadSteps, 2);
-            var sigMatrix = Matrix<double>.Build.Dense(NumLoadSteps, 3);
-            var sig1Matrix = Matrix<double>.Build.Dense(NumLoadSteps, 2);
-            var sigCMatrix = Matrix<double>.Build.Dense(NumLoadSteps, 3);
-            var sigSMatrix = Matrix<double>.Build.Dense(NumLoadSteps, 3);
-            var thetaMatrix = Matrix<double>.Build.Dense(NumLoadSteps, 1);
+            var epsMatrix = Matrix<double>.Build.Dense(numLoadSteps, 3);
+            var e1Matrix = Matrix<double>.Build.Dense(numLoadSteps, 2);
+            var sigMatrix = Matrix<double>.Build.Dense(numLoadSteps, 3);
+            var sig1Matrix = Matrix<double>.Build.Dense(numLoadSteps, 2);
 
             //int[] itUpdate = new int[200];
             //for (int i = 0; i < itUpdate.Length; i++)
@@ -100,23 +78,23 @@ namespace Membrane
             Stop = (false, string.Empty);
 
             // Initiate load steps
-            for (int ls = 1; ls <= NumLoadSteps; ls++)
+            for (int ls = 1; ls <= numLoadSteps; ls++)
             {
                 // Calculate stresses
-                var sig = ls * sig0;
+                var fi = ls * f0;
 
-                for (int it = 1; it <= MaxIterations; it++)
+                for (int it = 1; it <= maxIterations; it++)
                 {
                     // Do analysis
-                    Analysis(ei, ls, it);
+                    Calculate(ei, ls, it);
 
                     // Calculate residual
-                    var sigR = sig - Stresses;
+                    var fr = ResidualStresses(fi);
 
                     // Calculate convergence
-                    double conv = Convergence(sigR, sig);
+                    double conv = Convergence(fr, fi);
 
-                    if (ConvergenceReached(conv, it))
+                    if (ConvergenceReached(conv, tolerance, it))
                     {
                         Console.WriteLine("LS = {0}, Iterations = {1}", ls, it);
 
@@ -129,21 +107,17 @@ namespace Membrane
 
                         // Set results
                         epsMatrix.SetRow(ls - 1, Strains);
-                        epsCMatrix.SetRow(ls - 1, ConcreteStrains);
                         sigMatrix.SetRow(ls - 1, Stresses);
-                        sigCMatrix.SetRow(ls - 1, ConcreteStresses);
-                        sigSMatrix.SetRow(ls - 1, ReinforcementStresses);
                         e1Matrix.SetRow(ls - 1, new[] { ec1, ec2 });
                         sig1Matrix.SetRow(ls - 1, new[] { fc1, fc2 });
-                        thetaMatrix[ls - 1, 0] = PrincipalAngles.theta2;
 
                         break;
                     }
 
                     // Increment strains
-                    ei += D.Solve(sigR);
+                    ei += StrainIncrement(D, fr);
 
-                    if (it == MaxIterations)
+                    if (it == maxIterations)
                     {
                         Stop = (true, "CONVERGENCE NOT REACHED");
                         Console.WriteLine("LS = {0}, {1}", ls, Stop.Message);
@@ -156,8 +130,8 @@ namespace Membrane
 
             // Result matrices
             var sigXeps = Matrix<double>.Build.DenseOfColumnVectors(
-                epsMatrix.Column(2), sigMatrix.Column(2), Vector<double>.Build.Dense(NumLoadSteps),
-                e1Matrix.Column(0), sig1Matrix.Column(0), Vector<double>.Build.Dense(NumLoadSteps),
+                epsMatrix.Column(2), sigMatrix.Column(2), Vector<double>.Build.Dense(numLoadSteps),
+                e1Matrix.Column(0), sig1Matrix.Column(0), Vector<double>.Build.Dense(numLoadSteps),
                 e1Matrix.Column(1), sig1Matrix.Column(1));
 
             string[]
@@ -185,135 +159,38 @@ namespace Membrane
         }
 
         // Verify if convergence is reached
-        private bool ConvergenceReached(double convergence, int iteration) => convergence <= Tolerance && iteration > 9;
+        private bool ConvergenceReached(double convergence, double tolerance, int iteration) => convergence <= tolerance && iteration > 9;
 		
-        // Calculate tensile strain angle
-        public (double theta1, double theta2) StrainAngles(Vector<double> strains, (double ec1, double ec2) principalStrains) => Relations.Strain.PrincipalAngles(strains, principalStrains);
+		// Calculate residual stresses
+		public virtual Vector<double> ResidualStresses(Vector<double> appliedStresses)
+		{
+			return
+				appliedStresses - Stresses;
+		}
 
-        // Calculate principal strains
-        public (double ec1, double ec2) PrincipalStrains(Vector<double> strains) => Relations.Strain.PrincipalStrains(strains);
-
-        // Calculate initial stiffness
-        public Matrix<double> InitialConcreteStiffness()
-        {
-	        // Concrete matrix
-	        double Ec = Concrete.Ec;
-	        var Dc1 = Matrix<double>.Build.Dense(3, 3);
-	        Dc1[0, 0] = Ec;
-	        Dc1[1, 1] = Ec;
-	        Dc1[2, 2] = 0.5 * Ec;
-
-	        // Get transformation matrix
-	        var T = Transformation_Matrix(Constants.PiOver4);
-
-	        // Calculate Dc
-	        return
-		        T.Transpose() * Dc1 * T;
-        }
-
-        // Initial reinforcement stiffness
-        public Matrix<double> InitialReinforcementStiffness()
-        {
-	        // Steel matrix
-	        var Ds = Matrix<double>.Build.Dense(3, 3);
-	        Ds[0, 0] = psx * Esxi;
-	        Ds[1, 1] = psy * Esyi;
-
-	        return Ds;
-        }
+		// Calculate strain increment
+		private Vector<double> StrainIncrement(Matrix<double> stiffness, Vector<double> residualStresses)
+		{
+			return
+				stiffness.Solve(residualStresses);
+		}
 
         // Calculate initial stiffness
-        public Matrix<double> InitialStiffness() => InitialConcreteStiffness() + InitialReinforcementStiffness();
-
-        // Calculate steel stiffness matrix
-        public Matrix<double> Reinforcement_Stiffness((double Esx, double Esy)? steelSecantModule = null)
-        {
-	        double Esx, Esy;
-
-	        if (steelSecantModule.HasValue)
-		        (Esx, Esy) = steelSecantModule.Value;
-	        else
-		        (Esx, Esy) = Reinforcement.SecantModule;
-
-	        // Steel matrix
-	        var Ds = Matrix<double>.Build.Dense(3, 3);
-	        Ds[0, 0] = psx * Esx;
-	        Ds[1, 1] = psy * Esy;
-
-	        return Ds;
-        }
-
-        // Calculate concrete stiffness matrix
-        public Matrix<double> Concrete_Stiffness(double? thetaC1 = null, (double Ec1, double Ec2)? concreteSecantModule = null)
-        {
-	        double Ec1, Ec2;
-
-	        if (concreteSecantModule.HasValue)
-		        (Ec1, Ec2) = concreteSecantModule.Value;
-	        else
-		        (Ec1, Ec2) = Concrete.SecantModule;
-
-	        double Gc = Ec1 * Ec2 / (Ec1 + Ec2);
-
-	        // Concrete matrix
-	        var Dc1 = Matrix<double>.Build.Dense(3, 3);
-	        Dc1[0, 0] = Ec1;
-	        Dc1[1, 1] = Ec2;
-	        Dc1[2, 2] = Gc;
-
-	        // Get transformation matrix
-	        var T = Transformation_Matrix(thetaC1);
-
-	        // Calculate Dc
-	        return
-		        T.Transpose() * Dc1 * T;
-        }
-
-        // Calculate stresses/strains transformation matrix
-        // This matrix transforms from x-y to 1-2 coordinates
-        public Matrix<double> Transformation_Matrix(double? theta1 = null)
-        {
-	        if (!theta1.HasValue)
-		        theta1 = PrincipalAngles.theta1;
-
-	        return
-		        Relations.Strain.TransformationMatrix(theta1.Value);
-        }
-
-        // Calculate concrete stresses
-        public Vector<double> Concrete_Stresses(Matrix<double> concreteStiffness = null, Vector<double> concreteStrains = null)
-        {
-	        if (concreteStiffness == null)
-		        concreteStiffness = ConcreteStiffness;
-
-	        if (concreteStrains == null)
-		        concreteStrains = ConcreteStrains;
-
-	        return
-		        concreteStiffness * concreteStrains;
-        }
-
-        // Get reinforcement stresses as a vector multiplied by reinforcement ratio
-        public Vector<double> Reinforcement_Stresses()
-        {
-            var (fsx, fsy) = Reinforcement.Stresses;
-
-            return
-                CreateVector.DenseOfArray(new[] { psx * fsx, psy * fsy, 0 });
-        }
-
-        // Calculate slopes related to reinforcement
-        public (double X, double Y) ReinforcementAngles(double theta1) => Reinforcement.Angles(theta1);
+        public Matrix<double> InitialStiffness() => Concrete.InitialStiffness() + Reinforcement.InitialStiffness();
 
         // Crack check procedure
-        public double CrackCheck(double? theta2 = null)
+        public void CrackCheck(double? theta2 = null)
         {
+			// Verify if concrete is cracked
+			if (!Concrete.Cracked)
+				return;
+
 	        if (!theta2.HasValue)
-		        theta2 = PrincipalAngles.theta2;
+		        theta2 = Concrete.PrincipalAngles.theta2;
 
             // Get the values
             double ec1 = Concrete.PrincipalStrains.ec1;
-            (double fsx, double fsy) = Reinforcement.Stresses;
+            (double fsx, double fsy) = Reinforcement.SteelStresses;
             double f1a = Concrete.PrincipalStresses.fc1;
 
             // Calculate thetaC sine and cosine
@@ -349,9 +226,6 @@ namespace Membrane
             // Set to concrete
             if (fc1 < f1a)
                 Concrete.SetTensileStress(fc1);
-
-            // Calculate critical stresses on crack
-            return fc1;
         }
 
         // Calculate maximum shear on crack
@@ -386,7 +260,7 @@ namespace Membrane
         public double ReferenceLength(double? thetaC1 = null)
         {
 	        if (!thetaC1.HasValue)
-		        thetaC1 = PrincipalAngles.theta1;
+		        thetaC1 = Concrete.PrincipalAngles.theta1;
 
 	        var (cosThetaC, sinThetaC) = DirectionCosines(thetaC1.Value);
 
@@ -406,6 +280,7 @@ namespace Membrane
 
 	        return (cos, sin);
         }
+
         public static double Tangent(double angle)
         {
 	        double tan;

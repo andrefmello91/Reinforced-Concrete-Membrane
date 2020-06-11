@@ -18,37 +18,23 @@ namespace Membrane
 
 			// Initiate new concrete
 			Concrete = new Concrete.Biaxial(fc, phiAg, Parameters.MCFT, Behavior.MCFT);
-
-			// Initiate stiffness
-			ConcreteStiffness      = InitialConcreteStiffness();
-			ReinforcementStiffness = InitialReinforcementStiffness();
 		}
 
-		// Get concrete strains
-		public override Vector<double> ConcreteStrains => Strains;
-
 		// Do analysis by MCFT with applied strains
-		public override void Analysis(Vector<double> appliedStrains, int loadStep = 0, int iteration = 0)
+		public override void Calculate(Vector<double> appliedStrains, int loadStep = 0, int iteration = 0)
 		{
 			Strains = appliedStrains;
 
-			// Calculate new principal strains
-			var (ec1, ec2)  = PrincipalStrains(Strains);
-			PrincipalAngles = StrainAngles(Strains, (ec1, ec2));
-
 			// Calculate and set concrete and steel stresses
-			Concrete.SetStrainsAndStresses((ec1, ec2));
-			Reinforcement.SetStrainsAndStresses(Strains);
+			Concrete.CalculatePrincipalStresses(Strains);
+			Reinforcement.CalculateStresses(Strains);
 
 			// Verify if concrete is cracked and check crack stresses to limit fc1
-			if (Concrete.Cracked)
-				CrackCheck();
+			CrackCheck();
 
-			// Set results
-			ConcreteStiffness      = Concrete_Stiffness();
-			ReinforcementStiffness = Reinforcement_Stiffness();
-			ConcreteStresses       = Concrete_Stresses();
-			ReinforcementStresses  = Reinforcement_Stresses();
+			// Calculate stiffness
+			Concrete.CalculateStiffness();
+			Reinforcement.CalculateStiffness();
 		}
 	}
 }
