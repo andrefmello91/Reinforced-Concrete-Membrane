@@ -7,7 +7,7 @@ using Relations;
 using Parameters = Material.Concrete.ModelParameters;
 using Behavior = Material.Concrete.ModelBehavior;
 
-namespace Membrane
+namespace RCMembrane
 {
 	public class DSFM : Membrane
 	{

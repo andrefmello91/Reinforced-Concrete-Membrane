@@ -2,7 +2,7 @@
 using Material;
 using MathNet.Numerics.LinearAlgebra;
 
-namespace Membrane
+namespace RCMembrane
 {
     public static class Solver
     {

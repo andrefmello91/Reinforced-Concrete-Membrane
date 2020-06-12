@@ -5,7 +5,7 @@ using MathNet.Numerics.LinearAlgebra;
 using Material;
 using MathNet.Numerics.Data.Text;
 
-namespace Membrane
+namespace RCMembrane
 {
     public abstract class Membrane
     {

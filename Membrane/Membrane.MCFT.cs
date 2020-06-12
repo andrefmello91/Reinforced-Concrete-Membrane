@@ -3,7 +3,7 @@ using Material;
 using Parameters = Material.Concrete.ModelParameters;
 using Behavior   = Material.Concrete.ModelBehavior;
 
-namespace Membrane
+namespace RCMembrane
 {
 	public class MCFT : Membrane
 	{
@@ -17,7 +17,7 @@ namespace Membrane
 				phiAg = concrete.AggregateDiameter;
 
 			// Initiate new concrete
-			Concrete = new Concrete.Biaxial(fc, phiAg, Parameters.MCFT, Behavior.MCFT);
+			Concrete = new Concrete.Biaxial(fc, phiAg);
 		}
 
 		// Do analysis by MCFT with applied strains
