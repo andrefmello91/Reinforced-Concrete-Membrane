@@ -159,7 +159,11 @@ namespace RCMembrane
         }
 
         // Verify if convergence is reached
-        private bool ConvergenceReached(double convergence, double tolerance, int iteration) => convergence <= tolerance && iteration > 9;
+        private bool ConvergenceReached(double convergence, double tolerance, int iteration, int minIterations = 10) => convergence <= tolerance && iteration >= minIterations;
+
+        // Verify if convergence is reached
+        private bool ConvergenceReached(Vector<double> residualStress, Vector<double> appliedStress, double tolerance,
+	        int iteration, int minIterations = 10) => ConvergenceReached(Convergence(residualStress, appliedStress), tolerance, iteration, minIterations);
 		
 		// Calculate residual stresses
 		public virtual Vector<double> ResidualStresses(Vector<double> appliedStresses)
