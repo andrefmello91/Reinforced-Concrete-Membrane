@@ -4,19 +4,23 @@ using MathNet.Numerics;
 using MathNet.Numerics.LinearAlgebra;
 using Material;
 using MathNet.Numerics.Data.Text;
+using Parameters    = Material.Concrete.Parameters;
+using Behavior      = Material.Concrete.Behavior;
+using Concrete      = Material.Concrete.Biaxial;
+using Reinforcement = Material.Reinforcement.Biaxial;
 
 namespace RCMembrane
 {
     public abstract class Membrane
     {
         // Properties
-        public Concrete.Biaxial               Concrete               { get; set; }
-        public Reinforcement.Biaxial          Reinforcement          { get; }
-        public (bool S, string Message)       Stop                   { get; set; }
-        public Vector<double>                 Strains                { get; set; }
+        public Concrete                 Concrete               { get; set; }
+        public Reinforcement            Reinforcement          { get; }
+        public (bool S, string Message) Stop                   { get; set; }
+        public Vector<double>           Strains                { get; set; }
 
         // Constructor
-        public Membrane(Concrete.Biaxial concrete, Reinforcement.Biaxial reinforcement, double panelWidth)
+        public Membrane(Concrete concrete, Reinforcement reinforcement, double panelWidth)
         {
             // Get reinforcement
             var diams = reinforcement.BarDiameter;
@@ -24,7 +28,22 @@ namespace RCMembrane
             var steel = reinforcement.Steel;
 
             // Initiate new materials
-            Reinforcement = new Reinforcement.Biaxial(diams, spcs, steel, panelWidth);
+            Reinforcement = new Reinforcement(diams, spcs, steel, panelWidth);
+
+            // Set initial strains
+            Strains = Vector<double>.Build.Dense(3);
+        }
+
+        // Constructor
+        public Membrane(Parameters concreteParameters, Behavior concreteBehavior, Reinforcement reinforcement, double panelWidth)
+        {
+            // Get reinforcement
+            var diams = reinforcement.BarDiameter;
+            var spcs  = reinforcement.BarSpacing;
+            var steel = reinforcement.Steel;
+
+            // Initiate new materials
+            Reinforcement = new Reinforcement(diams, spcs, steel, panelWidth);
 
             // Set initial strains
             Strains = Vector<double>.Build.Dense(3);

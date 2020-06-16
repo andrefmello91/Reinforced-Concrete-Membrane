@@ -4,8 +4,13 @@ using MathNet.Numerics.LinearAlgebra;
 using MathNet.Numerics.RootFinding;
 using Material;
 using Relations;
-using Parameters = Material.Concrete.ModelParameters;
-using Behavior = Material.Concrete.ModelBehavior;
+using Concrete        = Material.Concrete.Biaxial;
+using Reinforcement   = Material.Reinforcement.Biaxial;
+using ModelParameters = Material.Concrete.ModelParameters;
+using ModelBehavior   = Material.Concrete.ModelBehavior;
+using Parameters      = Material.Concrete.Parameters;
+using Behavior        = Material.Concrete.Behavior;
+
 
 namespace RCMembrane
 {
@@ -24,7 +29,7 @@ namespace RCMembrane
 		}
 
 		// Constructor
-		public DSFM(Concrete.Biaxial concrete, Reinforcement.Biaxial reinforcement, double panelWidth,
+		public DSFM(Concrete concrete, Reinforcement reinforcement, double panelWidth,
 			bool considerCrackSlip = true) : base(concrete, reinforcement, panelWidth)
 		{
 			// Get concrete parameters
@@ -33,7 +38,18 @@ namespace RCMembrane
 				phiAg = concrete.AggregateDiameter;
 
 			// Initiate new concrete
-			Concrete = new Concrete.Biaxial(fc, phiAg, Parameters.DSFM, Behavior.DSFM);
+			Concrete = new Concrete(fc, phiAg, ModelParameters.DSFM, ModelBehavior.DSFM);
+
+			// Initiate crack slip strains
+			ConsiderCrackSlip = considerCrackSlip;
+			CrackSlipStrains  = Vector<double>.Build.Dense(3);
+		}
+
+		public DSFM(Parameters concreteParameters, Behavior concreteBehavior, Reinforcement reinforcement, double panelWidth,
+			bool considerCrackSlip = true) : base(concreteParameters, concreteBehavior, reinforcement, panelWidth)
+		{
+			// Initiate new concrete
+			Concrete = new Concrete(concreteParameters, concreteBehavior);
 
 			// Initiate crack slip strains
 			ConsiderCrackSlip = considerCrackSlip;
