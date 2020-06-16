@@ -6,8 +6,6 @@ using Material;
 using Relations;
 using Concrete        = Material.Concrete.Biaxial;
 using Reinforcement   = Material.Reinforcement.Biaxial;
-using ModelParameters = Material.Concrete.ModelParameters;
-using ModelBehavior   = Material.Concrete.ModelBehavior;
 using Parameters      = Material.Concrete.Parameters;
 using Behavior        = Material.Concrete.Behavior;
 
@@ -38,7 +36,7 @@ namespace RCMembrane
 				phiAg = concrete.AggregateDiameter;
 
 			// Initiate new concrete
-			Concrete = new Concrete(fc, phiAg, ModelParameters.DSFM, ModelBehavior.DSFM);
+			Concrete = new Concrete(fc, phiAg, Material.Concrete.ParameterModel.DSFM, Material.Concrete.BehaviorModel.DSFM);
 
 			// Initiate crack slip strains
 			ConsiderCrackSlip = considerCrackSlip;
