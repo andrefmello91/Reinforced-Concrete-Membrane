@@ -4,7 +4,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{F26DDECB-E2E4-49F1-ADD7-99BF554EECEA}</ProjectGuid>
+    <ProjectGuid>{004BF0A6-E383-4123-9542-53EF87DE205C}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>RCMembrane</RootNamespace>

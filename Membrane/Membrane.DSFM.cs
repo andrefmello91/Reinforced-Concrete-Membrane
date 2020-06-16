@@ -99,8 +99,7 @@ namespace RCMembrane
 		// Calculate crack local stresses
 		private (double fscrx, double fscry, double vci) CrackLocalStresses(double? thetaC1 = null)
 		{
-			if (!thetaC1.HasValue)
-				thetaC1 = Concrete.PrincipalAngles.theta1;
+			double theta1 = thetaC1 ?? Concrete.PrincipalAngles.theta1;
 
 			// Initiate stresses
 			double
@@ -120,7 +119,7 @@ namespace RCMembrane
 				var fc1 = Concrete.PrincipalStresses.fc1;
 
 				// Get reinforcement angles and stresses
-				var (thetaNx, thetaNy) = Reinforcement.Angles(thetaC1.Value);
+				var (thetaNx, thetaNy) = Reinforcement.Angles(theta1);
 				var (fsx, fsy) = Reinforcement.SteelStresses;
 
 				// Calculate cosines and sines
@@ -189,19 +188,17 @@ namespace RCMembrane
 		// Calculate crack slip
 		private Vector<double> CrackSlip(double vci = 0, double? thetaE1 = null, double? thetaC1 = null)
 		{
-			if (!thetaC1.HasValue)
-				thetaC1 = Concrete.PrincipalAngles.theta1;
-
-			if (!thetaE1.HasValue)
-				thetaE1 = ApparentAngles.theta1;
+			double
+				thetaC = thetaC1 ?? Concrete.PrincipalAngles.theta1,
+				thetaE = thetaE1 ?? ApparentAngles.theta1;
 
 			// Calculate shear slip strains
-			var (cos2ThetaC, sin2ThetaC) = DirectionCosines(2 * thetaC1.Value);
+			var (cos2ThetaC, sin2ThetaC) = DirectionCosines(2 * thetaC);
 
 			// Get shear slip strains
 			double
-				ysa = StressCrackSlip(thetaC1.Value, vci),
-				ysb = RotationLagCrackSlip(thetaE1.Value),
+				ysa = StressCrackSlip(thetaC, vci),
+				ysb = RotationLagCrackSlip(thetaE),
 				ys = Math.Max(ysa, ysb);
 
 			// Calculate the vector of shear slip strains
@@ -314,13 +311,10 @@ namespace RCMembrane
 		}
 
 		// Calculate the pseudo-prestress
-		private Vector<double> PseudoPStress(Matrix<double> Dc = null, Vector<double> es = null)
+		private Vector<double> PseudoPStress(Matrix<double> concreteStiffness = null, Vector<double> crackSlipStrains = null)
 		{
-			if (Dc == null)
-				Dc = Concrete.Stiffness;
-
-			if (es == null)
-				es = CrackSlipStrains;
+			var Dc = concreteStiffness ?? Concrete.Stiffness;
+			var es = crackSlipStrains  ?? CrackSlipStrains;
 
 			return
 				Dc * es;

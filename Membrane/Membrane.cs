@@ -189,17 +189,15 @@ namespace RCMembrane
 			if (!Concrete.Cracked)
 				return;
 
-	        if (!theta2.HasValue)
-		        theta2 = Concrete.PrincipalAngles.theta2;
-
             // Get the values
+            double theta = theta2 ?? Concrete.PrincipalAngles.theta2;
             double ec1 = Concrete.PrincipalStrains.ec1;
             (double fsx, double fsy) = Reinforcement.SteelStresses;
             double f1a = Concrete.PrincipalStresses.fc1;
 
             // Calculate thetaC sine and cosine
-            var (cosTheta, sinTheta) = DirectionCosines(theta2.Value);
-            double tanTheta = Tangent(theta2.Value);
+            var (cosTheta, sinTheta) = DirectionCosines(theta);
+            double tanTheta = Tangent(theta);
 
             // Reinforcement capacity reserve
             double
@@ -207,7 +205,7 @@ namespace RCMembrane
                 f1cy = psy * (fyy - fsy);
 
             // Maximum possible shear on crack interface
-            double vcimaxA = MaximumShearOnCrack(theta2.Value, ec1);
+            double vcimaxA = MaximumShearOnCrack(theta, ec1);
 
             // Maximum possible shear for biaxial yielding
             double vcimaxB = Math.Abs(f1cx - f1cy) / (tanTheta + 1 / tanTheta);
@@ -263,13 +261,12 @@ namespace RCMembrane
         // Calculate reference length
         public double ReferenceLength(double? thetaC1 = null)
         {
-	        if (!thetaC1.HasValue)
-		        thetaC1 = Concrete.PrincipalAngles.theta1;
+			double theta = thetaC1 ?? Concrete.PrincipalAngles.theta1;
 
-	        var (cosThetaC, sinThetaC) = DirectionCosines(thetaC1.Value);
+	        var (cosTheta, sinTheta) = DirectionCosines(theta);
 
 	        return
-		        0.5 / (Math.Abs(sinThetaC) / smx + Math.Abs(cosThetaC) / smy);
+		        0.5 / (Math.Abs(sinTheta) / smx + Math.Abs(cosTheta) / smy);
         }
 
         // Verify if a number is zero
