@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29424.173
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Membrane", "Membrane\Membrane.csproj", "{F26DDECB-E2E4-49F1-ADD7-99BF554EECEA}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Relations", "..\Stress-and-Strain-Relations\Relations\Relations.csproj", "{7DF65381-8507-4F02-9C2B-2AE9A1E50EFA}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Material", "..\Material\Material\Material.csproj", "{5E103AD6-45A8-4B2D-816C-5CCEC09380E6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RCMembrane", "Membrane\RCMembrane.csproj", "{004BF0A6-E383-4123-9542-53EF87DE205C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,10 +15,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{F26DDECB-E2E4-49F1-ADD7-99BF554EECEA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F26DDECB-E2E4-49F1-ADD7-99BF554EECEA}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F26DDECB-E2E4-49F1-ADD7-99BF554EECEA}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F26DDECB-E2E4-49F1-ADD7-99BF554EECEA}.Release|Any CPU.Build.0 = Release|Any CPU
 		{7DF65381-8507-4F02-9C2B-2AE9A1E50EFA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{7DF65381-8507-4F02-9C2B-2AE9A1E50EFA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7DF65381-8507-4F02-9C2B-2AE9A1E50EFA}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -27,6 +23,10 @@ Global
 		{5E103AD6-45A8-4B2D-816C-5CCEC09380E6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5E103AD6-45A8-4B2D-816C-5CCEC09380E6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5E103AD6-45A8-4B2D-816C-5CCEC09380E6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{004BF0A6-E383-4123-9542-53EF87DE205C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{004BF0A6-E383-4123-9542-53EF87DE205C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{004BF0A6-E383-4123-9542-53EF87DE205C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{004BF0A6-E383-4123-9542-53EF87DE205C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
