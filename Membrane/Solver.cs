@@ -4,8 +4,14 @@ using MathNet.Numerics.LinearAlgebra;
 
 namespace RCMembrane
 {
+	/// <summary>
+    /// Simple solver class.
+    /// </summary>
     public static class Solver
     {
+		/// <summary>
+        /// Simple solver class, with example panel element.
+        /// </summary>
 	    public static void Solve()
 	    {
 		    // Initiate concrete

@@ -7,11 +7,16 @@ using Reinforcement = Material.Reinforcement.Biaxial;
 
 namespace RCMembrane
 {
+	/// <summary>
+    /// MCFT class, based on formulation by Vecchio and Collins (1986).
+    /// </summary>
 	public class MCFT : Membrane
 	{
-		// Constructor
-		public MCFT(Concrete concrete, Reinforcement reinforcement, double panelWidth) : base(concrete,
-			reinforcement, panelWidth)
+		///<inheritdoc/>
+		/// <summary>
+        /// Membrane element for MCFT analysis.
+        /// </summary>
+		public MCFT(Concrete concrete, Reinforcement reinforcement, double sectionWidth) : base(concrete, reinforcement, sectionWidth)
 		{
 			// Get concrete parameters
 			double
@@ -19,16 +24,25 @@ namespace RCMembrane
 				phiAg = concrete.AggregateDiameter;
 
 			// Initiate new concrete
-			Concrete = new Concrete.Biaxial(fc, phiAg);
+			Concrete = new Concrete(fc, phiAg);
 		}
 
-		public MCFT(Parameters concreteParameters, Behavior concreteBehavior, Reinforcement reinforcement, double panelWidth) : base(concreteParameters, concreteBehavior, reinforcement, panelWidth)
+		///<inheritdoc/>
+		/// <summary>
+		/// Membrane element for MCFT analysis.
+		/// </summary>
+		public MCFT(Parameters concreteParameters, Behavior concreteBehavior, Reinforcement reinforcement, double sectionWidth) : base(concreteParameters, concreteBehavior, reinforcement, sectionWidth)
 		{
 			// Initiate new concrete
 			Concrete = new Concrete(concreteParameters, concreteBehavior);
 		}
 
-		// Do analysis by MCFT with applied strains
+		/// <summary>
+		/// Calculate stresses and the membrane stiffness by MCFT, given strains.
+		/// </summary>
+		/// <param name="appliedStrains">Current strains.</param>
+		/// <param name="loadStep">Current load step.</param>
+		/// <param name="iteration">Current iteration.</param>
 		public override void Calculate(Vector<double> appliedStrains, int loadStep = 0, int iteration = 0)
 		{
 			Strains = appliedStrains;
