@@ -11,6 +11,9 @@ using Reinforcement = Material.Reinforcement.Biaxial;
 
 namespace RCMembrane
 {
+	/// <summary>
+    /// Membrane element base class.
+    /// </summary>
     public abstract class Membrane
     {
         // Properties
@@ -19,8 +22,13 @@ namespace RCMembrane
         public (bool S, string Message) Stop                   { get; set; }
         public Vector<double>           Strains                { get; set; }
 
-        // Constructor
-        public Membrane(Concrete concrete, Reinforcement reinforcement, double panelWidth)
+		/// <summary>
+        /// Base membrane element constructor.
+        /// </summary>
+        /// <param name="concrete">Biaxial concrete object.</param>
+        /// <param name="reinforcement">Biaxial reinforcement object.</param>
+        /// <param name="sectionWidth">The width of cross-section, in mm.</param>
+        public Membrane(Concrete concrete, Reinforcement reinforcement, double sectionWidth)
         {
             // Get reinforcement
             var diams = reinforcement.BarDiameter;
@@ -28,14 +36,20 @@ namespace RCMembrane
             var steel = reinforcement.Steel;
 
             // Initiate new materials
-            Reinforcement = new Reinforcement(diams, spcs, steel, panelWidth);
+            Reinforcement = new Reinforcement(diams, spcs, steel, sectionWidth);
 
             // Set initial strains
             Strains = Vector<double>.Build.Dense(3);
         }
 
-        // Constructor
-        public Membrane(Parameters concreteParameters, Behavior concreteBehavior, Reinforcement reinforcement, double panelWidth)
+        /// <summary>
+        /// Base membrane element constructor.
+        /// </summary>
+        /// <param name="concreteParameters">Concrete parameters object.</param>
+        /// <param name="concreteBehavior">Concrete behavior object.</param>
+        /// <param name="reinforcement">Biaxial reinforcement object.</param>
+        /// <param name="sectionWidth">The width of cross-section, in mm.</param>
+        public Membrane(Parameters concreteParameters, Behavior concreteBehavior, Reinforcement reinforcement, double sectionWidth)
         {
             // Get reinforcement
             var diams = reinforcement.BarDiameter;
@@ -43,7 +57,7 @@ namespace RCMembrane
             var steel = reinforcement.Steel;
 
             // Initiate new materials
-            Reinforcement = new Reinforcement(diams, spcs, steel, panelWidth);
+            Reinforcement = new Reinforcement(diams, spcs, steel, sectionWidth);
 
             // Set initial strains
             Strains = Vector<double>.Build.Dense(3);
@@ -65,15 +79,31 @@ namespace RCMembrane
         public double smx => phiX / (5.4 * psx);
         public double smy => phiY / (5.4 * psy);
 
-        // Get current Stiffness
+        /// <summary>
+        /// Get current membrane stiffness.
+        /// </summary>
         public Matrix<double> Stiffness => Concrete.Stiffness + Reinforcement.Stiffness;
 
-        // Get current stresses
+        /// <summary>
+        /// Get current stresses, in MPa.
+        /// </summary>
         public Vector<double> Stresses  => Concrete.Stresses + Reinforcement.Stresses;
 
+		/// <summary>
+        /// Calculate stresses and the membrane stiffness, given strains.
+        /// </summary>
+        /// <param name="appliedStrains">Current strains.</param>
+        /// <param name="loadStep">Current load step.</param>
+        /// <param name="iteration">Current iteration.</param>
         public abstract void Calculate(Vector<double> appliedStrains, int loadStep = 0, int iteration = 0);
 
-        // Solver for known stresses
+        /// <summary>
+        /// Membrane solver for known stresses.
+        /// </summary>
+        /// <param name="stresses">Applied stresses, in MPa.</param>
+        /// <param name="numLoadSteps">The number of load steps (default: 100).</param>
+        /// <param name="maxIterations">Maximum number of iterations (default: 1000).</param>
+        /// <param name="tolerance">Stress convergence tolerance (default: 1E-3).</param>
         public virtual void Solver(Vector<double> stresses, int numLoadSteps = 100, int maxIterations = 1000, double tolerance = 1E-3)
         {
             // Get initial stresses
@@ -160,48 +190,78 @@ namespace RCMembrane
             DelimitedWriter.Write("D:/sig x eps.csv", sigXeps, ";", res, null, null, 0);
         }
 
-        // Calculate convergence
-        private double Convergence(Vector<double> residualStress, Vector<double> appliedStress)
+        /// <summary>
+        /// Calculate stress convergence.
+        /// </summary>
+        /// <param name="residualStresses">Residual stresses, in MPa.</param>
+        /// <param name="appliedStresses">Known applied stresses, in MPa.</param>
+        private double Convergence(Vector<double> residualStresses, Vector<double> appliedStresses)
         {
 	        double
 		        num = 0,
 		        den = 1;
 
-	        for (int i = 0; i < residualStress.Count; i++)
+	        for (int i = 0; i < residualStresses.Count; i++)
 	        {
-		        num += residualStress[i] * residualStress[i];
-		        den += appliedStress[i] * appliedStress[i];
+		        num += residualStresses[i] * residualStresses[i];
+		        den += appliedStresses[i] * appliedStresses[i];
 	        }
 
 	        return
 		        num / den;
         }
 
-        // Verify if convergence is reached
+        /// <summary>
+        /// Verify if convergence is reached.
+        /// </summary>
+        /// <param name="convergence">Calculated convergence.</param>
+        /// <param name="tolerance">Stress convergence tolerance (default: 1E-3).</param>
+        /// <param name="iteration">Current iteration.</param>
+        /// <param name="minIterations">Minimum number of iterations (default: 10).</param>
         private bool ConvergenceReached(double convergence, double tolerance, int iteration, int minIterations = 10) => convergence <= tolerance && iteration >= minIterations;
 
-        // Verify if convergence is reached
-        private bool ConvergenceReached(Vector<double> residualStress, Vector<double> appliedStress, double tolerance,
-	        int iteration, int minIterations = 10) => ConvergenceReached(Convergence(residualStress, appliedStress), tolerance, iteration, minIterations);
-		
-		// Calculate residual stresses
-		public virtual Vector<double> ResidualStresses(Vector<double> appliedStresses)
+        /// <summary>
+        /// Verify if convergence is reached.
+        /// </summary>
+        /// <param name="residualStresses">Residual stresses, in MPa.</param>
+        /// <param name="appliedStresses">Known applied stresses, in MPa.</param>
+        /// <param name="tolerance">Stress convergence tolerance (default: 1E-3).</param>
+        /// <param name="iteration">Current iteration.</param>
+        /// <param name="minIterations">Minimum number of iterations (default: 10).</param>
+        private bool ConvergenceReached(Vector<double> residualStresses, Vector<double> appliedStresses, double tolerance,
+	        int iteration, int minIterations = 10) => ConvergenceReached(Convergence(residualStresses, appliedStresses), tolerance, iteration, minIterations);
+
+        /// <summary>
+        /// Calculate residual stresses, in MPa.
+        /// </summary>
+        /// <param name="appliedStresses">Known applied stresses, in MPa.</param>
+        /// <returns></returns>
+        public virtual Vector<double> ResidualStresses(Vector<double> appliedStresses)
 		{
 			return
 				appliedStresses - Stresses;
 		}
 
-		// Calculate strain increment
-		private Vector<double> StrainIncrement(Matrix<double> stiffness, Vector<double> residualStresses)
+        /// <summary>
+        /// Calculate the strain increment for next iteration.
+        /// </summary>
+        /// <param name="stiffness">Current stiffness.</param>
+        /// <param name="residualStresses">Residual stresses, in MPa.</param>
+        private Vector<double> StrainIncrement(Matrix<double> stiffness, Vector<double> residualStresses)
 		{
 			return
 				stiffness.Solve(residualStresses);
 		}
 
-        // Calculate initial stiffness
+        /// <summary>
+        /// Calculate initial membrane stiffness.
+        /// </summary>
         public Matrix<double> InitialStiffness() => Concrete.InitialStiffness() + Reinforcement.InitialStiffness();
 
-        // Crack check procedure
+		/// <summary>
+        /// Limit tensile principal stress by crack check procedure, by Bentz (2000).
+        /// </summary>
+        /// <param name="theta2">Principal compressive strain angle, in radians.</param>
         public void CrackCheck(double? theta2 = null)
         {
 			// Verify if concrete is cracked
@@ -249,7 +309,11 @@ namespace RCMembrane
                 Concrete.SetTensileStress(fc1);
         }
 
-        // Calculate maximum shear on crack
+        /// <summary>
+        /// Calculate maximum shear stress on crack, in MPa.
+        /// </summary>
+        /// <param name="theta2">Principal compressive strain angle, in radians.</param>
+        /// <param name="ec1">Principal tensile strain.</param>
         public double MaximumShearOnCrack(double theta2, double ec1)
         {
 	        // Calculate thetaC sine and cosine
@@ -265,7 +329,11 @@ namespace RCMembrane
 		        MaximumShearOnCrack(w);
         }
 
-        // Calculate maximum shear on crack
+        /// <summary>
+        /// Calculate maximum shear stress on crack, in MPa.
+        /// </summary>
+        /// <param name="w">Average crack opening, in mm.</param>
+        /// <returns></returns>
         public double MaximumShearOnCrack(double w)
         {
 	        double
@@ -277,7 +345,10 @@ namespace RCMembrane
 		        0.18 * Math.Sqrt(fc) / (0.31 + 24 * w / (phiAg + 16));
         }
 
-        // Calculate reference length
+        /// <summary>
+        /// Calculate reference length, in mm.
+        /// </summary>
+        /// <param name="thetaC1">Concrete principal tensile strain angle, in radians.</param>
         public double ReferenceLength(double? thetaC1 = null)
         {
 			double theta = thetaC1 ?? Concrete.PrincipalAngles.theta1;
@@ -288,10 +359,17 @@ namespace RCMembrane
 		        0.5 / (Math.Abs(sinTheta) / smx + Math.Abs(cosTheta) / smy);
         }
 
-        // Verify if a number is zero
-        public bool NotZero(double num) => num != 0;
+        /// <summary>
+        /// Verify if a number is zero (true if is not zero).
+        /// </summary>
+        /// <param name="number">The number.</param>
+        public bool NotZero(double number) => number != 0;
 
-        // Get the direction cosines of an angle
+        /// <summary>
+        /// Calculate the direction cosines (cos, sin) of an angle.
+        /// </summary>
+        /// <param name="angle">Angle, in radians.</param>
+        /// <returns></returns>
         public (double cos, double sin) DirectionCosines(double angle)
         {
 	        double
@@ -301,6 +379,10 @@ namespace RCMembrane
 	        return (cos, sin);
         }
 
+        /// <summary>
+        /// Calculate tangent of an angle.
+        /// </summary>
+        /// <param name="angle">Angle, in radians.</param>
         public static double Tangent(double angle)
         {
 	        double tan;
