@@ -53,8 +53,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Membrane.cs" />
-    <Compile Include="Membrane.DSFM.cs" />
-    <Compile Include="Membrane.MCFT.cs" />
+    <Compile Include="DSFM.cs" />
+    <Compile Include="MCFT.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Solver.cs" />
   </ItemGroup>

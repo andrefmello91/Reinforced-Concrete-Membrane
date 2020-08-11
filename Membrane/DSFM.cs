@@ -2,12 +2,10 @@
 using MathNet.Numerics;
 using MathNet.Numerics.LinearAlgebra;
 using MathNet.Numerics.RootFinding;
-using Material;
+using Material.Concrete;
 using Relations;
-using Concrete        = Material.Concrete.Biaxial;
-using Reinforcement   = Material.Reinforcement.Biaxial;
+using Reinforcement   = Material.Reinforcement.BiaxialReinforcement;
 using Parameters      = Material.Concrete.Parameters;
-using Behavior        = Material.Concrete.Behavior;
 
 
 namespace RCMembrane
@@ -15,7 +13,7 @@ namespace RCMembrane
 	/// <summary>
 	/// DSFM class, based on formulation by Vecchio (2000).
 	/// </summary>
-	public class DSFM : Membrane
+	public class DSFMMembrane : Membrane
 	{
 		// Properties
 		public Vector<double>                 CrackSlipStrains           { get; set; }
@@ -25,8 +23,8 @@ namespace RCMembrane
 
 		public bool ConsiderCrackSlip
 		{
-			get => Concrete.ConcreteBehavior.ConsiderCrackSlip;
-			set => Concrete.ConcreteBehavior.ConsiderCrackSlip = value;
+			get => Concrete.Constitutive.ConsiderCrackSlip;
+			set => Concrete.Constitutive.ConsiderCrackSlip = value;
 		}
 
 		///<inheritdoc/>
@@ -34,7 +32,7 @@ namespace RCMembrane
 		/// Membrane element for DSFM analysis.
 		/// </summary>
 		/// <param name="considerCrackSlip">Consider crack slip? (default: true)</param>
-		public DSFM(Concrete concrete, Reinforcement reinforcement, double sectionWidth, bool considerCrackSlip = true) : base(concrete, reinforcement, sectionWidth)
+		public DSFMMembrane(BiaxialConcrete concrete, Reinforcement reinforcement, double sectionWidth, bool considerCrackSlip = true) : base(concrete, reinforcement, sectionWidth)
 		{
 			// Get concrete parameters
 			double
@@ -42,7 +40,7 @@ namespace RCMembrane
 				phiAg = concrete.AggregateDiameter;
 
 			// Initiate new concrete
-			Concrete = new Concrete(fc, phiAg, Material.Concrete.ParameterModel.DSFM, Material.Concrete.BehaviorModel.DSFM);
+			Concrete = new BiaxialConcrete(fc, phiAg, ParameterModel.DSFM, ConstitutiveModel.DSFM);
 
 			// Initiate crack slip strains
 			ConsiderCrackSlip = considerCrackSlip;
@@ -54,11 +52,11 @@ namespace RCMembrane
 		/// Membrane element for DSFM analysis.
 		/// </summary>
 		/// <param name="considerCrackSlip">Consider crack slip? (default: true)</param>
-		public DSFM(Parameters concreteParameters, Behavior concreteBehavior, Reinforcement reinforcement, double sectionWidth,
-			bool considerCrackSlip = true) : base(concreteParameters, concreteBehavior, reinforcement, sectionWidth)
+		public DSFMMembrane(Parameters concreteParameters, Constitutive concreteConstitutive, Reinforcement reinforcement, double sectionWidth,
+			bool considerCrackSlip = true) : base(concreteParameters, concreteConstitutive, reinforcement, sectionWidth)
 		{
 			// Initiate new concrete
-			Concrete = new Concrete(concreteParameters, concreteBehavior);
+			Concrete = new BiaxialConcrete(concreteParameters, concreteConstitutive);
 
 			// Initiate crack slip strains
 			ConsiderCrackSlip = considerCrackSlip;

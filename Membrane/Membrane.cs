@@ -2,12 +2,10 @@
 using System.Linq;
 using MathNet.Numerics;
 using MathNet.Numerics.LinearAlgebra;
-using Material;
+using Material.Concrete;
 using MathNet.Numerics.Data.Text;
 using Parameters    = Material.Concrete.Parameters;
-using Behavior      = Material.Concrete.Behavior;
-using Concrete      = Material.Concrete.Biaxial;
-using Reinforcement = Material.Reinforcement.Biaxial;
+using Reinforcement = Material.Reinforcement.BiaxialReinforcement;
 
 namespace RCMembrane
 {
@@ -17,18 +15,18 @@ namespace RCMembrane
     public abstract class Membrane
     {
         // Properties
-        public Concrete                 Concrete               { get; set; }
+        public BiaxialConcrete                 Concrete               { get; set; }
         public Reinforcement            Reinforcement          { get; }
         public (bool S, string Message) Stop                   { get; set; }
         public Vector<double>           Strains                { get; set; }
 
-		/// <summary>
+        /// <summary>
         /// Base membrane element constructor.
         /// </summary>
-        /// <param name="concrete">Biaxial concrete object.</param>
-        /// <param name="reinforcement">Biaxial reinforcement object.</param>
+        /// <param name="concrete">Biaxial concrete object <see cref="BiaxialConcrete"/>.</param>
+        /// <param name="reinforcement">Biaxial reinforcement object <see cref="Material.Reinforcement.BiaxialReinforcement"/>.</param>
         /// <param name="sectionWidth">The width of cross-section, in mm.</param>
-        public Membrane(Concrete concrete, Reinforcement reinforcement, double sectionWidth)
+        public Membrane(BiaxialConcrete concrete, Reinforcement reinforcement, double sectionWidth)
         {
             // Get reinforcement
             var diams = reinforcement.BarDiameter;
@@ -45,11 +43,11 @@ namespace RCMembrane
         /// <summary>
         /// Base membrane element constructor.
         /// </summary>
-        /// <param name="concreteParameters">Concrete parameters object.</param>
-        /// <param name="concreteBehavior">Concrete behavior object.</param>
-        /// <param name="reinforcement">Biaxial reinforcement object.</param>
+        /// <param name="concreteParameters">Concrete parameters object <see cref="Parameters"/>.</param>
+        /// <param name="concreteConstitutive">Concrete constitutive object <see cref="Constitutive"/>.</param>
+        /// <param name="reinforcement">Biaxial reinforcement object <see cref="Material.Reinforcement.BiaxialReinforcement"/>.</param>
         /// <param name="sectionWidth">The width of cross-section, in mm.</param>
-        public Membrane(Parameters concreteParameters, Behavior concreteBehavior, Reinforcement reinforcement, double sectionWidth)
+        public Membrane(Parameters concreteParameters, Constitutive concreteConstitutive, Reinforcement reinforcement, double sectionWidth)
         {
             // Get reinforcement
             var diams = reinforcement.BarDiameter;
@@ -61,6 +59,22 @@ namespace RCMembrane
 
             // Set initial strains
             Strains = Vector<double>.Build.Dense(3);
+        }
+
+        /// <summary>
+        /// Read membrane element based on concrete constitutive model.
+        /// </summary>
+        /// <param name="concreteParameters">Concrete parameters object <see cref="Parameters"/>.</param>
+        /// <param name="concreteConstitutive">Concrete constitutive object <see cref="Constitutive"/>.</param>
+        /// <param name="reinforcement">Biaxial reinforcement object <see cref="Material.Reinforcement.BiaxialReinforcement"/>.</param>
+        /// <param name="sectionWidth">The width of cross-section, in mm.</param>
+        /// <returns></returns>
+        public static Membrane ReadMembrane(Parameters concreteParameters, Constitutive concreteConstitutive, Reinforcement reinforcement, double sectionWidth)
+        {
+			if (concreteConstitutive is MCFTConstitutive)
+				return new MCFTMembrane(concreteParameters, concreteConstitutive, reinforcement, sectionWidth);
+
+			return new DSFMMembrane(concreteParameters, concreteConstitutive, reinforcement, sectionWidth);
         }
 
         // Get steel parameters

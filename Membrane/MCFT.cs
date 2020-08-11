@@ -1,22 +1,20 @@
 ﻿using MathNet.Numerics.LinearAlgebra;
-using Material;
+using Material.Concrete;
 using Parameters    = Material.Concrete.Parameters;
-using Behavior      = Material.Concrete.Behavior;
-using Concrete      = Material.Concrete.Biaxial;
-using Reinforcement = Material.Reinforcement.Biaxial;
+using Reinforcement = Material.Reinforcement.BiaxialReinforcement;
 
 namespace RCMembrane
 {
 	/// <summary>
     /// MCFT class, based on formulation by Vecchio and Collins (1986).
     /// </summary>
-	public class MCFT : Membrane
+	public class MCFTMembrane : Membrane
 	{
 		///<inheritdoc/>
 		/// <summary>
         /// Membrane element for MCFT analysis.
         /// </summary>
-		public MCFT(Concrete concrete, Reinforcement reinforcement, double sectionWidth) : base(concrete, reinforcement, sectionWidth)
+		public MCFTMembrane(BiaxialConcrete concrete, Reinforcement reinforcement, double sectionWidth) : base(concrete, reinforcement, sectionWidth)
 		{
 			// Get concrete parameters
 			double
@@ -24,17 +22,17 @@ namespace RCMembrane
 				phiAg = concrete.AggregateDiameter;
 
 			// Initiate new concrete
-			Concrete = new Concrete(fc, phiAg);
+			Concrete = new BiaxialConcrete(fc, phiAg);
 		}
 
 		///<inheritdoc/>
 		/// <summary>
 		/// Membrane element for MCFT analysis.
 		/// </summary>
-		public MCFT(Parameters concreteParameters, Behavior concreteBehavior, Reinforcement reinforcement, double sectionWidth) : base(concreteParameters, concreteBehavior, reinforcement, sectionWidth)
+		public MCFTMembrane(Parameters concreteParameters, Constitutive concreteConstitutive, Reinforcement reinforcement, double sectionWidth) : base(concreteParameters, concreteConstitutive, reinforcement, sectionWidth)
 		{
 			// Initiate new concrete
-			Concrete = new Concrete(concreteParameters, concreteBehavior);
+			Concrete = new BiaxialConcrete(concreteParameters, concreteConstitutive);
 		}
 
 		/// <summary>
