@@ -52,11 +52,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Membrane.cs" />
-    <Compile Include="DSFM.cs" />
-    <Compile Include="MCFT.cs" />
+    <Compile Include="MembraneSolver\PanelExamples.cs" />
+    <Compile Include="Membrane\Membrane.cs" />
+    <Compile Include="Membrane\DSFM.cs" />
+    <Compile Include="Membrane\MCFT.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Solver.cs" />
+    <Compile Include="MembraneSolver\Solver.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -71,5 +72,6 @@
       <Name>Relations</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

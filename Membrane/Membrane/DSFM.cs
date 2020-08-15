@@ -101,17 +101,6 @@ namespace RCMembrane
 			Reinforcement.CalculateStiffness();
         }
 
-        ///<inheritdoc/>
-		public override Vector<double> ResidualStresses(Vector<double> appliedStresses)
-		{
-			if (ConsiderCrackSlip)
-				return
-					base.ResidualStresses(appliedStresses + PseudoPrestress);
-
-			return
-				base.ResidualStresses(appliedStresses);
-		}
-
 		/// <summary>
         /// Calculate and set crack slip strains and pseudo-prestress.
         /// </summary>
