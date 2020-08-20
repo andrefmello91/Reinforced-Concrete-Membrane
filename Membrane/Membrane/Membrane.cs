@@ -3,9 +3,10 @@ using System.Linq;
 using MathNet.Numerics;
 using MathNet.Numerics.LinearAlgebra;
 using Material.Concrete;
+using Material.Reinforcement;
 using MathNet.Numerics.Data.Text;
+using OnPlaneComponents;
 using Parameters    = Material.Concrete.Parameters;
-using Reinforcement = Material.Reinforcement.BiaxialReinforcement;
 
 namespace RCMembrane
 {
@@ -14,99 +15,108 @@ namespace RCMembrane
     /// </summary>
     public abstract class Membrane
     {
-        // Properties
+		/// <summary>
+        /// Get/set <see cref="BiaxialConcrete"/> of the membrane element.
+        /// </summary>
         public BiaxialConcrete          Concrete               { get; set; }
-        public Reinforcement            Reinforcement          { get; }
+
+        /// <summary>
+        /// Get/set <see cref="BiaxialReinforcement"/> of the membrane element.
+		/// </summary>
+        public BiaxialReinforcement     Reinforcement          { get; }
+
+        /// <summary>
+        /// Get/set stop parameters of the membrane element.
+        /// </summary>
         public (bool S, string Message) Stop                   { get; set; }
-        public Vector<double>           Strains                { get; set; }
+
+		/// <summary>
+        /// Get/set <see cref="Strain"/> in the membrane element.
+        /// </summary>
+        public Strain           Strains                { get; set; }
+
+		/// <summary>
+        /// Get the width of the membrane element.
+        /// </summary>
+		public double Width { get; }
 
         /// <summary>
         /// Base membrane element constructor.
         /// </summary>
-        /// <param name="concrete">Biaxial concrete object <see cref="BiaxialConcrete"/>.</param>
-        /// <param name="reinforcement">Biaxial reinforcement object <see cref="Material.Reinforcement.BiaxialReinforcement"/>.</param>
-        /// <param name="sectionWidth">The width of cross-section, in mm.</param>
-        public Membrane(BiaxialConcrete concrete, Reinforcement reinforcement, double sectionWidth)
+        /// <param name="concrete"><see cref="BiaxialConcrete"/> object .</param>
+        /// <param name="reinforcement"><see cref="BiaxialReinforcement"/> object.</param>
+        /// <param name="width">The width of cross-section, in mm.</param>
+        public Membrane(BiaxialConcrete concrete, BiaxialReinforcement reinforcement, double width)
         {
-            // Get reinforcement
-            var diams = reinforcement.BarDiameter;
-            var spcs  = reinforcement.BarSpacing;
-            var steel = reinforcement.Steel;
-
             // Initiate new materials
-            Reinforcement = new Reinforcement(diams, spcs, steel, sectionWidth);
+            Concrete      = BiaxialConcrete.Copy(concrete);
+            Reinforcement = BiaxialReinforcement.Copy(reinforcement);
+
+            Width = width;
 
             // Set initial strains
-            Strains = Vector<double>.Build.Dense(3);
+            Strains = Strain.Zero;
         }
 
         /// <summary>
         /// Base membrane element constructor.
         /// </summary>
-        /// <param name="concreteParameters">Concrete parameters object <see cref="Parameters"/>.</param>
-        /// <param name="concreteConstitutive">Concrete constitutive object <see cref="Constitutive"/>.</param>
-        /// <param name="reinforcement">Biaxial reinforcement object <see cref="Material.Reinforcement.BiaxialReinforcement"/>.</param>
-        /// <param name="sectionWidth">The width of cross-section, in mm.</param>
-        public Membrane(Parameters concreteParameters, Constitutive concreteConstitutive, Reinforcement reinforcement, double sectionWidth)
+        /// <param name="concreteParameters">Concrete <see cref="Parameters"/> object.</param>
+        /// <param name="concreteConstitutive">Concrete <see cref="Constitutive"/> object.</param>
+        /// <param name="reinforcement"><see cref="BiaxialReinforcement"/> object .</param>
+        /// <param name="width">The width of cross-section, in mm.</param>
+        public Membrane(Parameters concreteParameters, Constitutive concreteConstitutive, BiaxialReinforcement reinforcement, double width)
         {
-            // Get reinforcement
-            var diams = reinforcement.BarDiameter;
-            var spcs  = reinforcement.BarSpacing;
-            var steel = reinforcement.Steel;
-
             // Initiate new materials
-            Reinforcement = new Reinforcement(diams, spcs, steel, sectionWidth);
+			Concrete      = new BiaxialConcrete(concreteParameters, concreteConstitutive);
+            Reinforcement = BiaxialReinforcement.Copy(reinforcement);
+
+            Width = width;
 
             // Set initial strains
-            Strains = Vector<double>.Build.Dense(3);
+            Strains = Strain.Zero;
         }
 
         /// <summary>
         /// Read membrane element based on concrete constitutive model.
         /// </summary>
-        /// <param name="concrete">Biaxial concrete object <see cref="BiaxialConcrete"/>.</param>
-        /// <param name="reinforcement">Biaxial reinforcement object <see cref="Material.Reinforcement.BiaxialReinforcement"/>.</param>
-        /// <param name="sectionWidth">The width of cross-section, in mm.</param>
+        /// <param name="concrete"><see cref="BiaxialConcrete"/> object .</param>
+        /// <param name="reinforcement"><see cref="BiaxialReinforcement"/> object.</param>
+        /// <param name="width">The width of cross-section, in mm.</param>
         /// <param name="considerCrackSlip">Consider crack slip? Only for DSFM (default: true)</param>
-        public static Membrane ReadMembrane(BiaxialConcrete concrete, Reinforcement reinforcement, double sectionWidth, bool considerCrackSlip = true)
+        public static Membrane ReadMembrane(BiaxialConcrete concrete, BiaxialReinforcement reinforcement, double width, bool considerCrackSlip = true)
         {
 			if (concrete.Constitutive is MCFTConstitutive)
-				return new MCFTMembrane(concrete, reinforcement, sectionWidth);
+				return new MCFTMembrane(concrete, reinforcement, width);
 
-			return new DSFMMembrane(concrete, reinforcement, sectionWidth, considerCrackSlip);
+			return new DSFMMembrane(concrete, reinforcement, width, considerCrackSlip);
         }
 
         /// <summary>
         /// Read membrane element based on concrete constitutive model.
         /// </summary>
-        /// <param name="concreteParameters">Concrete parameters object <see cref="Parameters"/>.</param>
-        /// <param name="concreteConstitutive">Concrete constitutive object <see cref="Constitutive"/>.</param>
-        /// <param name="reinforcement">Biaxial reinforcement object <see cref="Material.Reinforcement.BiaxialReinforcement"/>.</param>
-        /// <param name="sectionWidth">The width of cross-section, in mm.</param>
+        /// <param name="concreteParameters">Concrete <see cref="Parameters"/> object.</param>
+        /// <param name="concreteConstitutive">Concrete <see cref="Constitutive"/> object.</param>
+        /// <param name="reinforcement"><see cref="BiaxialReinforcement"/> object .</param>
+        /// <param name="width">The width of cross-section, in mm.</param>
         /// <param name="considerCrackSlip">Consider crack slip? Only for DSFM (default: true)</param>
-        public static Membrane ReadMembrane(Parameters concreteParameters, Constitutive concreteConstitutive, Reinforcement reinforcement, double sectionWidth, bool considerCrackSlip = true)
+        public static Membrane ReadMembrane(Parameters concreteParameters, Constitutive concreteConstitutive, BiaxialReinforcement reinforcement, double width, bool considerCrackSlip = true)
         {
 			if (concreteConstitutive is MCFTConstitutive)
-				return new MCFTMembrane(concreteParameters, concreteConstitutive, reinforcement, sectionWidth);
+				return new MCFTMembrane(concreteParameters, concreteConstitutive, reinforcement, width);
 
-			return new DSFMMembrane(concreteParameters, concreteConstitutive, reinforcement, sectionWidth, considerCrackSlip);
+			return new DSFMMembrane(concreteParameters, concreteConstitutive, reinforcement, width, considerCrackSlip);
         }
 
-        // Get steel parameters
-        public double fyx  => Reinforcement.Steel.X.YieldStress;
-        public double Esxi => Reinforcement.Steel.X.ElasticModule;
-        public double fyy  => Reinforcement.Steel.Y.YieldStress;
-        public double Esyi => Reinforcement.Steel.Y.ElasticModule;
+        /// <summary>
+        /// Get crack spacing in X direction.
+        /// </summary>
+        protected double smx => CrackSpacing(Reinforcement.DirectionX);
 
-        // Get reinforcement
-        public double phiX => Reinforcement.BarDiameter.X;
-        public double phiY => Reinforcement.BarDiameter.Y;
-        public double psx  => Reinforcement.Ratio.X;
-        public double psy  => Reinforcement.Ratio.Y;
-
-        // Calculate crack spacings
-        public double smx => phiX / (5.4 * psx);
-        public double smy => phiY / (5.4 * psy);
+        /// <summary>
+        /// Get crack spacing in Y direction.
+        /// </summary>
+        protected double smy => CrackSpacing(Reinforcement.DirectionY);
 
         /// <summary>
         /// Get current membrane stiffness.
@@ -116,7 +126,7 @@ namespace RCMembrane
         /// <summary>
         /// Get current stresses, in MPa.
         /// </summary>
-        public Vector<double> Stresses  => Concrete.Stresses + Reinforcement.Stresses;
+        public Stress Stresses  => Concrete.Stresses + Reinforcement.Stresses;
 
 		/// <summary>
         /// Calculate stresses and the membrane stiffness, given strains.
@@ -132,6 +142,27 @@ namespace RCMembrane
         public Matrix<double> InitialStiffness() => Concrete.InitialStiffness() + Reinforcement.InitialStiffness();
 
 		/// <summary>
+        /// Calculate the crack spacing.
+        /// </summary>
+        /// <param name="direction">The <see cref="WebReinforcementDirection"/>.</param>
+        /// <returns></returns>
+        private double CrackSpacing(WebReinforcementDirection direction)
+        {
+	        if (direction is null)
+		        return 0;
+
+	        double
+		        phi = direction.BarDiameter,
+		        ps  = direction.Ratio,
+		        sm  = phi / (5.4 * ps);
+
+	        if (double.IsNaN(sm))
+		        sm = 0;
+
+	        return sm;
+        }
+
+        /// <summary>
         /// Limit tensile principal stress by crack check procedure, by Bentz (2000).
         /// </summary>
         /// <param name="theta2">Principal compressive strain angle, in radians.</param>
@@ -153,8 +184,8 @@ namespace RCMembrane
 
             // Reinforcement capacity reserve
             double
-                f1cx = psx * (fyx - fsx),
-                f1cy = psy * (fyy - fsy);
+	            f1cx = Reinforcement?.DirectionX?.CapacityReserve ?? 0,
+	            f1cy = Reinforcement?.DirectionY?.CapacityReserve ?? 0;
 
             // Maximum possible shear on crack interface
             double vcimaxA = MaximumShearOnCrack(theta, ec1);

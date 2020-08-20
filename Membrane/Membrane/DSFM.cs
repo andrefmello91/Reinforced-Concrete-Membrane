@@ -3,7 +3,6 @@ using MathNet.Numerics;
 using MathNet.Numerics.LinearAlgebra;
 using MathNet.Numerics.RootFinding;
 using Material.Concrete;
-using Relations;
 using Reinforcement   = Material.Reinforcement.BiaxialReinforcement;
 using Parameters      = Material.Concrete.Parameters;
 
@@ -32,7 +31,7 @@ namespace RCMembrane
 		/// Membrane element for DSFM analysis.
 		/// </summary>
 		/// <param name="considerCrackSlip">Consider crack slip? (default: true)</param>
-		public DSFMMembrane(BiaxialConcrete concrete, Reinforcement reinforcement, double sectionWidth, bool considerCrackSlip = true) : base(concrete, reinforcement, sectionWidth)
+		public DSFMMembrane(BiaxialConcrete concrete, Reinforcement reinforcement, double width, bool considerCrackSlip = true) : base(concrete, reinforcement, width)
 		{
 			// Get concrete parameters
 			double
@@ -52,8 +51,8 @@ namespace RCMembrane
 		/// Membrane element for DSFM analysis.
 		/// </summary>
 		/// <param name="considerCrackSlip">Consider crack slip? (default: true)</param>
-		public DSFMMembrane(Parameters concreteParameters, Constitutive concreteConstitutive, Reinforcement reinforcement, double sectionWidth,
-			bool considerCrackSlip = true) : base(concreteParameters, concreteConstitutive, reinforcement, sectionWidth)
+		public DSFMMembrane(Parameters concreteParameters, Constitutive concreteConstitutive, Reinforcement reinforcement, double width,
+			bool considerCrackSlip = true) : base(concreteParameters, concreteConstitutive, reinforcement, width)
 		{
 			// Initiate new concrete
 			Concrete = new BiaxialConcrete(concreteParameters, concreteConstitutive);

@@ -14,7 +14,7 @@ namespace RCMembrane
 		/// <summary>
         /// Membrane element for MCFT analysis.
         /// </summary>
-		public MCFTMembrane(BiaxialConcrete concrete, Reinforcement reinforcement, double sectionWidth) : base(concrete, reinforcement, sectionWidth)
+		public MCFTMembrane(BiaxialConcrete concrete, Reinforcement reinforcement, double width) : base(concrete, reinforcement, width)
 		{
 			// Get concrete parameters
 			double
@@ -29,7 +29,7 @@ namespace RCMembrane
 		/// <summary>
 		/// Membrane element for MCFT analysis.
 		/// </summary>
-		public MCFTMembrane(Parameters concreteParameters, Constitutive concreteConstitutive, Reinforcement reinforcement, double sectionWidth) : base(concreteParameters, concreteConstitutive, reinforcement, sectionWidth)
+		public MCFTMembrane(Parameters concreteParameters, Constitutive concreteConstitutive, Reinforcement reinforcement, double width) : base(concreteParameters, concreteConstitutive, reinforcement, width)
 		{
 			// Initiate new concrete
 			Concrete = new BiaxialConcrete(concreteParameters, concreteConstitutive);

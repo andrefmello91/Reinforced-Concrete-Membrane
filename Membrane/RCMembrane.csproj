@@ -67,9 +67,9 @@
       <Project>{5e103ad6-45a8-4b2d-816c-5ccec09380e6}</Project>
       <Name>Material</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\Stress-and-Strain-Relations\Relations\Relations.csproj">
-      <Project>{7df65381-8507-4f02-9c2b-2ae9a1e50efa}</Project>
-      <Name>Relations</Name>
+    <ProjectReference Include="..\..\On-Plane-Components\OnPlaneComponents\OnPlaneComponents.csproj">
+      <Project>{5ea278f4-5f43-4cd7-9627-9f46411a871e}</Project>
+      <Name>OnPlaneComponents</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup />
