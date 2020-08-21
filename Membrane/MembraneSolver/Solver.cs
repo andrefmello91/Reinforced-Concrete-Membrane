@@ -4,6 +4,8 @@ using Material.Reinforcement;
 using MathNet.Numerics.Data.Text;
 using Reinforcement = Material.Reinforcement.BiaxialReinforcement;
 using MathNet.Numerics.LinearAlgebra;
+using MathNet.Numerics.LinearAlgebra.Double;
+using OnPlaneComponents;
 
 namespace RCMembrane
 {
@@ -21,10 +23,7 @@ namespace RCMembrane
 		    var membrane = PanelExamples.PV10(ConstitutiveModel.DSFM);
 
 		    // Initiate stresses
-		    var sigma = 5 * Vector<double>.Build.DenseOfArray(new double[]
-		    {
-			    0, 0, 1
-		    });
+		    var sigma = new StressState(0, 0, 5);
 
 		    // Solve
 		    Solver(membrane, sigma);
@@ -37,20 +36,20 @@ namespace RCMembrane
         /// Membrane solver for known stresses.
         /// </summary>
         /// <param name="membrane">The membrane object.</param>
-        /// <param name="stresses">Applied stresses, in MPa.</param>
+        /// <param name="appliedStresses">Applied <see cref="St"/>, in MPa.</param>
         /// <param name="numLoadSteps">The number of load steps (default: 100).</param>
         /// <param name="maxIterations">Maximum number of iterations (default: 1000).</param>
         /// <param name="tolerance">Stress convergence tolerance (default: 1E-3).</param>
-        private static void Solver(Membrane membrane, Vector<double> stresses, int numLoadSteps = 100, int maxIterations = 1000, double tolerance = 1E-3)
+        private static void Solver(Membrane membrane, StressState appliedStresses, int numLoadSteps = 100, int maxIterations = 1000, double tolerance = 1E-3)
         {
             // Get initial stresses
-            var f0 = (double)1 / numLoadSteps * stresses;
+            var f0 = (double)1 / numLoadSteps * appliedStresses;
 
             // Calculate initial stiffness
             var D = membrane.InitialStiffness();
 
             // Calculate e0
-            var ei = D.Solve(f0);
+            var ei = StrainState.FromStresses(f0, D);
 
             // Initiate matrices
             var epsMatrix = Matrix<double>.Build.Dense(numLoadSteps, 3);
@@ -88,12 +87,15 @@ namespace RCMembrane
                         D = membrane.Stiffness;
 
                         // Get stresses
-                        var (fc1, fc2) = membrane.Concrete.PrincipalStresses;
-                        var (ec1, ec2) = membrane.Concrete.PrincipalStrains;
+                        double
+	                        fc1 = membrane.Concrete.PrincipalStresses.Sigma1,
+	                        fc2 = membrane.Concrete.PrincipalStresses.Sigma2,
+	                        ec1 = membrane.Concrete.PrincipalStrains.Epsilon1,
+	                        ec2 = membrane.Concrete.PrincipalStrains.Epsilon2;
 
                         // Set results
-                        epsMatrix.SetRow(ls - 1, membrane.AverageStrains);
-                        sigMatrix.SetRow(ls - 1, membrane.StressesState);
+                        epsMatrix.SetRow(ls - 1, membrane.AverageStrains.Vector);
+                        sigMatrix.SetRow(ls - 1, membrane.AverageStresses.Vector);
                         e1Matrix.SetRow(ls - 1, new[] { ec1, ec2 });
                         sig1Matrix.SetRow(ls - 1, new[] { fc1, fc2 });
 
@@ -130,18 +132,22 @@ namespace RCMembrane
         /// <summary>
         /// Calculate stress convergence.
         /// </summary>
-        /// <param name="residualStresses">Residual stresses, in MPa.</param>
-        /// <param name="appliedStresses">Known applied stresses, in MPa.</param>
-        private static double Convergence(Vector<double> residualStresses, Vector<double> appliedStresses)
+        /// <param name="residualStresses">Residual <see cref="StressState"/>, in MPa.</param>
+        /// <param name="appliedStresses">Known applied <see cref="StressState"/>, in MPa.</param>
+        private static double Convergence(StressState residualStresses, StressState appliedStresses)
         {
+	        Vector<double>
+		        res = residualStresses.Vector,
+		        app = appliedStresses.Vector;
+
             double
                 num = 0,
                 den = 1;
 
-            for (int i = 0; i < residualStresses.Count; i++)
+            for (int i = 0; i < res.Count; i++)
             {
-                num += residualStresses[i] * residualStresses[i];
-                den += appliedStresses[i] * appliedStresses[i];
+                num += res[i] * res[i];
+                den += app[i] * app[i];
             }
 
             return
@@ -160,39 +166,35 @@ namespace RCMembrane
         /// <summary>
         /// Verify if convergence is reached.
         /// </summary>
-        /// <param name="residualStresses">Residual stresses, in MPa.</param>
-        /// <param name="appliedStresses">Known applied stresses, in MPa.</param>
+        /// <param name="residualStresses">Residual <see cref="StressState"/>, in MPa.</param>
+        /// <param name="appliedStresses">Known applied <see cref="StressState"/>, in MPa.</param>
         /// <param name="tolerance">Stress convergence tolerance (default: 1E-3).</param>
         /// <param name="iteration">Current iteration.</param>
         /// <param name="minIterations">Minimum number of iterations (default: 10).</param>
-        private static bool ConvergenceReached(Vector<double> residualStresses, Vector<double> appliedStresses, double tolerance,
+        private static bool ConvergenceReached(StressState residualStresses, StressState appliedStresses, double tolerance,
             int iteration, int minIterations = 10) => ConvergenceReached(Convergence(residualStresses, appliedStresses), tolerance, iteration, minIterations);
 
         /// <summary>
         /// Calculate residual stresses, in MPa.
         /// </summary>
-        /// <param name="membrane">The membrane object.</param>
-        /// <param name="appliedStresses">Known applied stresses, in MPa.</param>
+        /// <param name="membrane">The <see cref="Membrane"/> object.</param>
+        /// <param name="appliedStresses">Known applied <see cref="StressState"/>, in MPa.</param>
         /// <returns></returns>
-        private static Vector<double> ResidualStresses(Membrane membrane, Vector<double> appliedStresses)
+        private static StressState ResidualStresses(Membrane membrane, StressState appliedStresses)
         {
 	        if (membrane is DSFMMembrane dsfmMembrane && dsfmMembrane.ConsiderCrackSlip)
 		        return
-			        appliedStresses + dsfmMembrane.PseudoPrestress - dsfmMembrane.StressesState;
+			        appliedStresses + dsfmMembrane.PseudoPrestress - dsfmMembrane.AverageStresses;
 
 	        return
-		        appliedStresses - membrane.StressesState;
+		        appliedStresses - membrane.AverageStresses;
         }
 
         /// <summary>
         /// Calculate the strain increment for next iteration.
         /// </summary>
-        /// <param name="stiffness">Current stiffness.</param>
+        /// <param name="stiffness">Current stiffness <see cref="Matrix"/>.</param>
         /// <param name="residualStresses">Residual stresses, in MPa.</param>
-        private static Vector<double> StrainIncrement(Matrix<double> stiffness, Vector<double> residualStresses)
-        {
-            return
-                stiffness.Solve(residualStresses);
-        }
+        private static StrainState StrainIncrement(Matrix<double> stiffness, StressState residualStresses) => StrainState.FromStresses(residualStresses, stiffness);
     }
 }

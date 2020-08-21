@@ -129,9 +129,9 @@ namespace RCMembrane
         public Matrix<double> Stiffness => Concrete.Stiffness + Reinforcement.Stiffness;
 
         /// <summary>
-        /// Get current stresses, in MPa.
+        /// Get average <see cref="StressState"/>, in MPa.
         /// </summary>
-        public StressState StressesState  => Concrete.Stresses + Reinforcement.Stresses;
+        public StressState AverageStresses  => Concrete.Stresses + Reinforcement.Stresses;
 
 		/// <summary>
         /// Calculate stresses and the membrane stiffness, given strains.
