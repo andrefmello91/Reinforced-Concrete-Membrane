@@ -31,9 +31,14 @@ namespace RCMembrane
         public (bool S, string Message) Stop                   { get; set; }
 
 		/// <summary>
-        /// Get/set <see cref="Strain"/> in the membrane element.
+        /// Get/set the average <see cref="StrainState"/> in the membrane element.
         /// </summary>
-        public Strain           Strains                { get; set; }
+        public StrainState           AverageStrains                { get; set; }
+
+		/// <summary>
+        /// Get the <see cref="StrainState"/> in concrete.
+        /// </summary>
+        public abstract StrainState           ConcreteStrains                { get; }
 
 		/// <summary>
         /// Get the width of the membrane element.
@@ -55,7 +60,7 @@ namespace RCMembrane
             Width = width;
 
             // Set initial strains
-            Strains = Strain.Zero;
+            AverageStrains = StrainState.Zero;
         }
 
         /// <summary>
@@ -74,7 +79,7 @@ namespace RCMembrane
             Width = width;
 
             // Set initial strains
-            Strains = Strain.Zero;
+            AverageStrains = StrainState.Zero;
         }
 
         /// <summary>
@@ -126,15 +131,15 @@ namespace RCMembrane
         /// <summary>
         /// Get current stresses, in MPa.
         /// </summary>
-        public Stress Stresses  => Concrete.Stresses + Reinforcement.Stresses;
+        public StressState StressesState  => Concrete.Stresses + Reinforcement.Stresses;
 
 		/// <summary>
         /// Calculate stresses and the membrane stiffness, given strains.
         /// </summary>
-        /// <param name="appliedStrains">Current strains.</param>
+        /// <param name="appliedStrains">Current applied <see cref="StrainState"/>.</param>
         /// <param name="loadStep">Current load step.</param>
         /// <param name="iteration">Current iteration.</param>
-        public abstract void Calculate(Vector<double> appliedStrains, int loadStep = 0, int iteration = 0);
+        public abstract void Calculate(StrainState appliedStrains, int loadStep = 0, int iteration = 0);
 
         /// <summary>
         /// Calculate initial membrane stiffness.
@@ -165,22 +170,20 @@ namespace RCMembrane
         /// <summary>
         /// Limit tensile principal stress by crack check procedure, by Bentz (2000).
         /// </summary>
-        /// <param name="theta2">Principal compressive strain angle, in radians.</param>
-        public void CrackCheck(double? theta2 = null)
+        public void CrackCheck()
         {
 			// Verify if concrete is cracked
 			if (!Concrete.Cracked)
 				return;
 
             // Get the values
-            double theta = theta2 ?? Concrete.PrincipalAngles.theta2;
-            double ec1 = Concrete.PrincipalStrains.ec1;
-            (double fsx, double fsy) = Reinforcement.SteelStresses;
-            double f1a = Concrete.PrincipalStresses.fc1;
+            double theta2 = Concrete.PrincipalStrains.Theta2;
+            double ec1    = Concrete.PrincipalStrains.Epsilon1;
+            double f1a    = Concrete.PrincipalStresses.Sigma1;
 
             // Calculate thetaC sine and cosine
-            var (cosTheta, sinTheta) = DirectionCosines(theta);
-            double tanTheta = Tangent(theta);
+            var (cosTheta, sinTheta) = DirectionCosines(theta2);
+            double tanTheta = Tangent(theta2);
 
             // Reinforcement capacity reserve
             double
@@ -188,7 +191,7 @@ namespace RCMembrane
 	            f1cy = Reinforcement?.DirectionY?.CapacityReserve ?? 0;
 
             // Maximum possible shear on crack interface
-            double vcimaxA = MaximumShearOnCrack(theta, ec1);
+            double vcimaxA = MaximumShearOnCrack(theta2, ec1);
 
             // Maximum possible shear for biaxial yielding
             double vcimaxB = Math.Abs(f1cx - f1cy) / (tanTheta + 1 / tanTheta);
@@ -252,12 +255,11 @@ namespace RCMembrane
         /// <summary>
         /// Calculate reference length, in mm.
         /// </summary>
-        /// <param name="thetaC1">Concrete principal tensile strain angle, in radians.</param>
-        public double ReferenceLength(double? thetaC1 = null)
+        public double ReferenceLength()
         {
-			double theta = thetaC1 ?? Concrete.PrincipalAngles.theta1;
+			double theta1 = Concrete.PrincipalStrains.Theta1;
 
-	        var (cosTheta, sinTheta) = DirectionCosines(theta);
+	        var (cosTheta, sinTheta) = DirectionCosines(theta1);
 
 	        return
 		        0.5 / (Math.Abs(sinTheta) / smx + Math.Abs(cosTheta) / smy);

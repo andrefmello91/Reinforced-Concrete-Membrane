@@ -1,5 +1,6 @@
 ﻿using MathNet.Numerics.LinearAlgebra;
 using Material.Concrete;
+using OnPlaneComponents;
 using Parameters    = Material.Concrete.Parameters;
 using Reinforcement = Material.Reinforcement.BiaxialReinforcement;
 
@@ -11,10 +12,13 @@ namespace RCMembrane
 	public class MCFTMembrane : Membrane
 	{
 		///<inheritdoc/>
-		/// <summary>
+		public override StrainState ConcreteStrains => AverageStrains;
+
+        ///<inheritdoc/>
+        /// <summary>
         /// Membrane element for MCFT analysis.
         /// </summary>
-		public MCFTMembrane(BiaxialConcrete concrete, Reinforcement reinforcement, double width) : base(concrete, reinforcement, width)
+        public MCFTMembrane(BiaxialConcrete concrete, Reinforcement reinforcement, double width) : base(concrete, reinforcement, width)
 		{
 			// Get concrete parameters
 			double
@@ -41,13 +45,13 @@ namespace RCMembrane
 		/// <param name="appliedStrains">Current strains.</param>
 		/// <param name="loadStep">Current load step.</param>
 		/// <param name="iteration">Current iteration.</param>
-		public override void Calculate(Vector<double> appliedStrains, int loadStep = 0, int iteration = 0)
+		public override void Calculate(StrainState appliedStrains, int loadStep = 0, int iteration = 0)
 		{
-			Strains = appliedStrains;
+			AverageStrains = appliedStrains;
 
 			// Calculate and set concrete and steel stresses
-			Concrete.CalculatePrincipalStresses(Strains);
-			Reinforcement.CalculateStresses(Strains);
+			Concrete.CalculatePrincipalStresses(ConcreteStrains);
+			Reinforcement.CalculateStresses(AverageStrains);
 
 			// Verify if concrete is cracked and check crack stresses to limit fc1
 			CrackCheck();
@@ -56,5 +60,6 @@ namespace RCMembrane
 			Concrete.CalculateStiffness();
 			Reinforcement.CalculateStiffness();
 		}
+
 	}
 }

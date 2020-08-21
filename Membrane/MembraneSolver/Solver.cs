@@ -92,8 +92,8 @@ namespace RCMembrane
                         var (ec1, ec2) = membrane.Concrete.PrincipalStrains;
 
                         // Set results
-                        epsMatrix.SetRow(ls - 1, membrane.Strains);
-                        sigMatrix.SetRow(ls - 1, membrane.Stresses);
+                        epsMatrix.SetRow(ls - 1, membrane.AverageStrains);
+                        sigMatrix.SetRow(ls - 1, membrane.StressesState);
                         e1Matrix.SetRow(ls - 1, new[] { ec1, ec2 });
                         sig1Matrix.SetRow(ls - 1, new[] { fc1, fc2 });
 
@@ -178,10 +178,10 @@ namespace RCMembrane
         {
 	        if (membrane is DSFMMembrane dsfmMembrane && dsfmMembrane.ConsiderCrackSlip)
 		        return
-			        appliedStresses + dsfmMembrane.PseudoPrestress - dsfmMembrane.Stresses;
+			        appliedStresses + dsfmMembrane.PseudoPrestress - dsfmMembrane.StressesState;
 
 	        return
-		        appliedStresses - membrane.Stresses;
+		        appliedStresses - membrane.StressesState;
         }
 
         /// <summary>
