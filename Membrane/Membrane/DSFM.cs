@@ -17,6 +17,11 @@ namespace RCMembrane
 	public class DSFMMembrane : Membrane
 	{
 		/// <summary>
+        /// Initial cracking angle.
+        /// </summary>
+		private double? _thetaIc;
+
+		/// <summary>
 		/// Get/set the average <see cref="PrincipalStrainState"/>.
 		/// </summary>
 		public PrincipalStrainState AveragePrincipalStrains { get; set; }
@@ -29,26 +34,22 @@ namespace RCMembrane
         /// </summary>
         public StrainState CrackSlipStrains { get; set; }
 
-		/// <summary>
-		/// Get/set the pseudo <see cref="StressState"/>.
-		/// </summary>
-		public StressState PseudoPrestress { get; set; }
-
-		/// <summary>
-		/// Get/set crack slip consideration.
-		/// </summary>
-		public bool ConsiderCrackSlip
+        /// <summary>
+        /// Get/set crack slip consideration.
+        /// <para>See: <seealso cref="Constitutive.ConsiderCrackSlip"/>.</para>
+        /// </summary>
+        public bool ConsiderCrackSlip
 		{
 			get => Concrete.Constitutive.ConsiderCrackSlip;
 			set => Concrete.Constitutive.ConsiderCrackSlip = value;
 		}
 
-		///<inheritdoc/>
-		/// <summary>
-		/// Membrane element for DSFM analysis.
-		/// </summary>
-		/// <param name="considerCrackSlip">Consider crack slip? (default: true)</param>
-		public DSFMMembrane(BiaxialConcrete concrete, Reinforcement reinforcement, double width,
+        /// <summary>
+        /// Membrane element for DSFM analysis.
+        /// </summary>
+        /// <inheritdoc/>
+        /// <param name="considerCrackSlip">Consider crack slip? (default: true)</param>
+        public DSFMMembrane(BiaxialConcrete concrete, Reinforcement reinforcement, double width,
 			bool considerCrackSlip = true) : base(concrete, reinforcement, width)
 		{
 			// Get concrete parameters
@@ -116,16 +117,25 @@ namespace RCMembrane
 		/// <summary>
 		/// Calculate and set crack slip strains and pseudo-prestress.
 		/// </summary>
-		public void CalculateCrackSlip()
+		private	void CalculateCrackSlip()
 		{
+			// Verify the initial crack angle
+			InitialCrackAngle();
+
 			// Calculate crack local stresses
 			var vci = ShearAtCrack();
 
 			// Calculate crack slip strains
 			CrackSlipStrains = CrackSlip(vci);
+		}
 
-			// Calculate pseudo-prestress
-			PseudoPrestress = PseudoPStresses();
+		/// <summary>
+        /// Set the angle of initial cracking (<see cref="_thetaIc"/>).
+        /// </summary>
+		private void InitialCrackAngle()
+		{
+			if (!_thetaIc.HasValue && Concrete.Cracked)
+				_thetaIc = Concrete.PrincipalStrains.Theta1;
 		}
 
 		/// <summary>
@@ -234,11 +244,14 @@ namespace RCMembrane
 		/// <param name="vci">Shear stress on crack surface, in MPa.</param>
 		private StrainState CrackSlip(double vci)
 		{
+			if (!Concrete.Cracked)
+				return StrainState.Zero;
+
 			// Get shear slip strains
 			double
 				ysa = StressCrackSlip(vci),
 				ysb = RotationLagCrackSlip(),
-				ys = Math.Max(ysa, ysb);
+				ys  = Math.Max(ysa, ysb);
 
 			// Get concrete principal angle
 			double thetaC1 = Concrete.PrincipalStrains.Theta1;
@@ -272,9 +285,7 @@ namespace RCMembrane
 			double fc  = Concrete.fc;
 
 			// Get the angles
-			var (cosThetaC, sinThetaC) = DirectionCosines(thetaC1);
-			cosThetaC = Math.Abs(cosThetaC);
-			sinThetaC = Math.Abs(sinThetaC);
+			var (cosThetaC, sinThetaC) = DirectionCosines(thetaC1, true);
 
 			// Calculate crack spacings and width
 			double s = 1 / (sinThetaC / smx + cosThetaC / smy);
@@ -284,7 +295,7 @@ namespace RCMembrane
 
 			// Calculate shear slip strain by stress-based approach
 			double
-				a = Math.Max(0.234 * Math.Pow(w, -0.707) - 0.2, 0),
+				a  = Math.Max(0.234 * Math.Pow(w, -0.707) - 0.2, 0),
 				ds = vci / (1.8 * Math.Pow(w, -0.8) + a * fc);
 
 			return
@@ -307,9 +318,7 @@ namespace RCMembrane
 			double ec1 = Concrete.PrincipalStrains.Epsilon1;
 
 			// Get the angles
-			var (cosThetaC, sinThetaC) = DirectionCosines(thetaC1);
-			cosThetaC = Math.Abs(cosThetaC);
-			sinThetaC = Math.Abs(sinThetaC);
+			var (cosThetaC, sinThetaC) = DirectionCosines(thetaC1, true);
 
 			// Calculate crack spacings and width
 			double s = 1 / (sinThetaC / smx + cosThetaC / smy);
@@ -350,22 +359,22 @@ namespace RCMembrane
 
 			// Calculate shear slip strain by rotation lag approach
 			double
-				thetaIc = Constants.PiOver4,
+				thetaIc = _thetaIc.Value,
 				dThetaE = thetaE1 - thetaIc,
 				thetaL,
 				dThetaS;
 
-			if (psx > 0 && psy > 0)
-				thetaL = Trig.DegreeToRadian(5);
-			else
-				thetaL = Trig.DegreeToRadian(7.5);
+			// Get theta L
+			thetaL = (psx > 0 && psy > 0
+				? Trig.DegreeToRadian(5)
+				: (psx > 0 || psy > 0
+					? Trig.DegreeToRadian(7.5)
+					: Trig.DegreeToRadian(10)));
 
-
-			if (Math.Abs(dThetaE) > thetaL)
-				dThetaS = dThetaE - thetaL;
-
-			else
-				dThetaS = dThetaE;
+			// Get dTheta s
+			dThetaS = Math.Abs(dThetaE) > thetaL 
+				? dThetaE - thetaL 
+				: dThetaE;
 
 			double
 				thetaS = thetaIc + dThetaS;
@@ -379,15 +388,6 @@ namespace RCMembrane
 		/// <summary>
 		/// Calculate current pseudo-prestresses, in MPa.
 		/// </summary>
-		private StressState PseudoPStresses()
-		{
-			var Dc = Concrete.Stiffness;
-			var es = CrackSlipStrains.Vector;
-
-			// Calculate stress vector
-			var ps = Dc * es;
-
-			return StressState.FromVector(ps);
-		}
+		private StressState PseudoPStresses() => StressState.FromStrains(CrackSlipStrains, Concrete.Stiffness);
 	}
 }

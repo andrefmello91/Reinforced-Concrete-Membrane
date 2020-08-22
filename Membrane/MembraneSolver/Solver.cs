@@ -1,8 +1,5 @@
 ﻿using System;
-using Material.Concrete;
-using Material.Reinforcement;
 using MathNet.Numerics.Data.Text;
-using Reinforcement = Material.Reinforcement.BiaxialReinforcement;
 using MathNet.Numerics.LinearAlgebra;
 using MathNet.Numerics.LinearAlgebra.Double;
 using OnPlaneComponents;
@@ -20,7 +17,7 @@ namespace RCMembrane
 	    public static void Solve()
 	    {
 		    // Initiate the membrane
-		    var membrane = PanelExamples.PV10(ConstitutiveModel.DSFM);
+		    var membrane = PanelExamples.PV10();
 
 		    // Initiate stresses
 		    var sigma = new StressState(0, 0, 5);
@@ -36,7 +33,7 @@ namespace RCMembrane
         /// Membrane solver for known stresses.
         /// </summary>
         /// <param name="membrane">The membrane object.</param>
-        /// <param name="appliedStresses">Applied <see cref="St"/>, in MPa.</param>
+        /// <param name="appliedStresses">Applied <see cref="StressState"/>, in MPa.</param>
         /// <param name="numLoadSteps">The number of load steps (default: 100).</param>
         /// <param name="maxIterations">Maximum number of iterations (default: 1000).</param>
         /// <param name="tolerance">Stress convergence tolerance (default: 1E-3).</param>
@@ -61,6 +58,10 @@ namespace RCMembrane
             //for (int i = 0; i < itUpdate.Length; i++)
             //	itUpdate[i] = 50 * i;
             membrane.Stop = (false, string.Empty);
+
+			// Get readers for result
+            string[]
+	            res = { "Gamma", "Tau", "", "ec1", "fc1", "", "ec2", "fc2" };
 
             // Initiate load steps
             for (int ls = 1; ls <= numLoadSteps; ls++)
@@ -99,6 +100,16 @@ namespace RCMembrane
                         e1Matrix.SetRow(ls - 1, new[] { ec1, ec2 });
                         sig1Matrix.SetRow(ls - 1, new[] { fc1, fc2 });
 
+                        // Result matrices
+                        var sigXeps = Matrix<double>.Build.DenseOfColumnVectors(
+	                        epsMatrix.Column(2), sigMatrix.Column(2), Vector<double>.Build.Dense(numLoadSteps),
+	                        e1Matrix.Column(0), sig1Matrix.Column(0), Vector<double>.Build.Dense(numLoadSteps),
+	                        e1Matrix.Column(1), sig1Matrix.Column(1));
+
+
+                        // Save results
+                        DelimitedWriter.Write("D:/sig x eps.csv", sigXeps, ";", res, null, null, 0);
+
                         break;
                     }
 
@@ -116,17 +127,6 @@ namespace RCMembrane
                     break;
             }
 
-            // Result matrices
-            var sigXeps = Matrix<double>.Build.DenseOfColumnVectors(
-                epsMatrix.Column(2), sigMatrix.Column(2), Vector<double>.Build.Dense(numLoadSteps),
-                e1Matrix.Column(0), sig1Matrix.Column(0), Vector<double>.Build.Dense(numLoadSteps),
-                e1Matrix.Column(1), sig1Matrix.Column(1));
-
-            string[]
-                res = { "Gamma", "Tau", "", "ec1", "fc1", "", "ec2", "fc2" };
-
-            // Save results
-            DelimitedWriter.Write("D:/sig x eps.csv", sigXeps, ";", res, null, null, 0);
         }
 
         /// <summary>
@@ -180,15 +180,7 @@ namespace RCMembrane
         /// <param name="membrane">The <see cref="Membrane"/> object.</param>
         /// <param name="appliedStresses">Known applied <see cref="StressState"/>, in MPa.</param>
         /// <returns></returns>
-        private static StressState ResidualStresses(Membrane membrane, StressState appliedStresses)
-        {
-	        if (membrane is DSFMMembrane dsfmMembrane && dsfmMembrane.ConsiderCrackSlip)
-		        return
-			        appliedStresses + dsfmMembrane.PseudoPrestress - dsfmMembrane.AverageStresses;
-
-	        return
-		        appliedStresses - membrane.AverageStresses;
-        }
+        private static StressState ResidualStresses(Membrane membrane, StressState appliedStresses) => appliedStresses - membrane.AverageStresses;
 
         /// <summary>
         /// Calculate the strain increment for next iteration.

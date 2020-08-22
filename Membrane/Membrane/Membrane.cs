@@ -88,7 +88,7 @@ namespace RCMembrane
         /// <param name="concrete"><see cref="BiaxialConcrete"/> object .</param>
         /// <param name="reinforcement"><see cref="BiaxialReinforcement"/> object.</param>
         /// <param name="width">The width of cross-section, in mm.</param>
-        /// <param name="considerCrackSlip">Consider crack slip? Only for DSFM (default: true)</param>
+        /// <param name="considerCrackSlip">Consider crack slip? Only for <see cref="DSFMMembrane"/> (default: true)</param>
         public static Membrane ReadMembrane(BiaxialConcrete concrete, BiaxialReinforcement reinforcement, double width, bool considerCrackSlip = true)
         {
 			if (concrete.Constitutive is MCFTConstitutive)
@@ -177,13 +177,14 @@ namespace RCMembrane
 				return;
 
             // Get the values
-            double theta2 = Concrete.PrincipalStrains.Theta2;
-            double ec1    = Concrete.PrincipalStrains.Epsilon1;
-            double f1a    = Concrete.PrincipalStresses.Sigma1;
+            double
+	            theta1 = Concrete.PrincipalStrains.Theta1,
+				ec1    = Concrete.PrincipalStrains.Epsilon1,
+				f1a    = Concrete.PrincipalStresses.Sigma1;
 
             // Calculate thetaC sine and cosine
-            var (cosTheta, sinTheta) = DirectionCosines(theta2);
-            double tanTheta = Tangent(theta2);
+            var (cosTheta, sinTheta) = DirectionCosines(theta1);
+            double tanTheta = Tangent(theta1);
 
             // Reinforcement capacity reserve
             double
@@ -191,7 +192,7 @@ namespace RCMembrane
 	            f1cy = Reinforcement?.DirectionY?.CapacityReserve ?? 0;
 
             // Maximum possible shear on crack interface
-            double vcimaxA = MaximumShearOnCrack(theta2, ec1);
+            double vcimaxA = MaximumShearOnCrack(theta1, ec1);
 
             // Maximum possible shear for biaxial yielding
             double vcimaxB = Math.Abs(f1cx - f1cy) / (tanTheta + 1 / tanTheta);
@@ -200,12 +201,12 @@ namespace RCMembrane
             double vcimax = Math.Min(vcimaxA, vcimaxB);
 
             // Biaxial yielding condition
-            double f1b = f1cx * sinTheta * sinTheta + f1cy * cosTheta * cosTheta;
+            double f1b = f1cx * cosTheta * cosTheta + f1cy * sinTheta * sinTheta;
 
             // Maximum tensile stress for equilibrium in X and Y
             double
-                f1c = f1cx + vcimax / tanTheta,
-                f1d = f1cy + vcimax * tanTheta;
+                f1c = f1cx + vcimax * tanTheta,
+                f1d = f1cy + vcimax / tanTheta;
 
             // Calculate the minimum tensile stress
             var f1List = new[] { f1a, f1b, f1c, f1d };
@@ -219,17 +220,17 @@ namespace RCMembrane
         /// <summary>
         /// Calculate maximum shear stress on crack, in MPa.
         /// </summary>
-        /// <param name="theta2">Principal compressive strain angle, in radians.</param>
+        /// <param name="theta1">Principal compressive strain angle, in radians.</param>
         /// <param name="ec1">Principal tensile strain.</param>
-        public double MaximumShearOnCrack(double theta2, double ec1)
+        public double MaximumShearOnCrack(double theta1, double ec1)
         {
 	        // Calculate thetaC sine and cosine
-	        var (cosTheta, sinTheta) = DirectionCosines(theta2);
+	        var (cosTheta, sinTheta) = DirectionCosines(theta1);
 
 	        // Average crack spacing and opening
 	        double
-		        smTheta = 1 / (sinTheta / smx + cosTheta / smy),
-		        w = smTheta * ec1;
+		        smTheta = 1 / (Math.Abs(sinTheta) / smx + Math.Abs(cosTheta) / smy),
+		        w       = smTheta * ec1;
 
 	        // Maximum possible shear on crack interface
 	        return
@@ -275,14 +276,17 @@ namespace RCMembrane
         /// Calculate the direction cosines (cos, sin) of an angle.
         /// </summary>
         /// <param name="angle">Angle, in radians.</param>
-        /// <returns></returns>
-        public (double cos, double sin) DirectionCosines(double angle)
+        /// <param name="absoluteValue">Return cosine and sine in absolute values? (default: false).</param>
+        public (double cos, double sin) DirectionCosines(double angle, bool absoluteValue = false)
         {
 	        double
 		        cos = Trig.Cos(angle).CoerceZero(1E-6),
 		        sin = Trig.Sin(angle).CoerceZero(1E-6);
 
-	        return (cos, sin);
+			if (!absoluteValue)
+				return (cos, sin);
+
+			return (Math.Abs(cos), Math.Abs(sin));
         }
 
         /// <summary>
