@@ -30,7 +30,7 @@ namespace RCMembrane
 	    }
 
         /// <summary>
-        /// Membrane solver for known stresses.
+        /// Membrane solver for known <see cref="StressState"/>.
         /// </summary>
         /// <param name="membrane">The membrane object.</param>
         /// <param name="appliedStresses">Applied <see cref="StressState"/>, in MPa.</param>
@@ -175,7 +175,7 @@ namespace RCMembrane
             int iteration, int minIterations = 10) => ConvergenceReached(Convergence(residualStresses, appliedStresses), tolerance, iteration, minIterations);
 
         /// <summary>
-        /// Calculate residual stresses, in MPa.
+        /// Calculate residual <see cref="StressState"/>, in MPa.
         /// </summary>
         /// <param name="membrane">The <see cref="Membrane"/> object.</param>
         /// <param name="appliedStresses">Known applied <see cref="StressState"/>, in MPa.</param>
@@ -186,7 +186,7 @@ namespace RCMembrane
         /// Calculate the strain increment for next iteration.
         /// </summary>
         /// <param name="stiffness">Current stiffness <see cref="Matrix"/>.</param>
-        /// <param name="residualStresses">Residual stresses, in MPa.</param>
+        /// <param name="residualStresses">Residual <see cref="StressState"/>, in MPa.</param>
         private static StrainState StrainIncrement(Matrix<double> stiffness, StressState residualStresses) => StrainState.FromStresses(residualStresses, stiffness);
     }
 }

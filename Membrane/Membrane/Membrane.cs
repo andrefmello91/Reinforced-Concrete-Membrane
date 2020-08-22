@@ -2,6 +2,7 @@
 using System.Linq;
 using MathNet.Numerics;
 using MathNet.Numerics.LinearAlgebra;
+using MathNet.Numerics.LinearAlgebra.Double;
 using Material.Concrete;
 using Material.Reinforcement;
 using MathNet.Numerics.Data.Text;
@@ -124,7 +125,7 @@ namespace RCMembrane
         protected double smy => CrackSpacing(Reinforcement.DirectionY);
 
         /// <summary>
-        /// Get current membrane stiffness.
+        /// Get current membrane stiffness <see cref="Matrix"/>.
         /// </summary>
         public Matrix<double> Stiffness => Concrete.Stiffness + Reinforcement.Stiffness;
 
@@ -134,7 +135,7 @@ namespace RCMembrane
         public StressState AverageStresses  => Concrete.Stresses + Reinforcement.Stresses;
 
 		/// <summary>
-        /// Calculate stresses and the membrane stiffness, given strains.
+        /// Calculate <see cref="AverageStresses"/> and <see cref="Stiffness"/>, given a known <see cref="StrainState"/>.
         /// </summary>
         /// <param name="appliedStrains">Current applied <see cref="StrainState"/>.</param>
         /// <param name="loadStep">Current load step.</param>
@@ -142,7 +143,7 @@ namespace RCMembrane
         public abstract void Calculate(StrainState appliedStrains, int loadStep = 0, int iteration = 0);
 
         /// <summary>
-        /// Calculate initial membrane stiffness.
+        /// Calculate initial membrane stiffness <see cref="Matrix"/>.
         /// </summary>
         public Matrix<double> InitialStiffness() => Concrete.InitialStiffness() + Reinforcement.InitialStiffness();
 
