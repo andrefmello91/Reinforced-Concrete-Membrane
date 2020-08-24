@@ -1,4 +1,5 @@
 ﻿using System;
+using Material.Concrete;
 using MathNet.Numerics.Data.Text;
 using MathNet.Numerics.LinearAlgebra;
 using MathNet.Numerics.LinearAlgebra.Double;
@@ -17,7 +18,7 @@ namespace RCMembrane
 	    public static void Solve()
 	    {
 		    // Initiate the membrane
-		    var membrane = PanelExamples.PV10();
+		    var membrane = PanelExamples.PV5();
 
 		    // Initiate stresses
 		    var sigma = new StressState(0, 0, 5);
