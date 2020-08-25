@@ -6,10 +6,13 @@ using Concrete      = Material.Concrete.BiaxialConcrete;
 namespace RCMembrane
 {
     /// <summary>
-    /// Class with some panel examples from Vecchio(1985).
+    /// Class with some panel examples.
     /// </summary>
     public static class PanelExamples
     {
+		// Panels from Collins et al. (1985).
+	    #region Collins1985
+
         /// <summary>
         /// PV1 Panel.
         /// </summary>
@@ -693,5 +696,9 @@ namespace RCMembrane
             return
                 Membrane.ReadMembrane(concrete, reinforcement, 70, considerCrackSlip);
         }
+
+        #endregion
+
+
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using Material.Concrete;
+using MathNet.Numerics;
 using MathNet.Numerics.Data.Text;
 using MathNet.Numerics.LinearAlgebra;
 using MathNet.Numerics.LinearAlgebra.Double;
@@ -12,14 +13,39 @@ namespace RCMembrane
     /// Simple solver class.
     /// </summary>
     public static class MembraneSolver
-    {
+	{
 		/// <summary>
+        /// <see cref="Array"/> of <see cref="StrainState"/> results for each load step.
+        /// </summary>
+		private static StrainState[] _strainOutput;
+
+        /// <summary>
+        /// <see cref="Array"/> of <see cref="PrincipalStrainState"/> results for each load step.
+        /// </summary>
+        private static PrincipalStrainState[] _principalStrainOutput;
+
+        /// <summary>
+        /// <see cref="Array"/> of <see cref="StressState"/> results for each load step.
+        /// </summary>
+        private static StressState[] _stressOutput;
+
+        /// <summary>
+        /// <see cref="Array"/> of <see cref="PrincipalStressState"/> results for each load step.
+        /// </summary>
+        private static PrincipalStressState[] _principalStressOutput;
+
+		/// <summary>
+        /// The output file name and save location.
+        /// </summary>
+        private static readonly string ResultFileName = "D:/membrane_result.csv";
+
+        /// <summary>
         /// Simple console solver, with example panel element.
         /// </summary>
-	    public static void Solve()
+        public static void Solve()
 	    {
 		    // Initiate the membrane
-		    var membrane = PanelExamples.PV30(ConstitutiveModel.DSFM);
+		    var membrane = PanelExamples.PV10(ConstitutiveModel.DSFM);
 
 		    // Initiate stresses
 		    var sigma = new StressState(0, 0, 5);
@@ -28,7 +54,7 @@ namespace RCMembrane
 		    Solver(membrane, sigma);
 
 		    Console.WriteLine("Done! Press any key to exit.");
-		    System.Diagnostics.Process.Start("D:/sig x eps.csv");
+		    System.Diagnostics.Process.Start(ResultFileName);
 		    Console.ReadKey();
 	    }
 
@@ -51,22 +77,17 @@ namespace RCMembrane
             // Calculate e0
             var ei = StrainState.FromStresses(f0, D);
 
-            // Initiate matrices
-            var epsMatrix = Matrix<double>.Build.Dense(numLoadSteps, 3);
-            var e1Matrix = Matrix<double>.Build.Dense(numLoadSteps, 2);
-            var sigMatrix = Matrix<double>.Build.Dense(numLoadSteps, 3);
-            var sig1Matrix = Matrix<double>.Build.Dense(numLoadSteps, 2);
+            // Initiate output matrices
+            _strainOutput          = new StrainState[numLoadSteps];
+            _principalStrainOutput = new PrincipalStrainState[numLoadSteps];
+            _stressOutput          = new StressState[numLoadSteps];
+            _principalStressOutput = new PrincipalStressState[numLoadSteps];
 
-            //int[] itUpdate = new int[200];
-            //for (int i = 0; i < itUpdate.Length; i++)
-            //	itUpdate[i] = 50 * i;
+			// Auxiliary verifiers
             membrane.Stop = (false, string.Empty);
+			bool cracked  = false;
 
-			// Get readers for result
-            string[]
-	            res = { "Gamma", "Tau", "", "ec1", "fc1", "", "ec2", "fc2" };
-
-            // Initiate load steps
+			// Initiate load steps
             for (int ls = 1; ls <= numLoadSteps; ls++)
             {
                 // Calculate stresses
@@ -76,6 +97,12 @@ namespace RCMembrane
                 {
                     // Do analysis
                     membrane.Calculate(ei, ls, it);
+
+                    if (!cracked && membrane.Concrete.Cracked)
+                    {
+	                    cracked = true;
+	                    Console.WriteLine("Concrete cracked at step {0}", ls);
+                    }
 
                     // Calculate residual
                     var fr = ResidualStresses(membrane, fi);
@@ -90,28 +117,8 @@ namespace RCMembrane
                         // Update stiffness
                         D = membrane.Stiffness;
 
-                        // Get stresses
-                        double
-	                        fc1 = membrane.Concrete.PrincipalStresses.Sigma1,
-	                        fc2 = membrane.Concrete.PrincipalStresses.Sigma2,
-	                        ec1 = membrane.Concrete.PrincipalStrains.Epsilon1,
-	                        ec2 = membrane.Concrete.PrincipalStrains.Epsilon2;
-
-                        // Set results
-                        epsMatrix.SetRow(ls - 1, membrane.AverageStrains.AsVector());
-                        sigMatrix.SetRow(ls - 1, membrane.AverageStresses.AsVector());
-                        e1Matrix.SetRow(ls - 1, new[] { ec1, ec2 });
-                        sig1Matrix.SetRow(ls - 1, new[] { fc1, fc2 });
-
-                        // Result matrices
-                        var sigXeps = Matrix<double>.Build.DenseOfColumnVectors(
-	                        epsMatrix.Column(2), sigMatrix.Column(2), Vector<double>.Build.Dense(numLoadSteps),
-	                        e1Matrix.Column(0), sig1Matrix.Column(0), Vector<double>.Build.Dense(numLoadSteps),
-	                        e1Matrix.Column(1), sig1Matrix.Column(1));
-
-
-                        // Save results
-                        DelimitedWriter.Write("D:/sig x eps.csv", sigXeps, ";", res, null, null, 0);
+						// Set results on output matrices
+						SaveResults(membrane, ls);
 
                         break;
                     }
@@ -130,6 +137,8 @@ namespace RCMembrane
                     break;
             }
 
+			// Output results
+			OutputResults(numLoadSteps);
         }
 
         /// <summary>
@@ -191,5 +200,52 @@ namespace RCMembrane
         /// <param name="stiffness">Current stiffness <see cref="Matrix"/>.</param>
         /// <param name="residualStresses">Residual <see cref="StressState"/>, in MPa.</param>
         private static StrainState StrainIncrement(Matrix<double> stiffness, StressState residualStresses) => StrainState.FromStresses(residualStresses, stiffness);
+
+        /// <summary>
+        /// Save results in output matrices.
+        /// <para>See: <see cref="_strainOutput"/>, <see cref="_stressOutput"/>, <see cref="_principalStrainOutput"/> and <see cref="_principalStressOutput"/>.</para>
+        /// </summary>
+        /// <param name="membrane">The <see cref="Membrane"/> element analyzed.</param>
+        /// <param name="loadStep">The current load step.</param>
+        private static void SaveResults(Membrane membrane, int loadStep)
+        {
+			// Get row
+			int i = loadStep - 1;
+
+			_strainOutput[i]          = membrane.AverageStrains;
+			_principalStrainOutput[i] = membrane.Concrete.PrincipalStrains;
+			_stressOutput[i]          = membrane.AverageStresses;
+			_principalStressOutput[i] = membrane.Concrete.PrincipalStresses;
+        }
+
+        /// <summary>
+        /// Output results in a CSV file.
+        /// </summary>
+        /// <param name="numLoadSteps">The number of load steps (default: 100).</param>
+        private static void OutputResults(int numLoadSteps = 100)
+        {
+	        // Get readers for result
+	        string[]
+		        outputReaders = { "ex", "ey", "exy", "", "fx", "fy", "fxy", "", "ec1", "ec2", "theta1e", "", "fc1", "fc2", "theta1f" };
+
+            // Result matrices
+            var result = Matrix.Build.Dense(numLoadSteps, outputReaders.Length);
+
+            for (int i = 0; i < numLoadSteps; i++)
+            {
+				// Set stress and strain states
+				result.SetSubMatrix(i,  0, _strainOutput[i].AsVector().ToRowMatrix());
+				result.SetSubMatrix(i,  4, _stressOutput[i].AsVector().ToRowMatrix());
+				result.SetSubMatrix(i,  8, _principalStrainOutput[i].AsVector().ToRowMatrix());
+				result.SetSubMatrix(i, 12, _principalStressOutput[i].AsVector().ToRowMatrix());
+
+				// Set angles in degrees
+				result[i, 10] = Trig.RadianToDegree(_principalStrainOutput[i].Theta1);
+				result[i, 14] = Trig.RadianToDegree(_principalStressOutput[i].Theta1);
+            }
+
+	        // Save results
+	        DelimitedWriter.Write(ResultFileName, result, ";", outputReaders, null, null, 0);
+        }
     }
 }
