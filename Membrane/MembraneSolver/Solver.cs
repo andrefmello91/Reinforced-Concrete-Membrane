@@ -22,7 +22,7 @@ namespace RCMembrane
 		    var membrane = PanelExamples.PV30(ConstitutiveModel.DSFM);
 
 		    // Initiate stresses
-		    var sigma = new StressState(10, 0, 0);
+		    var sigma = new StressState(0, 0, 5);
 
 		    // Solve
 		    Solver(membrane, sigma);
@@ -98,8 +98,8 @@ namespace RCMembrane
 	                        ec2 = membrane.Concrete.PrincipalStrains.Epsilon2;
 
                         // Set results
-                        epsMatrix.SetRow(ls - 1, membrane.AverageStrains.Vector);
-                        sigMatrix.SetRow(ls - 1, membrane.AverageStresses.Vector);
+                        epsMatrix.SetRow(ls - 1, membrane.AverageStrains.AsVector());
+                        sigMatrix.SetRow(ls - 1, membrane.AverageStresses.AsVector());
                         e1Matrix.SetRow(ls - 1, new[] { ec1, ec2 });
                         sig1Matrix.SetRow(ls - 1, new[] { fc1, fc2 });
 
@@ -140,8 +140,8 @@ namespace RCMembrane
         private static double Convergence(StressState residualStresses, StressState appliedStresses)
         {
 	        Vector<double>
-		        res = residualStresses.Vector,
-		        app = appliedStresses.Vector;
+		        res = residualStresses.AsVector(),
+		        app = appliedStresses.AsVector();
 
             double
                 num = 0,
