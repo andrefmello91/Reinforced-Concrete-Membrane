@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using Material.Concrete;
 using MathNet.Numerics.Data.Text;
 using MathNet.Numerics.LinearAlgebra;
@@ -18,15 +19,16 @@ namespace RCMembrane
 	    public static void Solve()
 	    {
 		    // Initiate the membrane
-		    var membrane = PanelExamples.PV5();
+		    var membrane = PanelExamples.PV30(ConstitutiveModel.DSFM);
 
 		    // Initiate stresses
-		    var sigma = new StressState(0, 0, 5);
+		    var sigma = new StressState(10, 0, 0);
 
 		    // Solve
 		    Solver(membrane, sigma);
 
 		    Console.WriteLine("Done! Press any key to exit.");
+		    System.Diagnostics.Process.Start("D:/sig x eps.csv");
 		    Console.ReadKey();
 	    }
 
