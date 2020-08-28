@@ -37,6 +37,11 @@ namespace RCMembrane
         public StrainState           AverageStrains                { get; set; }
 
 		/// <summary>
+		/// Get/set the average <see cref="PrincipalStrainState"/>.
+		/// </summary>
+		public virtual PrincipalStrainState AveragePrincipalStrains { get; set; }
+
+        /// <summary>
         /// Get the <see cref="StrainState"/> in concrete.
         /// </summary>
         public abstract StrainState           ConcreteStrains                { get; }
@@ -115,16 +120,6 @@ namespace RCMembrane
         }
 
         /// <summary>
-        /// Get crack spacing in X direction.
-        /// </summary>
-        protected double smx => CrackSpacing(Reinforcement.DirectionX);
-
-        /// <summary>
-        /// Get crack spacing in Y direction.
-        /// </summary>
-        protected double smy => CrackSpacing(Reinforcement.DirectionY);
-
-        /// <summary>
         /// Get current membrane stiffness <see cref="Matrix"/>.
         /// </summary>
         public Matrix<double> Stiffness => Concrete.Stiffness + Reinforcement.Stiffness;
@@ -148,25 +143,45 @@ namespace RCMembrane
         public Matrix<double> InitialStiffness() => Concrete.InitialStiffness() + Reinforcement.InitialStiffness();
 
 		/// <summary>
-        /// Calculate the crack spacing.
+        /// Calculate the crack spacing at <paramref name="direction"/> (in mm), according to Kaklauskas (2019) expression.
+        /// <para>sm = 21 mm + 0.155 phi / rho</para>
         /// </summary>
         /// <param name="direction">The <see cref="WebReinforcementDirection"/>.</param>
-        /// <returns></returns>
         private double CrackSpacing(WebReinforcementDirection direction)
         {
-	        if (direction is null)
-		        return 0;
+	        if (direction is null || direction.BarDiameter == 0 || direction.Ratio == 0)
+		        return 21;
 
 	        double
 		        phi = direction.BarDiameter,
-		        ps  = direction.Ratio,
-		        sm  = phi / (5.4 * ps);
+		        ps  = direction.Ratio;
 
-	        if (double.IsNaN(sm))
-		        sm = 0;
-
-	        return sm;
+	        return
+		        21 + 0.155 * phi / ps;
         }
+
+		/// <summary>
+        /// Calculate the crack spacing in principal strain direction.
+        /// </summary>
+        protected double CrackSpacing()
+        {
+	        // Get the angles
+	        var (cosThetaC, sinThetaC) = DirectionCosines(Concrete.PrincipalStrains.Theta1, true);
+
+			// Calculate crack spacings in X and Y
+			double
+				smx = CrackSpacing(Reinforcement.DirectionX),
+				smy = CrackSpacing(Reinforcement.DirectionY);
+
+	        // Calculate crack spacing
+	        return
+		        1 / (sinThetaC / smx + cosThetaC / smy);
+        }
+
+		/// <summary>
+        /// Calculate the average crack opening, in mm.
+        /// </summary>
+		protected double CrackOpening() => Concrete.PrincipalStrains.Epsilon1 * CrackSpacing();
 
         /// <summary>
         /// Limit tensile principal stress by crack check procedure, by Bentz (2000).
@@ -180,12 +195,11 @@ namespace RCMembrane
             // Get the values
             double
 	            theta1 = Concrete.PrincipalStrains.Theta1,
-				ec1    = Concrete.PrincipalStrains.Epsilon1,
 				f1a    = Concrete.PrincipalStresses.Sigma1;
 
             // Calculate thetaC sine and cosine
             var (cosTheta, sinTheta) = DirectionCosines(theta1);
-            double tanTheta = Tangent(theta1);
+            double tanTheta          = Tangent(theta1);
 
             // Reinforcement capacity reserve
             double
@@ -193,7 +207,7 @@ namespace RCMembrane
 	            f1cy = Reinforcement?.DirectionY?.CapacityReserve ?? 0;
 
             // Maximum possible shear on crack interface
-            double vcimaxA = MaximumShearOnCrack(theta1, ec1);
+            double vcimaxA = MaximumShearOnCrack();
 
             // Maximum possible shear for biaxial yielding
             double vcimaxB = Math.Abs(f1cx - f1cy) / (tanTheta + 1 / tanTheta);
@@ -218,32 +232,16 @@ namespace RCMembrane
                 Concrete.SetTensileStress(fc1);
         }
 
-        /// <summary>
-        /// Calculate maximum shear stress on crack, in MPa.
-        /// </summary>
-        /// <param name="theta1">Principal compressive strain angle, in radians.</param>
-        /// <param name="ec1">Principal tensile strain.</param>
-        public double MaximumShearOnCrack(double theta1, double ec1)
-        {
-	        // Calculate thetaC sine and cosine
-	        var (cosTheta, sinTheta) = DirectionCosines(theta1);
-
-	        // Average crack spacing and opening
-	        double
-		        smTheta = 1 / (Math.Abs(sinTheta) / smx + Math.Abs(cosTheta) / smy),
-		        w       = smTheta * ec1;
-
-	        // Maximum possible shear on crack interface
-	        return
-		        MaximumShearOnCrack(w);
-        }
+		/// <summary>
+		/// Calculate maximum shear stress on crack, in MPa.
+		/// </summary>
+		public double MaximumShearOnCrack() => MaximumShearOnCrack(Concrete.PrincipalStrains.Epsilon1 * CrackSpacing());
 
         /// <summary>
         /// Calculate maximum shear stress on crack, in MPa.
         /// </summary>
-        /// <param name="w">Average crack opening, in mm.</param>
-        /// <returns></returns>
-        public double MaximumShearOnCrack(double w)
+        /// <param name="crackOpening">Average crack opening, in mm.</param>
+        public double MaximumShearOnCrack(double crackOpening)
         {
 	        double
 		        fc    = Concrete.fc,
@@ -251,21 +249,13 @@ namespace RCMembrane
 
 	        // Maximum possible shear on crack interface
 	        return
-		        0.18 * Math.Sqrt(fc) / (0.31 + 24 * w / (phiAg + 16));
+		        0.18 * Math.Sqrt(fc) / (0.31 + 24 * crackOpening / (phiAg + 16));
         }
 
         /// <summary>
         /// Calculate reference length, in mm.
         /// </summary>
-        public double ReferenceLength()
-        {
-			double theta1 = Concrete.PrincipalStrains.Theta1;
-
-	        var (cosTheta, sinTheta) = DirectionCosines(theta1);
-
-	        return
-		        0.5 / (Math.Abs(sinTheta) / smx + Math.Abs(cosTheta) / smy);
-        }
+        public double ReferenceLength() => 0.5 * CrackSpacing();
 
         /// <summary>
         /// Verify if a number is zero (true if is not zero).

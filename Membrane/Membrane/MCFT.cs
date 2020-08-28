@@ -14,7 +14,16 @@ namespace RCMembrane
 		///<inheritdoc/>
 		public override StrainState ConcreteStrains => AverageStrains;
 
-        ///<inheritdoc/>
+		/// <inheritdoc/>
+		public override PrincipalStrainState AveragePrincipalStrains
+		{
+			get => Concrete.PrincipalStrains;
+			set
+			{
+			}
+		}
+
+		///<inheritdoc/>
         /// <summary>
         /// Membrane element for MCFT analysis.
         /// </summary>

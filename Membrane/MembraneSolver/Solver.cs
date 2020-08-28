@@ -20,9 +20,14 @@ namespace RCMembrane
 		private static StrainState[] _strainOutput;
 
         /// <summary>
-        /// <see cref="Array"/> of <see cref="PrincipalStrainState"/> results for each load step.
+        /// <see cref="Array"/> of concrete <see cref="PrincipalStrainState"/> results for each load step.
         /// </summary>
-        private static PrincipalStrainState[] _principalStrainOutput;
+        private static PrincipalStrainState[] _concretePrincipalStrainOutput;
+
+        /// <summary>
+        /// <see cref="Array"/> of average <see cref="PrincipalStrainState"/> results for each load step.
+        /// </summary>
+        private static PrincipalStrainState[] _averagePrincipalStrainOutput;
 
         /// <summary>
         /// <see cref="Array"/> of <see cref="StressState"/> results for each load step.
@@ -34,10 +39,10 @@ namespace RCMembrane
         /// </summary>
         private static PrincipalStressState[] _principalStressOutput;
 
-		/// <summary>
+        /// <summary>
         /// The output file name and save location.
         /// </summary>
-        private static readonly string ResultFileName = "D:/membrane_result.csv";
+        private const string ResultFileName = "D:/membrane_result.csv";
 
         /// <summary>
         /// Simple console solver, with example panel element.
@@ -45,10 +50,10 @@ namespace RCMembrane
         public static void Solve()
 	    {
 		    // Initiate the membrane
-		    var membrane = PanelExamples.PV10(ConstitutiveModel.DSFM);
+		    var membrane = PanelExamples.PL3(ConstitutiveModel.DSFM);
 
 		    // Initiate stresses
-		    var sigma = new StressState(0, 0, 5);
+		    var sigma = new StressState(5, 0, 5);
 
 		    // Solve
 		    Solver(membrane, sigma);
@@ -79,11 +84,13 @@ namespace RCMembrane
 
             // Initiate output matrices
             _strainOutput          = new StrainState[numLoadSteps];
-            _principalStrainOutput = new PrincipalStrainState[numLoadSteps];
             _stressOutput          = new StressState[numLoadSteps];
             _principalStressOutput = new PrincipalStressState[numLoadSteps];
 
-			// Auxiliary verifiers
+            _concretePrincipalStrainOutput = new PrincipalStrainState[numLoadSteps];
+            _averagePrincipalStrainOutput  = new PrincipalStrainState[numLoadSteps];
+
+            // Auxiliary verifiers
             membrane.Stop = (false, string.Empty);
 			bool cracked  = false;
 
@@ -113,6 +120,11 @@ namespace RCMembrane
                     if (ConvergenceReached(conv, tolerance, it))
                     {
                         Console.WriteLine("LS = {0}, Iterations = {1}", ls, it);
+
+                        if (membrane is DSFMMembrane dsfm && membrane.Concrete.Cracked)
+                        {
+                            Console.WriteLine(dsfm.SlipApproach);
+                        }
 
                         // Update stiffness
                         D = membrane.Stiffness;
@@ -193,7 +205,7 @@ namespace RCMembrane
         /// <param name="appliedStresses">Known applied <see cref="StressState"/>, in MPa.</param>
         /// <returns></returns>
         private static StressState ResidualStresses(Membrane membrane, StressState appliedStresses) => appliedStresses - membrane.AverageStresses;
-
+		
         /// <summary>
         /// Calculate the strain increment for next iteration.
         /// </summary>
@@ -203,7 +215,7 @@ namespace RCMembrane
 
         /// <summary>
         /// Save results in output matrices.
-        /// <para>See: <see cref="_strainOutput"/>, <see cref="_stressOutput"/>, <see cref="_principalStrainOutput"/> and <see cref="_principalStressOutput"/>.</para>
+        /// <para>See: <see cref="_strainOutput"/>, <see cref="_stressOutput"/>, <see cref="_concretePrincipalStrainOutput"/> and <see cref="_principalStressOutput"/>.</para>
         /// </summary>
         /// <param name="membrane">The <see cref="Membrane"/> element analyzed.</param>
         /// <param name="loadStep">The current load step.</param>
@@ -213,9 +225,11 @@ namespace RCMembrane
 			int i = loadStep - 1;
 
 			_strainOutput[i]          = membrane.AverageStrains;
-			_principalStrainOutput[i] = membrane.Concrete.PrincipalStrains;
 			_stressOutput[i]          = membrane.AverageStresses;
 			_principalStressOutput[i] = membrane.Concrete.PrincipalStresses;
+
+			_concretePrincipalStrainOutput[i] = membrane.Concrete.PrincipalStrains;
+			_averagePrincipalStrainOutput[i]  = membrane.AveragePrincipalStrains;
         }
 
         /// <summary>
@@ -236,11 +250,11 @@ namespace RCMembrane
 				// Set stress and strain states
 				result.SetSubMatrix(i,  0, _strainOutput[i].AsVector().ToRowMatrix());
 				result.SetSubMatrix(i,  4, _stressOutput[i].AsVector().ToRowMatrix());
-				result.SetSubMatrix(i,  8, _principalStrainOutput[i].AsVector().ToRowMatrix());
+				result.SetSubMatrix(i,  8, _concretePrincipalStrainOutput[i].AsVector().ToRowMatrix());
 				result.SetSubMatrix(i, 12, _principalStressOutput[i].AsVector().ToRowMatrix());
 
-				// Set angles in degrees
-				result[i, 10] = Trig.RadianToDegree(_principalStrainOutput[i].Theta1);
+				// Set angles in degrees (average angle in strains)
+				result[i, 10] = Trig.RadianToDegree(_averagePrincipalStrainOutput[i].Theta1);
 				result[i, 14] = Trig.RadianToDegree(_principalStressOutput[i].Theta1);
             }
 

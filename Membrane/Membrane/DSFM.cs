@@ -8,7 +8,6 @@ using Reinforcement   = Material.Reinforcement.BiaxialReinforcement;
 using Parameters      = Material.Concrete.Parameters;
 using UnitsNet;
 
-
 namespace RCMembrane
 {
 	/// <summary>
@@ -21,10 +20,7 @@ namespace RCMembrane
         /// </summary>
 		private double? _thetaIc;
 
-		/// <summary>
-		/// Get/set the average <see cref="PrincipalStrainState"/>.
-		/// </summary>
-		public PrincipalStrainState AveragePrincipalStrains { get; set; }
+		public string SlipApproach;
 
 		///<inheritdoc/>
 		public override StrainState ConcreteStrains => AverageStrains - CrackSlipStrains;
@@ -139,7 +135,10 @@ namespace RCMembrane
 		private void InitialCrackAngle()
 		{
 			if (!_thetaIc.HasValue && Concrete.Cracked)
+			{
 				_thetaIc = Concrete.PrincipalStrains.Theta1;
+				Console.WriteLine(Trig.RadianToDegree(_thetaIc.Value));
+			}
 		}
 
 		/// <summary>
@@ -166,9 +165,7 @@ namespace RCMembrane
 				psy = Reinforcement?.DirectionY?.Ratio ?? 0;
 
 			// Get reinforcement angles
-			var (thetaNx, thetaNy) = Reinforcement?.Angles(theta1) ??
-			                         (Concrete.PrincipalStrains.Theta1,
-				                         Concrete.PrincipalStrains.Theta1 - Constants.PiOver2);
+			var (thetaNx, thetaNy) = Reinforcement?.Angles(theta1) ?? (theta1, theta1 - Constants.PiOver2);
 
 			// Get reinforcement stresses
 			var rSt = Reinforcement?.Stresses;
@@ -191,7 +188,7 @@ namespace RCMembrane
 			double de1Cr = 0;
 			try
 			{
-				solution = Brent.TryFindRoot(CrackEquilibrium, 0, 0.005, 1E-9, 100, out de1Cr);
+				solution = Brent.TryFindRoot(CrackEquilibrium, 0, 0.01, 1E-9, 1000, out de1Cr);
 
 				// Function to check equilibrium
 				double CrackEquilibrium(double de1CrIt)
@@ -248,7 +245,9 @@ namespace RCMembrane
 			double
 				ysa = StressCrackSlip(vci),
 				ysb = RotationLagCrackSlip(),
-				ys  = Math.Max(ysa, ysb);
+				ys  = Math.Abs(ysa) >= Math.Abs(ysb) ? ysa : ysb;
+
+			SlipApproach = ys == ysa ? "Stress" : "Rotation lag";
 
 			// Get concrete principal angle
 			double thetaC1 = Concrete.PrincipalStrains.Theta1;
@@ -274,26 +273,21 @@ namespace RCMembrane
 			if (vci == 0)
 				return 0;
 
-			// Get concrete principal angle
-			double thetaC1 = Concrete.PrincipalStrains.Theta1;
-
 			// Get concrete principal tensile strain and strength
-			double ec1 = Concrete.PrincipalStrains.Epsilon1;
 			double fc  = Concrete.fc;
 
-			// Get the angles
-			var (cosThetaC, sinThetaC) = DirectionCosines(thetaC1, true);
-
 			// Calculate crack spacings and width
-			double s = 1 / (sinThetaC / smx + cosThetaC / smy);
+			double s = CrackSpacing();
 
 			// Calculate crack width
-			double w = ec1 * s;
+			double w = CrackOpening();
 
 			// Calculate shear slip strain by stress-based approach
 			double
 				a  = Math.Max(0.234 * Math.Pow(w, -0.707) - 0.2, 0),
 				ds = vci / (1.8 * Math.Pow(w, -0.8) + a * fc);
+
+			//Console.Write("\n" + (ds/s) + "\n");
 
 			return
 				ds / s;
@@ -308,25 +302,19 @@ namespace RCMembrane
 			if (vci == 0)
 				return 0;
 
-			// Get concrete principal angle
-			double thetaC1 = Concrete.PrincipalStrains.Theta1;
-
 			// Get concrete principal tensile strain and strength
 			double ec1 = Concrete.PrincipalStrains.Epsilon1;
 
-			// Get the angles
-			var (cosThetaC, sinThetaC) = DirectionCosines(thetaC1, true);
-
 			// Calculate crack spacings and width
-			double s = 1 / (sinThetaC / smx + cosThetaC / smy);
+			double s = CrackSpacing();
 
-			// Calculate crack width
-			double w = ec1 * s;
+            // Calculate crack width
+            double w = ec1 * s;
 
 			// Calculate vciMax and psi ratio
 			double
 				vciMax = MaximumShearOnCrack(w),
-				psi = vci / vciMax;
+				psi    = vci / vciMax;
 
 			// Calculate shear slip strain by stress-based approach
 			double ds = 0.75 * w * Math.Sqrt(psi / (psi - 1));
@@ -357,19 +345,21 @@ namespace RCMembrane
 			// Calculate shear slip strain by rotation lag approach
 			double
 				thetaIc = _thetaIc ?? Concrete.PrincipalStrains.Theta1,
-				dThetaE = thetaE1 - thetaIc,
-				thetaL,
-				dThetaS;
+				dThetaE = thetaE1 - thetaIc;
 
 			// Get theta L
-			thetaL = (psx > 0 && psy > 0
+			double thetaL = psx > 0 && psy > 0
 				? Trig.DegreeToRadian(5)
-				: (psx > 0 || psy > 0
+				: psx > 0 || psy > 0
 					? Trig.DegreeToRadian(7.5)
-					: Trig.DegreeToRadian(10)));
+					: Trig.DegreeToRadian(10);
+
+			// Correct thetaL if dThetaE < 0
+			if (dThetaE < 0)
+				thetaL = -thetaL;
 
 			// Get dTheta s
-			dThetaS = Math.Abs(dThetaE) > thetaL 
+			double dThetaS = Math.Abs(dThetaE) > Math.Abs(thetaL) 
 				? dThetaE - thetaL 
 				: dThetaE;
 
@@ -385,6 +375,6 @@ namespace RCMembrane
 		/// <summary>
 		/// Calculate current pseudo-prestresses, in MPa.
 		/// </summary>
-		private StressState PseudoPStresses() => StressState.FromStrains(CrackSlipStrains, Concrete.Stiffness);
+		public StressState PseudoPStresses() => StressState.FromStrains(CrackSlipStrains, Concrete.Stiffness);
 	}
 }

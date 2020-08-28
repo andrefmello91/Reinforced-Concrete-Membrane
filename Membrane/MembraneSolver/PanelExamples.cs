@@ -699,6 +699,399 @@ namespace RCMembrane
 
         #endregion
 
+        // Panels from Vecchio et. al. (1994)
 
+        #region Vecchio1994
+
+        /// <summary>
+        /// PHS1 Panel.
+        /// </summary>
+        /// <param name="constitutiveModel">The <see cref="ConstitutiveModel"/> for concrete</param>
+        /// <param name="considerCrackSlip">Consider crack slip? Only for <see cref="DSFMMembrane"/> (default: true).</param>
+        public static Membrane PHS1(ConstitutiveModel constitutiveModel = ConstitutiveModel.MCFT, bool considerCrackSlip = true)
+        {
+	        // Get concrete parameter model
+	        var parModel = constitutiveModel == ConstitutiveModel.MCFT ? ParameterModel.MCFT : ParameterModel.DSFM;
+
+	        // Initiate concrete
+	        var concrete = new Concrete(72.2, 10, parModel, constitutiveModel);
+
+	        // Initiate steel for each direction
+	        var steelX = new Steel(606, 200000);
+
+	        // Get reinforcement
+	        var reinforcement = new Reinforcement(8, 44.46, steelX, 0, 0, null, 70);
+
+	        return
+		        Membrane.ReadMembrane(concrete, reinforcement, 70, considerCrackSlip);
+        }
+
+        /// <summary>
+        /// PHS2 Panel.
+        /// </summary>
+        /// <param name="constitutiveModel">The <see cref="ConstitutiveModel"/> for concrete</param>
+        /// <param name="considerCrackSlip">Consider crack slip? Only for <see cref="DSFMMembrane"/> (default: true).</param>
+        public static Membrane PHS2(ConstitutiveModel constitutiveModel = ConstitutiveModel.MCFT, bool considerCrackSlip = true)
+        {
+	        // Get concrete parameter model
+	        var parModel = constitutiveModel == ConstitutiveModel.MCFT ? ParameterModel.MCFT : ParameterModel.DSFM;
+
+	        // Initiate concrete
+	        var concrete = new Concrete(66.1, 10, parModel, constitutiveModel);
+
+	        // Initiate steel for each direction
+	        var steelX = new Steel(606, 200000);
+	        var steelY = new Steel(521, 200000);
+
+	        // Get reinforcement
+	        var reinforcement = new Reinforcement(8, 44.46, steelX, 5.72, 179.07, steelY, 70);
+
+	        return
+		        Membrane.ReadMembrane(concrete, reinforcement, 70, considerCrackSlip);
+        }
+
+        /// <summary>
+        /// PHS3 Panel.
+        /// </summary>
+        /// <param name="constitutiveModel">The <see cref="ConstitutiveModel"/> for concrete</param>
+        /// <param name="considerCrackSlip">Consider crack slip? Only for <see cref="DSFMMembrane"/> (default: true).</param>
+        public static Membrane PHS3(ConstitutiveModel constitutiveModel = ConstitutiveModel.MCFT, bool considerCrackSlip = true)
+        {
+	        // Get concrete parameter model
+	        var parModel = constitutiveModel == ConstitutiveModel.MCFT ? ParameterModel.MCFT : ParameterModel.DSFM;
+
+	        // Initiate concrete
+	        var concrete = new Concrete(58.4, 10, parModel, constitutiveModel);
+
+	        // Initiate steel for each direction
+	        var steelX = new Steel(606, 200000);
+	        var steelY = new Steel(521, 200000);
+
+	        // Get reinforcement
+	        var reinforcement = new Reinforcement(8, 44.46, steelX, 5.72, 89.54, steelY, 70);
+
+	        return
+		        Membrane.ReadMembrane(concrete, reinforcement, 70, considerCrackSlip);
+        }
+
+        /// <summary>
+        /// PHS4 Panel.
+        /// </summary>
+        /// <param name="constitutiveModel">The <see cref="ConstitutiveModel"/> for concrete</param>
+        /// <param name="considerCrackSlip">Consider crack slip? Only for <see cref="DSFMMembrane"/> (default: true).</param>
+        public static Membrane PHS4(ConstitutiveModel constitutiveModel = ConstitutiveModel.MCFT, bool considerCrackSlip = true)
+        {
+	        // Get concrete parameter model
+	        var parModel = constitutiveModel == ConstitutiveModel.MCFT ? ParameterModel.MCFT : ParameterModel.DSFM;
+
+	        // Initiate concrete
+	        var concrete = new Concrete(68.5, 10, parModel, constitutiveModel);
+
+	        // Initiate steel for each direction
+	        var steelX = new Steel(606, 200000);
+	        var steelY = new Steel(521, 200000);
+
+	        // Get reinforcement
+	        var reinforcement = new Reinforcement(8, 44.46, steelX, 5.72, 89.54, null, 70);
+
+	        return
+		        Membrane.ReadMembrane(concrete, reinforcement, 70, considerCrackSlip);
+        }
+
+        /// <summary>
+        /// PHS5 Panel.
+        /// </summary>
+        /// <param name="constitutiveModel">The <see cref="ConstitutiveModel"/> for concrete</param>
+        /// <param name="considerCrackSlip">Consider crack slip? Only for <see cref="DSFMMembrane"/> (default: true).</param>
+        public static Membrane PHS5(ConstitutiveModel constitutiveModel = ConstitutiveModel.MCFT, bool considerCrackSlip = true)
+        {
+	        // Get concrete parameter model
+	        var parModel = constitutiveModel == ConstitutiveModel.MCFT ? ParameterModel.MCFT : ParameterModel.DSFM;
+
+	        // Initiate concrete
+	        var concrete = new Concrete(52.1, 10, parModel, constitutiveModel);
+
+	        // Initiate steel for each direction
+	        var steelX = new Steel(606, 200000);
+	        var steelY = new Steel(521, 200000);
+
+	        // Get reinforcement
+	        var reinforcement = new Reinforcement(8, 44.46, steelX, 5.72, 179.07, steelY, 70);
+
+	        return
+		        Membrane.ReadMembrane(concrete, reinforcement, 70, considerCrackSlip);
+        }
+
+        /// <summary>
+        /// PHS6 Panel.
+        /// </summary>
+        /// <param name="constitutiveModel">The <see cref="ConstitutiveModel"/> for concrete</param>
+        /// <param name="considerCrackSlip">Consider crack slip? Only for <see cref="DSFMMembrane"/> (default: true).</param>
+        public static Membrane PHS6(ConstitutiveModel constitutiveModel = ConstitutiveModel.MCFT, bool considerCrackSlip = true)
+        {
+	        // Get concrete parameter model
+	        var parModel = constitutiveModel == ConstitutiveModel.MCFT ? ParameterModel.MCFT : ParameterModel.DSFM;
+
+	        // Initiate concrete
+	        var concrete = new Concrete(49.7, 10, parModel, constitutiveModel);
+
+	        // Initiate steel for each direction
+	        var steelX = new Steel(606, 200000);
+	        var steelY = new Steel(521, 200000);
+
+	        // Get reinforcement
+	        var reinforcement = new Reinforcement(8, 44.46, steelX, 5.72, 179.07, steelY, 70);
+
+	        return
+		        Membrane.ReadMembrane(concrete, reinforcement, 70, considerCrackSlip);
+        }
+
+        /// <summary>
+        /// PHS7 Panel.
+        /// </summary>
+        /// <param name="constitutiveModel">The <see cref="ConstitutiveModel"/> for concrete</param>
+        /// <param name="considerCrackSlip">Consider crack slip? Only for <see cref="DSFMMembrane"/> (default: true).</param>
+        public static Membrane PHS7(ConstitutiveModel constitutiveModel = ConstitutiveModel.MCFT, bool considerCrackSlip = true)
+        {
+	        // Get concrete parameter model
+	        var parModel = constitutiveModel == ConstitutiveModel.MCFT ? ParameterModel.MCFT : ParameterModel.DSFM;
+
+	        // Initiate concrete
+	        var concrete = new Concrete(53.6, 10, parModel, constitutiveModel);
+
+	        // Initiate steel for each direction
+	        var steelX = new Steel(606, 200000);
+	        var steelY = new Steel(521, 200000);
+
+	        // Get reinforcement
+	        var reinforcement = new Reinforcement(8, 44.46, steelX, 5.72, 89.54, steelY, 70);
+
+	        return
+		        Membrane.ReadMembrane(concrete, reinforcement, 70, considerCrackSlip);
+        }
+		
+        /// <summary>
+        /// PHS8 Panel.
+        /// </summary>
+        /// <param name="constitutiveModel">The <see cref="ConstitutiveModel"/> for concrete</param>
+        /// <param name="considerCrackSlip">Consider crack slip? Only for <see cref="DSFMMembrane"/> (default: true).</param>
+        public static Membrane PHS8(ConstitutiveModel constitutiveModel = ConstitutiveModel.MCFT, bool considerCrackSlip = true)
+        {
+	        // Get concrete parameter model
+	        var parModel = constitutiveModel == ConstitutiveModel.MCFT ? ParameterModel.MCFT : ParameterModel.DSFM;
+
+	        // Initiate concrete
+	        var concrete = new Concrete(55.9, 10, parModel, constitutiveModel);
+
+	        // Initiate steel for each direction
+	        var steelX = new Steel(606, 200000);
+	        var steelY = new Steel(521, 200000);
+
+	        // Get reinforcement
+	        var reinforcement = new Reinforcement(8, 44.46, steelX, 5.72, 59.21, steelY, 70);
+
+	        return
+		        Membrane.ReadMembrane(concrete, reinforcement, 70, considerCrackSlip);
+        }
+
+        /// <summary>
+        /// PHS9 Panel.
+        /// </summary>
+        /// <param name="constitutiveModel">The <see cref="ConstitutiveModel"/> for concrete</param>
+        /// <param name="considerCrackSlip">Consider crack slip? Only for <see cref="DSFMMembrane"/> (default: true).</param>
+        public static Membrane PHS9(ConstitutiveModel constitutiveModel = ConstitutiveModel.MCFT, bool considerCrackSlip = true)
+        {
+	        // Get concrete parameter model
+	        var parModel = constitutiveModel == ConstitutiveModel.MCFT ? ParameterModel.MCFT : ParameterModel.DSFM;
+
+	        // Initiate concrete
+	        var concrete = new Concrete(56, 10, parModel, constitutiveModel);
+
+	        // Initiate steel for each direction
+	        var steelX = new Steel(606, 200000);
+	        var steelY = new Steel(521, 200000);
+
+	        // Get reinforcement
+	        var reinforcement = new Reinforcement(8, 44.46, steelX, 5.72, 179.07, steelY, 70);
+
+	        return
+		        Membrane.ReadMembrane(concrete, reinforcement, 70, considerCrackSlip);
+        }
+		
+        /// <summary>
+        /// PHS10 Panel.
+        /// </summary>
+        /// <param name="constitutiveModel">The <see cref="ConstitutiveModel"/> for concrete</param>
+        /// <param name="considerCrackSlip">Consider crack slip? Only for <see cref="DSFMMembrane"/> (default: true).</param>
+        public static Membrane PHS10(ConstitutiveModel constitutiveModel = ConstitutiveModel.MCFT, bool considerCrackSlip = true)
+        {
+	        // Get concrete parameter model
+	        var parModel = constitutiveModel == ConstitutiveModel.MCFT ? ParameterModel.MCFT : ParameterModel.DSFM;
+
+	        // Initiate concrete
+	        var concrete = new Concrete(51.4, 10, parModel, constitutiveModel);
+
+	        // Initiate steel for each direction
+	        var steelX = new Steel(606, 200000);
+	        var steelY = new Steel(521, 200000);
+
+	        // Get reinforcement
+	        var reinforcement = new Reinforcement(8, 44.46, steelX, 5.72, 59.21, steelY, 70);
+
+	        return
+		        Membrane.ReadMembrane(concrete, reinforcement, 70, considerCrackSlip);
+        }
+
+
+        #endregion
+
+        // Panels from Xie et. al. (2011)
+        #region Xie2011
+
+        /// <summary>
+        /// PL1 Panel.
+        /// </summary>
+        /// <param name="constitutiveModel">The <see cref="ConstitutiveModel"/> for concrete</param>
+        /// <param name="considerCrackSlip">Consider crack slip? Only for <see cref="DSFMMembrane"/> (default: true).</param>
+        public static Membrane PL1(ConstitutiveModel constitutiveModel = ConstitutiveModel.MCFT, bool considerCrackSlip = true)
+        {
+	        // Get concrete parameter model
+	        var parModel = constitutiveModel == ConstitutiveModel.MCFT ? ParameterModel.MCFT : ParameterModel.DSFM;
+
+	        // Initiate concrete
+	        var concrete = new Concrete(38.5, 10, parModel, constitutiveModel);
+
+	        // Initiate steel for each direction
+	        var steelX = new Steel(604, 200000);
+	        var steelY = new Steel(529, 200000);
+
+	        // Get reinforcement
+	        var reinforcement = new Reinforcement(8.1, 92.7, steelX, 3.85, 178.8, steelY, 73);
+
+	        return
+		        Membrane.ReadMembrane(concrete, reinforcement, 73, considerCrackSlip);
+        }
+
+        /// <summary>
+        /// PL2 Panel.
+        /// </summary>
+        /// <param name="constitutiveModel">The <see cref="ConstitutiveModel"/> for concrete</param>
+        /// <param name="considerCrackSlip">Consider crack slip? Only for <see cref="DSFMMembrane"/> (default: true).</param>
+        public static Membrane PL2(ConstitutiveModel constitutiveModel = ConstitutiveModel.MCFT, bool considerCrackSlip = true)
+        {
+	        // Get concrete parameter model
+	        var parModel = constitutiveModel == ConstitutiveModel.MCFT ? ParameterModel.MCFT : ParameterModel.DSFM;
+
+	        // Initiate concrete
+	        var concrete = new Concrete(38.2, 10, parModel, constitutiveModel);
+
+	        // Initiate steel for each direction
+	        var steelX = new Steel(604, 200000);
+	        var steelY = new Steel(529, 200000);
+
+	        // Get reinforcement
+	        var reinforcement = new Reinforcement(8.1, 92.7, steelX, 3.85, 178.8, steelY, 73);
+
+	        return
+		        Membrane.ReadMembrane(concrete, reinforcement, 73, considerCrackSlip);
+        }
+
+        /// <summary>
+        /// PL3 Panel.
+        /// </summary>
+        /// <param name="constitutiveModel">The <see cref="ConstitutiveModel"/> for concrete</param>
+        /// <param name="considerCrackSlip">Consider crack slip? Only for <see cref="DSFMMembrane"/> (default: true).</param>
+        public static Membrane PL3(ConstitutiveModel constitutiveModel = ConstitutiveModel.MCFT, bool considerCrackSlip = true)
+        {
+	        // Get concrete parameter model
+	        var parModel = constitutiveModel == ConstitutiveModel.MCFT ? ParameterModel.MCFT : ParameterModel.DSFM;
+
+	        // Initiate concrete
+	        var concrete = new Concrete(42, 10, parModel, constitutiveModel);
+
+	        // Initiate steel for each direction
+	        var steelX = new Steel(604, 200000);
+	        var steelY = new Steel(529, 200000);
+
+	        // Get reinforcement
+	        var reinforcement = new Reinforcement(8.1, 92.7, steelX, 3.85, 178.8, steelY, 73);
+
+	        return
+		        Membrane.ReadMembrane(concrete, reinforcement, 73, considerCrackSlip);
+        }
+
+        /// <summary>
+        /// PL4 Panel.
+        /// </summary>
+        /// <param name="constitutiveModel">The <see cref="ConstitutiveModel"/> for concrete</param>
+        /// <param name="considerCrackSlip">Consider crack slip? Only for <see cref="DSFMMembrane"/> (default: true).</param>
+        public static Membrane PL4(ConstitutiveModel constitutiveModel = ConstitutiveModel.MCFT, bool considerCrackSlip = true)
+        {
+	        // Get concrete parameter model
+	        var parModel = constitutiveModel == ConstitutiveModel.MCFT ? ParameterModel.MCFT : ParameterModel.DSFM;
+
+	        // Initiate concrete
+	        var concrete = new Concrete(43.1, 10, parModel, constitutiveModel);
+
+	        // Initiate steel for each direction
+	        var steelX = new Steel(604, 200000);
+	        var steelY = new Steel(529, 200000);
+
+	        // Get reinforcement
+	        var reinforcement = new Reinforcement(8.1, 92.7, steelX, 3.85, 178.8, steelY, 73);
+
+	        return
+		        Membrane.ReadMembrane(concrete, reinforcement, 73, considerCrackSlip);
+        }
+
+        /// <summary>
+        /// PL5 Panel.
+        /// </summary>
+        /// <param name="constitutiveModel">The <see cref="ConstitutiveModel"/> for concrete</param>
+        /// <param name="considerCrackSlip">Consider crack slip? Only for <see cref="DSFMMembrane"/> (default: true).</param>
+        public static Membrane PL5(ConstitutiveModel constitutiveModel = ConstitutiveModel.MCFT, bool considerCrackSlip = true)
+        {
+	        // Get concrete parameter model
+	        var parModel = constitutiveModel == ConstitutiveModel.MCFT ? ParameterModel.MCFT : ParameterModel.DSFM;
+
+	        // Initiate concrete
+	        var concrete = new Concrete(38.1, 10, parModel, constitutiveModel);
+
+	        // Initiate steel for each direction
+	        var steelX = new Steel(604, 200000);
+	        var steelY = new Steel(529, 200000);
+
+	        // Get reinforcement
+	        var reinforcement = new Reinforcement(8.1, 92.7, steelX, 3.85, 178.8, steelY, 73);
+
+	        return
+		        Membrane.ReadMembrane(concrete, reinforcement, 73, considerCrackSlip);
+        }
+
+        /// <summary>
+        /// PL6 Panel.
+        /// </summary>
+        /// <param name="constitutiveModel">The <see cref="ConstitutiveModel"/> for concrete</param>
+        /// <param name="considerCrackSlip">Consider crack slip? Only for <see cref="DSFMMembrane"/> (default: true).</param>
+        public static Membrane PL6(ConstitutiveModel constitutiveModel = ConstitutiveModel.MCFT, bool considerCrackSlip = true)
+        {
+	        // Get concrete parameter model
+	        var parModel = constitutiveModel == ConstitutiveModel.MCFT ? ParameterModel.MCFT : ParameterModel.DSFM;
+
+	        // Initiate concrete
+	        var concrete = new Concrete(43.5, 10, parModel, constitutiveModel);
+
+	        // Initiate steel for each direction
+	        var steelX = new Steel(604, 200000);
+	        var steelY = new Steel(529, 200000);
+
+	        // Get reinforcement
+	        var reinforcement = new Reinforcement(8.1, 92.7, steelX, 3.85, 178.8, steelY, 73);
+
+	        return
+		        Membrane.ReadMembrane(concrete, reinforcement, 73, considerCrackSlip);
+        }
+		
+        #endregion
     }
 }
