@@ -69,6 +69,5 @@ namespace RCMembrane
 			Concrete.CalculateStiffness();
 			Reinforcement.CalculateStiffness();
 		}
-
 	}
 }

@@ -12,7 +12,7 @@ namespace RCMembrane
 	/// <summary>
     /// Simple solver class.
     /// </summary>
-    public static class MembraneSolver
+    public static partial class MembraneSolver
 	{
 		/// <summary>
         /// <see cref="Array"/> of <see cref="StrainState"/> results for each load step.
@@ -39,21 +39,21 @@ namespace RCMembrane
         /// </summary>
         private static PrincipalStressState[] _principalStressOutput;
 
-        /// <summary>
+		/// <summary>
         /// The output file name and save location.
         /// </summary>
         private const string ResultFileName = "D:/membrane_result.csv";
 
         /// <summary>
-        /// Simple console solver, with example panel element.
+        /// Simple console solver, with example from <see cref="PanelExamples"/>.
         /// </summary>
         public static void Solve()
 	    {
 		    // Initiate the membrane
-		    var membrane = PanelExamples.PL3(ConstitutiveModel.DSFM);
+		    var membrane = PanelExamples.PB17(ConstitutiveModel.DSFM);
 
 		    // Initiate stresses
-		    var sigma = new StressState(5, 0, 5);
+		    var sigma = new StressState(11.8, 0, 2);
 
 		    // Solve
 		    Solver(membrane, sigma);
@@ -184,8 +184,8 @@ namespace RCMembrane
         /// <param name="convergence">Calculated convergence.</param>
         /// <param name="tolerance">Stress convergence tolerance (default: 1E-3).</param>
         /// <param name="iteration">Current iteration.</param>
-        /// <param name="minIterations">Minimum number of iterations (default: 10).</param>
-        private static bool ConvergenceReached(double convergence, double tolerance, int iteration, int minIterations = 10) => convergence <= tolerance && iteration >= minIterations;
+        /// <param name="minIterations">Minimum number of iterations (default: 2).</param>
+        private static bool ConvergenceReached(double convergence, double tolerance, int iteration, int minIterations = 4) => convergence <= tolerance && iteration >= minIterations;
 
         /// <summary>
         /// Verify if convergence is reached.
@@ -194,9 +194,9 @@ namespace RCMembrane
         /// <param name="appliedStresses">Known applied <see cref="StressState"/>, in MPa.</param>
         /// <param name="tolerance">Stress convergence tolerance (default: 1E-3).</param>
         /// <param name="iteration">Current iteration.</param>
-        /// <param name="minIterations">Minimum number of iterations (default: 10).</param>
+        /// <param name="minIterations">Minimum number of iterations (default: 2).</param>
         private static bool ConvergenceReached(StressState residualStresses, StressState appliedStresses, double tolerance,
-            int iteration, int minIterations = 10) => ConvergenceReached(Convergence(residualStresses, appliedStresses), tolerance, iteration, minIterations);
+            int iteration, int minIterations = 4) => ConvergenceReached(Convergence(residualStresses, appliedStresses), tolerance, iteration, minIterations);
 
         /// <summary>
         /// Calculate residual <see cref="StressState"/>, in MPa.
@@ -204,8 +204,15 @@ namespace RCMembrane
         /// <param name="membrane">The <see cref="Membrane"/> object.</param>
         /// <param name="appliedStresses">Known applied <see cref="StressState"/>, in MPa.</param>
         /// <returns></returns>
-        private static StressState ResidualStresses(Membrane membrane, StressState appliedStresses) => appliedStresses - membrane.AverageStresses;
-		
+        private static StressState ResidualStresses(Membrane membrane, StressState appliedStresses)
+        {
+            //if (membrane is DSFMMembrane dsfm)
+            //    appliedStresses += dsfm.PseudoPStresses();
+
+            return
+				appliedStresses - membrane.AverageStresses;
+        }
+
         /// <summary>
         /// Calculate the strain increment for next iteration.
         /// </summary>

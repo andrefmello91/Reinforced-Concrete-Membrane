@@ -135,10 +135,7 @@ namespace RCMembrane
 		private void InitialCrackAngle()
 		{
 			if (!_thetaIc.HasValue && Concrete.Cracked)
-			{
 				_thetaIc = Concrete.PrincipalStrains.Theta1;
-				Console.WriteLine(Trig.RadianToDegree(_thetaIc.Value));
-			}
 		}
 
 		/// <summary>
@@ -159,13 +156,8 @@ namespace RCMembrane
 			// Get concrete tensile stress
 			var fc1 = Concrete.PrincipalStresses.Sigma1;
 
-			// Get reinforcement ratio
-			double
-				psx = Reinforcement?.DirectionX?.Ratio ?? 0,
-				psy = Reinforcement?.DirectionY?.Ratio ?? 0;
-
 			// Get reinforcement angles
-			var (thetaNx, thetaNy) = Reinforcement?.Angles(theta1) ?? (theta1, theta1 - Constants.PiOver2);
+			var (thetaNx, thetaNy) = Reinforcement?.Angles(theta1) ?? (theta1, Constants.PiOver2 - theta1);
 
 			// Get reinforcement stresses
 			var rSt = Reinforcement?.Stresses;
@@ -174,12 +166,9 @@ namespace RCMembrane
 				fsy = rSt?.SigmaY ?? 0;
 
 			// Calculate cosines and sines
-			//var (cosTheta, sinTheta) = Auxiliary.DirectionCosines(thetaC1);
 			var (cosNx, sinNx) = DirectionCosines(thetaNx);
 			var (cosNy, sinNy) = DirectionCosines(thetaNy);
 			double
-				//cosTheta2 = cosTheta * cosTheta,
-				//sinTheta2 = sinTheta * sinTheta,
 				cosNx2 = cosNx * cosNx,
 				cosNy2 = cosNy * cosNy;
 
@@ -188,7 +177,7 @@ namespace RCMembrane
 			double de1Cr = 0;
 			try
 			{
-				solution = Brent.TryFindRoot(CrackEquilibrium, 0, 0.01, 1E-9, 1000, out de1Cr);
+				solution = Brent.TryFindRoot(CrackEquilibrium, 0, 0.001, 1E-9, 1000, out de1Cr);
 
 				// Function to check equilibrium
 				double CrackEquilibrium(double de1CrIt)
@@ -200,12 +189,12 @@ namespace RCMembrane
 
 					// Calculate reinforcement stresses
 					double
-						fscrxIt = Reinforcement?.DirectionX?.Steel.CalculateStress(esCrxIt) ?? 0,
-						fscryIt = Reinforcement?.DirectionY?.Steel.CalculateStress(esCryIt) ?? 0;
+						fscrxIt = Reinforcement?.DirectionX?.CalculateStress(esCrxIt) ?? 0,
+						fscryIt = Reinforcement?.DirectionY?.CalculateStress(esCryIt) ?? 0;
 
 					// Check equilibrium (must be zero)
 					return
-						psx * (fscrxIt - fsx) * cosNx2 + psy * (fscryIt - fsy) * cosNy2 - fc1;
+						(fscrxIt - fsx) * cosNx2 + (fscryIt - fsy) * cosNy2 - fc1;
 				}
 			}
 			catch
@@ -224,11 +213,11 @@ namespace RCMembrane
 
 					// Calculate reinforcement stresses
 					double
-						fscrx = Reinforcement?.DirectionX?.Steel.CalculateStress(esCrx) ?? 0,
-						fscry = Reinforcement?.DirectionY?.Steel.CalculateStress(esCry) ?? 0;
+						fscrx = Reinforcement?.DirectionX?.CalculateStress(esCrx) ?? 0,
+						fscry = Reinforcement?.DirectionY?.CalculateStress(esCry) ?? 0;
 
 					// Calculate shear stress
-					vci = psx * (fscrx - fsx) * cosNx * sinNx + psy * (fscry - fsy) * cosNy * sinNy;
+					vci = (fscrx - fsx) * cosNx * sinNx + (fscry - fsy) * cosNy * sinNy;
 				}
 			}
 
