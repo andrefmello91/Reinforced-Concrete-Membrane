@@ -41,30 +41,30 @@ namespace RCMembrane
 	    /// </summary>
 	    private static StressState _lastResidual;
 
-
         /// <summary>
         /// Membrane solver for known <see cref="StressState"/>.
         /// </summary>
         /// <param name="membrane">The membrane object.</param>
         /// <param name="appliedStresses">Applied <see cref="StressState"/>, in MPa.</param>
         /// <param name="numLoadSteps">The number of load steps (default: 100).</param>
-        /// <param name="maxIterations">Maximum number of iterations (default: 1000).</param>
-        /// <param name="tolerance">Stress convergence tolerance (default: 1E-3).</param>
-        private static void SecantSolver(Membrane membrane, StressState appliedStresses, int numLoadSteps = 100, int maxIterations = 1000, double tolerance = 1E-3)
+        /// <param name="maxIterations">Maximum number of iterations (default: 10000).</param>
+        /// <param name="tolerance">Stress convergence tolerance (default: 1E-6).</param>
+        private static void SecantSolver(Membrane membrane, StressState appliedStresses, int numLoadSteps = 100, int maxIterations = 10000, double tolerance = 1E-6)
         {
             // Get initial stresses
             var f0 = (double)1 / numLoadSteps * appliedStresses;
 
             // Calculate initial stiffness
-            var D = membrane.InitialStiffness();
+            _currentStiffness = membrane.InitialStiffness;
 
-            // Calculate e0
-            var ei = StrainState.FromStresses(f0, D);
+            // Calculate initial strains
+            _currentStrains = StrainState.FromStresses(f0, _currentStiffness);
 
 			// Initiate solution values
-			_lastStiffness = D;
-			_lastStrains   = StrainState.Zero;
-			_lastResidual  = StressState.Zero;
+			_lastStiffness    = _currentStiffness;
+			_lastStrains      = StrainState.Zero;
+			_lastResidual     = StressState.Zero;
+			_currentResidual  = StressState.Zero;
 
             // Initiate output matrices
             _strainOutput = new StrainState[numLoadSteps];
@@ -87,7 +87,7 @@ namespace RCMembrane
                 for (int it = 1; it <= maxIterations; it++)
                 {
                     // Do analysis
-                    membrane.Calculate(ei, ls, it);
+                    membrane.Calculate(_currentStrains, ls, it);
 
                     if (!cracked && membrane.Concrete.Cracked)
                     {
@@ -95,11 +95,8 @@ namespace RCMembrane
                         Console.WriteLine("Concrete cracked at step {0}", ls);
                     }
 
-                    // Calculate residual
-                    _currentResidual = membrane.AverageStresses - fi;
-
-					// Get current strains
-                    _currentStrains  = membrane.AverageStrains;
+					// Calculate and update residual
+					ResidualUpdate(membrane, fi);
 
                     // Calculate convergence
                     double conv = Convergence(_currentResidual, fi);
@@ -113,24 +110,23 @@ namespace RCMembrane
                             Console.WriteLine(dsfm.SlipApproach);
                         }
 
-                        // Update stiffness
-                        D = membrane.Stiffness;
-
                         // Set results on output matrices
                         SaveResults(membrane, ls);
 
                         break;
                     }
-
-					// Calculate increment
-
-                    // Increment strains
-                    ei += StrainIncrement(D, fr);
-
+					
                     if (it == maxIterations)
                     {
                         membrane.Stop = (true, "CONVERGENCE NOT REACHED");
                         Console.WriteLine("LS = {0}, {1}", ls, membrane.Stop.Message);
+                    }
+
+                    else
+                    {
+	                    // Update stiffness and strains
+	                    SecantStiffnessUpdate();
+	                    StrainUpdate();
                     }
                 }
 
@@ -145,21 +141,53 @@ namespace RCMembrane
 		/// <summary>
         /// Calculate the secant stiffness <see cref="Matrix"/> of current iteration.
         /// </summary>
-        private static Matrix<double> SecantStiffnessUpdate()
+        private static void SecantStiffnessUpdate()
         {
+			// Get current stiffness
+			Matrix<double> kCur = _currentStiffness;
+
 			// Calculate the variation of strains and residual as vectors
 			Vector<double>
 				dStrain = (_currentStrains  - _lastStrains).AsVector(),
 				dRes    = (_currentResidual - _lastResidual).AsVector();
 
-			// Calculate 2-norm of strains
-			double norm = dStrain.Norm(2);
+			// Increment current stiffness
+			var dK = ((dRes - _lastStiffness * dStrain) / dStrain.Norm(2)).ToColumnMatrix() * dStrain.ToRowMatrix();
 
-			// Calculate K increment
-			var dK = ((dRes - _lastStiffness * dStrain) / norm).ToColumnMatrix() * dStrain.ToRowMatrix();
+			// Set new values
+			_currentStiffness = _lastStiffness + dK;
+			_lastStiffness    = kCur;
+        }
 
-			return
-				_lastStiffness + dK;
+        /// <summary>
+        /// Update residual <see cref="StressState"/>.
+        /// </summary>
+        /// <param name="membrane">The membrane object.</param>
+        /// <param name="appliedStresses">Applied <see cref="StressState"/>, in MPa.</param>
+		private static void ResidualUpdate(Membrane membrane, StressState appliedStresses)
+		{
+			// Set new values
+            _lastResidual    = _currentResidual;
+			_currentResidual = membrane.AverageStresses - appliedStresses;
+
+            //if (membrane is DSFMMembrane dsfm)
+            //    _currentResidual += dsfm.PseudoPStresses();
+        }
+
+		/// <summary>
+        /// Update strains.
+        /// </summary>
+        private static void StrainUpdate()
+        {
+			// Get current strains
+			var eCur = _currentStrains;
+
+			// Increment strains
+			var inc = StrainState.FromStresses(-_currentResidual, _currentStiffness);
+			_currentStrains  += inc;
+
+			// Set last strains
+			_lastStrains = eCur;
         }
     }
 }

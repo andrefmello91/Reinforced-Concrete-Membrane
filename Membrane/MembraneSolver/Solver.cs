@@ -50,13 +50,13 @@ namespace RCMembrane
         public static void Solve()
 	    {
 		    // Initiate the membrane
-		    var membrane = PanelExamples.PB17(ConstitutiveModel.DSFM);
+		    var membrane = PanelExamples.PV10(ConstitutiveModel.DSFM);
 
 		    // Initiate stresses
-		    var sigma = new StressState(11.8, 0, 2);
+		    var sigma = new StressState(0, 0, 5);
 
 		    // Solve
-		    Solver(membrane, sigma);
+		    SecantSolver(membrane, sigma);
 
 		    Console.WriteLine("Done! Press any key to exit.");
 		    System.Diagnostics.Process.Start(ResultFileName);
@@ -77,7 +77,7 @@ namespace RCMembrane
             var f0 = (double)1 / numLoadSteps * appliedStresses;
 
             // Calculate initial stiffness
-            var D = membrane.InitialStiffness();
+            var D = membrane.InitialStiffness;
 
             // Calculate e0
             var ei = StrainState.FromStresses(f0, D);
@@ -185,7 +185,7 @@ namespace RCMembrane
         /// <param name="tolerance">Stress convergence tolerance (default: 1E-3).</param>
         /// <param name="iteration">Current iteration.</param>
         /// <param name="minIterations">Minimum number of iterations (default: 2).</param>
-        private static bool ConvergenceReached(double convergence, double tolerance, int iteration, int minIterations = 4) => convergence <= tolerance && iteration >= minIterations;
+        private static bool ConvergenceReached(double convergence, double tolerance, int iteration, int minIterations = 2) => convergence <= tolerance && iteration >= minIterations;
 
         /// <summary>
         /// Verify if convergence is reached.
@@ -196,7 +196,7 @@ namespace RCMembrane
         /// <param name="iteration">Current iteration.</param>
         /// <param name="minIterations">Minimum number of iterations (default: 2).</param>
         private static bool ConvergenceReached(StressState residualStresses, StressState appliedStresses, double tolerance,
-            int iteration, int minIterations = 4) => ConvergenceReached(Convergence(residualStresses, appliedStresses), tolerance, iteration, minIterations);
+            int iteration, int minIterations = 2) => ConvergenceReached(Convergence(residualStresses, appliedStresses), tolerance, iteration, minIterations);
 
         /// <summary>
         /// Calculate residual <see cref="StressState"/>, in MPa.
