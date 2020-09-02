@@ -106,8 +106,8 @@ namespace RCMembrane
 				CrackCheck();
 
 			// Calculate stiffness
-			Concrete.CalculateStiffness();
-			Reinforcement.CalculateStiffness();
+			//Concrete.CalculateStiffness();
+			//Reinforcement.CalculateStiffness();
 		}
 
 		/// <summary>
@@ -364,6 +364,6 @@ namespace RCMembrane
 		/// <summary>
 		/// Calculate current pseudo-prestresses, in MPa.
 		/// </summary>
-		public StressState PseudoPStresses() => StressState.FromStrains(CrackSlipStrains, Concrete.Stiffness);
+		public StressState PseudoPStresses() => CrackSlipStrains.IsZero ? StressState.Zero : StressState.FromStrains(CrackSlipStrains, Concrete.Stiffness);
 	}
 }

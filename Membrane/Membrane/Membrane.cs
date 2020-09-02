@@ -120,16 +120,21 @@ namespace RCMembrane
         }
 
         /// <summary>
-        /// Get current membrane stiffness <see cref="Matrix"/>.
-        /// </summary>
-        public Matrix<double> Stiffness => Reinforcement is null ? Concrete.Stiffness : Concrete.Stiffness + Reinforcement.Stiffness;
-
-        /// <summary>
         /// Get average <see cref="StressState"/>, in MPa.
         /// </summary>
         public StressState AverageStresses  => Reinforcement is null ? Concrete.Stresses : Concrete.Stresses + Reinforcement.Stresses;
 
-		/// <summary>
+        /// <summary>
+        /// Get current <see cref="Membrane"/> stiffness <see cref="Matrix"/>.
+        /// </summary>
+        public Matrix<double> Stiffness => Reinforcement is null ? Concrete.Stiffness : Concrete.Stiffness + Reinforcement.Stiffness;
+
+        /// <summary>
+        /// Get initial <see cref="Membrane"/> stiffness <see cref="Matrix"/>.
+        /// </summary>
+        public Matrix<double> InitialStiffness => Reinforcement is null ? Concrete.InitialStiffness : Concrete.InitialStiffness + Reinforcement.InitialStiffness;
+
+        /// <summary>
         /// Calculate <see cref="AverageStresses"/> and <see cref="Stiffness"/>, given a known <see cref="StrainState"/>.
         /// </summary>
         /// <param name="appliedStrains">Current applied <see cref="StrainState"/>.</param>
@@ -138,11 +143,6 @@ namespace RCMembrane
         public abstract void Calculate(StrainState appliedStrains, int loadStep = 0, int iteration = 0);
 
 		/// <summary>
-		/// Calculate initial membrane stiffness <see cref="Matrix"/>.
-		/// </summary>
-		public Matrix<double> InitialStiffness() => Reinforcement is null ? Concrete.InitialStiffness() : Concrete.InitialStiffness() + Reinforcement.InitialStiffness();
-
-        /// <summary>
         /// Calculate the crack spacing at <paramref name="direction"/> (in mm), according to Kaklauskas (2019) expression.
         /// <para>sm = 21 mm + 0.155 phi / rho</para>
         /// </summary>

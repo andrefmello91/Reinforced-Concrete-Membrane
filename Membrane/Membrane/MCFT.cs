@@ -64,10 +64,6 @@ namespace RCMembrane
 
 			// Verify if concrete is cracked and check crack stresses to limit fc1
 			CrackCheck();
-
-			// Calculate stiffness
-			Concrete.CalculateStiffness();
-			Reinforcement.CalculateStiffness();
 		}
 	}
 }
