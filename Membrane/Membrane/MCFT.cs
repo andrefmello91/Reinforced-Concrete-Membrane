@@ -59,7 +59,7 @@ namespace RCMembrane
 			AverageStrains = appliedStrains;
 
 			// Calculate and set concrete and steel stresses
-			Concrete.CalculatePrincipalStresses(ConcreteStrains);
+			Concrete.CalculatePrincipalStresses(ConcreteStrains, Reinforcement);
 			Reinforcement.CalculateStresses(AverageStrains);
 
 			// Verify if concrete is cracked and check crack stresses to limit fc1

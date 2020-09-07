@@ -46,11 +46,14 @@ namespace RCMembrane
         /// </summary>
         /// <param name="membrane">The membrane object.</param>
         /// <param name="appliedStresses">Applied <see cref="StressState"/>, in MPa.</param>
+        /// <param name="fileName">The name of saved result file. <para>See: <seealso cref="ResultFileName"/>, <seealso cref="OutputResults"/>.</para></param>
         /// <param name="numLoadSteps">The number of load steps (default: 100).</param>
         /// <param name="maxIterations">Maximum number of iterations (default: 10000).</param>
         /// <param name="tolerance">Stress convergence tolerance (default: 1E-6).</param>
-        private static void SecantSolver(Membrane membrane, StressState appliedStresses, int numLoadSteps = 100, int maxIterations = 10000, double tolerance = 1E-6)
+        private static void SecantSolver(Membrane membrane, StressState appliedStresses, out string fileName, int numLoadSteps = 100, int maxIterations = 10000, double tolerance = 1E-6)
         {
+			AnalysisStart(membrane);
+
             // Get initial stresses
             var f0 = (double)1 / numLoadSteps * appliedStresses;
 
@@ -79,7 +82,8 @@ namespace RCMembrane
             bool cracked = false;
 
             // Initiate load steps
-            for (int ls = 1; ls <= numLoadSteps; ls++)
+            int ls;
+            for (ls = 1; ls <= numLoadSteps; ls++)
             {
                 // Calculate stresses
                 var fi = ls * f0;
@@ -103,15 +107,16 @@ namespace RCMembrane
 
                     if (ConvergenceReached(conv, tolerance, it))
                     {
-                        Console.WriteLine("LS = {0}, Iterations = {1}", ls, it);
+	                    if (membrane is DSFMMembrane dsfm && membrane.Concrete.Cracked)
+	                    {
+		                    Console.WriteLine("LS = {0}, Iterations = {1}, Slip Approach: {2}", ls, it, dsfm.SlipApproach);
 
-                        if (membrane is DSFMMembrane dsfm && membrane.Concrete.Cracked)
-                        {
-                            Console.WriteLine(dsfm.SlipApproach);
-                        }
+	                    }
+	                    else
+		                    Console.WriteLine("LS = {0}, Iterations = {1}", ls, it);
 
                         // Set results on output matrices
-                        SaveResults(membrane, ls);
+                        SaveResults(membrane, fi, ls);
 
                         break;
                     }
@@ -126,16 +131,21 @@ namespace RCMembrane
                     {
 	                    // Update stiffness and strains
 	                    SecantStiffnessUpdate();
-	                    StrainUpdate();
+	                    StrainUpdate(membrane);
                     }
                 }
 
                 if (membrane.Stop.S)
-                    break;
+                {
+	                // Decrement ls to correct output file
+	                ls--;
+	                break;
+                }
             }
 
             // Output results
-            OutputResults(numLoadSteps);
+            OutputResults(membrane, out fileName, ls);
+			AnalysisDone(membrane);
         }
 
 		/// <summary>
@@ -167,23 +177,28 @@ namespace RCMembrane
 		private static void ResidualUpdate(Membrane membrane, StressState appliedStresses)
 		{
 			// Set new values
-            _lastResidual    = _currentResidual;
+            _lastResidual = _currentResidual;
 			_currentResidual = membrane.AverageStresses - appliedStresses;
-
-            //if (membrane is DSFMMembrane dsfm)
-            //    _currentResidual += dsfm.PseudoPStresses();
         }
 
-		/// <summary>
+        /// <summary>
         /// Update strains.
         /// </summary>
-        private static void StrainUpdate()
+        /// <param name="membrane">The membrane object.</param>
+        private static void StrainUpdate(Membrane membrane)
         {
 			// Get current strains
 			var eCur = _currentStrains;
 
-			// Increment strains
-			var inc = StrainState.FromStresses(-_currentResidual, _currentStiffness);
+			// Get residual
+			var res = _currentResidual;
+
+            // Correct residual if DSFM
+            //if (membrane is DSFMMembrane dsfm)
+            //    res -= dsfm.PseudoStresses;
+
+            // Increment strains
+            var inc = StrainState.FromStresses(-res, _currentStiffness);
 			_currentStrains  += inc;
 
 			// Set last strains

@@ -39,27 +39,25 @@ namespace RCMembrane
         /// </summary>
         private static PrincipalStressState[] _principalStressOutput;
 
-		/// <summary>
-        /// The output file name and save location.
-        /// </summary>
-        private const string ResultFileName = "D:/membrane_result.csv";
-
         /// <summary>
         /// Simple console solver, with example from <see cref="PanelExamples"/>.
         /// </summary>
         public static void Solve()
 	    {
 		    // Initiate the membrane
-		    var membrane = PanelExamples.PV10(ConstitutiveModel.DSFM);
+		    var membraneMCFT = PanelExamples.PB12();
+		    var membraneDSFM = PanelExamples.PB12(ConstitutiveModel.DSFM);
 
 		    // Initiate stresses
-		    var sigma = new StressState(0, 0, 5);
+		    var sigma = new StressState(0, 0, 2);
 
 		    // Solve
-		    SecantSolver(membrane, sigma);
+		    SecantSolver(membraneMCFT, sigma, out string mcftFile);
+		    SecantSolver(membraneDSFM, sigma, out string dsfmFile);
 
-		    Console.WriteLine("Done! Press any key to exit.");
-		    System.Diagnostics.Process.Start(ResultFileName);
+		    Console.WriteLine("\nDone! Press any key to exit.");
+		    System.Diagnostics.Process.Start(mcftFile);
+		    System.Diagnostics.Process.Start(dsfmFile);
 		    Console.ReadKey();
 	    }
 
@@ -68,11 +66,14 @@ namespace RCMembrane
         /// </summary>
         /// <param name="membrane">The membrane object.</param>
         /// <param name="appliedStresses">Applied <see cref="StressState"/>, in MPa.</param>
+        /// <param name="fileName">The name of saved result file. <para>See: <seealso cref="ResultFileName"/>, <seealso cref="OutputResults"/>.</para></param>
         /// <param name="numLoadSteps">The number of load steps (default: 100).</param>
         /// <param name="maxIterations">Maximum number of iterations (default: 1000).</param>
         /// <param name="tolerance">Stress convergence tolerance (default: 1E-3).</param>
-        private static void Solver(Membrane membrane, StressState appliedStresses, int numLoadSteps = 100, int maxIterations = 1000, double tolerance = 1E-3)
+        private static void Solver(Membrane membrane, StressState appliedStresses, out string fileName, int numLoadSteps = 100, int maxIterations = 1000, double tolerance = 1E-3)
         {
+			AnalysisStart(membrane);
+
             // Get initial stresses
             var f0 = (double)1 / numLoadSteps * appliedStresses;
 
@@ -95,7 +96,8 @@ namespace RCMembrane
 			bool cracked  = false;
 
 			// Initiate load steps
-            for (int ls = 1; ls <= numLoadSteps; ls++)
+			int ls;
+            for (ls = 1; ls <= numLoadSteps; ls++)
             {
                 // Calculate stresses
                 var fi = ls * f0;
@@ -119,18 +121,19 @@ namespace RCMembrane
 
                     if (ConvergenceReached(conv, tolerance, it))
                     {
-                        Console.WriteLine("LS = {0}, Iterations = {1}", ls, it);
-
-                        if (membrane is DSFMMembrane dsfm && membrane.Concrete.Cracked)
+	                    if (membrane is DSFMMembrane dsfm && membrane.Concrete.Cracked)
                         {
-                            Console.WriteLine(dsfm.SlipApproach);
+                            Console.WriteLine("LS = {0}, Iterations = {1}, Slip Approach: {2}", ls, it, dsfm.SlipApproach);
+
                         }
+                        else
+	                        Console.WriteLine("LS = {0}, Iterations = {1}", ls, it);
 
                         // Update stiffness
                         D = membrane.Stiffness;
 
-						// Set results on output matrices
-						SaveResults(membrane, ls);
+                        // Set results on output matrices
+                        SaveResults(membrane, fi, ls);
 
                         break;
                     }
@@ -146,11 +149,16 @@ namespace RCMembrane
                 }
 
                 if (membrane.Stop.S)
-                    break;
+                {
+					// Decrement ls to correct output file
+					ls--;
+	                break;
+                }
             }
 
 			// Output results
-			OutputResults(numLoadSteps);
+			OutputResults(membrane, out fileName, ls);
+			AnalysisDone(membrane);
         }
 
         /// <summary>
@@ -225,14 +233,15 @@ namespace RCMembrane
         /// <para>See: <see cref="_strainOutput"/>, <see cref="_stressOutput"/>, <see cref="_concretePrincipalStrainOutput"/> and <see cref="_principalStressOutput"/>.</para>
         /// </summary>
         /// <param name="membrane">The <see cref="Membrane"/> element analyzed.</param>
+        /// <param name="appliedStresses">Current applied <see cref="StressState"/>.</param>
         /// <param name="loadStep">The current load step.</param>
-        private static void SaveResults(Membrane membrane, int loadStep)
+        private static void SaveResults(Membrane membrane, StressState appliedStresses, int loadStep)
         {
 			// Get row
 			int i = loadStep - 1;
 
 			_strainOutput[i]          = membrane.AverageStrains;
-			_stressOutput[i]          = membrane.AverageStresses;
+			_stressOutput[i]          = appliedStresses;
 			_principalStressOutput[i] = membrane.Concrete.PrincipalStresses;
 
 			_concretePrincipalStrainOutput[i] = membrane.Concrete.PrincipalStrains;
@@ -242,17 +251,19 @@ namespace RCMembrane
         /// <summary>
         /// Output results in a CSV file.
         /// </summary>
-        /// <param name="numLoadSteps">The number of load steps (default: 100).</param>
-        private static void OutputResults(int numLoadSteps = 100)
+        /// <param name="membrane">The <see cref="Membrane"/> element analyzed.</param>
+        /// <param name="fileName">The name of saved result file. <para>See: <seealso cref="ResultFileName"/>.</para></param>
+        /// <param name="calculatedLoadSteps">The number of calculated load steps (default: 100).</param>
+        private static void OutputResults(Membrane membrane, out string fileName, int calculatedLoadSteps = 100)
         {
 	        // Get readers for result
 	        string[]
 		        outputReaders = { "ex", "ey", "exy", "", "fx", "fy", "fxy", "", "ec1", "ec2", "theta1e", "", "fc1", "fc2", "theta1f" };
 
             // Result matrices
-            var result = Matrix.Build.Dense(numLoadSteps, outputReaders.Length);
+            var result = Matrix.Build.Dense(calculatedLoadSteps, outputReaders.Length, double.NaN);
 
-            for (int i = 0; i < numLoadSteps; i++)
+            for (int i = 0; i < calculatedLoadSteps; i++)
             {
 				// Set stress and strain states
 				result.SetSubMatrix(i,  0, _strainOutput[i].AsVector().ToRowMatrix());
@@ -265,8 +276,45 @@ namespace RCMembrane
 				result[i, 14] = Trig.RadianToDegree(_principalStressOutput[i].Theta1);
             }
 
+            fileName = ResultFileName(membrane);
+
 	        // Save results
-	        DelimitedWriter.Write(ResultFileName, result, ";", outputReaders, null, null, 0);
+	        DelimitedWriter.Write(fileName, result, ";", outputReaders, null, null, double.NaN);
         }
+
+		/// <summary>
+        /// Write a starting message in <see cref="Console"/>.
+        /// </summary>
+        /// <param name="membrane"></param>
+        private static void AnalysisStart(Membrane membrane)
+        {
+			Console.WriteLine("\nStarting {0} analysis...\n", membrane is MCFTMembrane ? "MCFT" : "DSFM");
+        }
+
+		/// <summary>
+        /// Write a ending message in <see cref="Console"/>.
+        /// </summary>
+        /// <param name="membrane"></param>
+        private static void AnalysisDone(Membrane membrane)
+        {
+			Console.WriteLine("\n{0} analysis done.\n", membrane is MCFTMembrane ? "MCFT" : "DSFM");
+        }
+
+        /// <summary>
+        /// Returns the output file name and save location.
+        /// </summary>
+        /// <param name="membrane">The <see cref="Membrane"/> element analyzed.</param>
+        private static string ResultFileName(Membrane membrane)
+        {
+	        // Set filename
+	        var fileName = "D:/membrane_result_";
+
+	        fileName += membrane is MCFTMembrane ? "MCFT" : "DSFM";
+
+	        // Set file extension
+			return
+				fileName + ".csv";
+        }
+
     }
 }

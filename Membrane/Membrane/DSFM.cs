@@ -41,6 +41,11 @@ namespace RCMembrane
 		}
 
         /// <summary>
+        /// Get current pseudo-stresses, in MPa.
+        /// </summary>
+        public StressState PseudoStresses => CrackSlipStrains.IsZero ? StressState.Zero : StressState.FromStrains(CrackSlipStrains, Concrete.Stiffness);
+
+        /// <summary>
         /// Membrane element for DSFM analysis.
         /// </summary>
         /// <inheritdoc/>
@@ -89,11 +94,8 @@ namespace RCMembrane
 			// Set strains
 			AverageStrains = appliedStrains;
 
-			// Calculate reference length
-			double lr = ReferenceLength();
-
 			// Calculate and set concrete and steel stresses
-			Concrete.CalculatePrincipalStresses(ConcreteStrains, lr, Reinforcement);
+			Concrete.CalculatePrincipalStresses(ConcreteStrains, Reinforcement, ReferenceLength());
 			Reinforcement.CalculateStresses(AverageStrains);
 
 			// Calculate apparent principal strains
@@ -360,10 +362,5 @@ namespace RCMembrane
 			return
 				yxy * cos2ThetaS + (ey - ex) * sin2ThetaS;
 		}
-
-		/// <summary>
-		/// Calculate current pseudo-prestresses, in MPa.
-		/// </summary>
-		public StressState PseudoPStresses() => CrackSlipStrains.IsZero ? StressState.Zero : StressState.FromStrains(CrackSlipStrains, Concrete.Stiffness);
 	}
 }
