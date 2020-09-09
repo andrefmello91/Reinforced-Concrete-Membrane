@@ -71,7 +71,7 @@ namespace RCMembrane
         /// Membrane element for DSFM analysis.
         /// </summary>
         /// <param name="considerCrackSlip">Consider crack slip? (default: true)</param>
-        public DSFMMembrane(Parameters concreteParameters, Constitutive concreteConstitutive, WebReinforcement reinforcement, double width, bool considerCrackSlip = true) 
+        public DSFMMembrane(in Parameters concreteParameters, in Constitutive concreteConstitutive, WebReinforcement reinforcement, double width, bool considerCrackSlip = true) 
 	        : this(concreteParameters, concreteConstitutive, reinforcement, Length.FromMillimeters(width), considerCrackSlip)
 		{
 		}
@@ -81,7 +81,7 @@ namespace RCMembrane
         /// </summary>
         /// <inheritdoc/>
         /// <param name="considerCrackSlip">Consider crack slip? (default: true)</param>
-        public DSFMMembrane(Parameters concreteParameters, Constitutive concreteConstitutive, WebReinforcement reinforcement, Length width, bool considerCrackSlip = true) 
+        public DSFMMembrane(in Parameters concreteParameters, in Constitutive concreteConstitutive, WebReinforcement reinforcement, Length width, bool considerCrackSlip = true) 
 	        : base(concreteParameters, concreteConstitutive, reinforcement, width)
         {
 	        // Initiate crack slip strains

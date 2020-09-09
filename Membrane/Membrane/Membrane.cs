@@ -80,7 +80,7 @@ namespace RCMembrane
         /// <param name="concreteConstitutive">Concrete <see cref="Constitutive"/> object.</param>
         /// <param name="reinforcement"><see cref="WebReinforcement"/> object .</param>
         /// <param name="width">The width of cross-section, in mm.</param>
-        public Membrane(Parameters concreteParameters, Constitutive concreteConstitutive, WebReinforcement reinforcement, double width)
+        public Membrane(in Parameters concreteParameters, in Constitutive concreteConstitutive, WebReinforcement reinforcement, double width)
 			: this (concreteParameters, concreteConstitutive, reinforcement, Length.FromMillimeters(width))
         {
         }
@@ -92,11 +92,11 @@ namespace RCMembrane
         /// <param name="concreteConstitutive">Concrete <see cref="Constitutive"/> object.</param>
         /// <param name="reinforcement"><see cref="WebReinforcement"/> object .</param>
         /// <param name="width">The width of cross-section.</param>
-        public Membrane(Parameters concreteParameters, Constitutive concreteConstitutive, WebReinforcement reinforcement, Length width)
+        public Membrane(in Parameters concreteParameters, in Constitutive concreteConstitutive, WebReinforcement reinforcement, Length width)
         {
             // Initiate new materials
 			Concrete      = new BiaxialConcrete(concreteParameters, concreteConstitutive);
-            Reinforcement = WebReinforcement.Copy(reinforcement);
+            Reinforcement = reinforcement.Copy();
 
             _width = width;
 
