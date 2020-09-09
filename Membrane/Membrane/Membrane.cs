@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using Extensions.Number;
 using MathNet.Numerics;
 using MathNet.Numerics.LinearAlgebra;
 using MathNet.Numerics.LinearAlgebra.Double;
@@ -7,6 +8,7 @@ using Material.Concrete;
 using Material.Reinforcement;
 using MathNet.Numerics.Data.Text;
 using OnPlaneComponents;
+using UnitsNet;
 using Parameters    = Material.Concrete.Parameters;
 
 namespace RCMembrane
@@ -14,59 +16,66 @@ namespace RCMembrane
 	/// <summary>
     /// Membrane element base class.
     /// </summary>
-    public abstract class Membrane
+    public abstract class Membrane : IEquatable<Membrane>
     {
+		// Auxiliary fields
+		private Length _width;
+
 		/// <summary>
-        /// Get/set <see cref="BiaxialConcrete"/> of the membrane element.
+        /// Get <see cref="BiaxialConcrete"/> of the membrane element.
         /// </summary>
-        public BiaxialConcrete          Concrete               { get; set; }
+        public BiaxialConcrete Concrete { get; protected set; }
 
         /// <summary>
-        /// Get/set <see cref="BiaxialReinforcement"/> of the membrane element.
+        /// Get/set <see cref="WebReinforcement"/> of the membrane element.
 		/// </summary>
-        public BiaxialReinforcement     Reinforcement          { get; }
+        public WebReinforcement Reinforcement { get; }
 
         /// <summary>
         /// Get/set stop parameters of the membrane element.
         /// </summary>
-        public (bool S, string Message) Stop                   { get; set; }
+        public (bool S, string Message) Stop { get; set; }
 
 		/// <summary>
         /// Get/set the average <see cref="StrainState"/> in the membrane element.
         /// </summary>
-        public StrainState           AverageStrains                { get; set; }
+        public StrainState AverageStrains { get; protected set; }
 
 		/// <summary>
 		/// Get/set the average <see cref="PrincipalStrainState"/>.
 		/// </summary>
-		public virtual PrincipalStrainState AveragePrincipalStrains { get; set; }
+		public virtual PrincipalStrainState AveragePrincipalStrains { get; protected set; }
 
         /// <summary>
         /// Get the <see cref="StrainState"/> in concrete.
         /// </summary>
-        public abstract StrainState           ConcreteStrains                { get; }
+        public abstract StrainState ConcreteStrains { get; }
 
-		/// <summary>
-        /// Get the width of the membrane element.
+        /// <summary>
+        /// Get the width of the membrane element, in mm.
         /// </summary>
-		public double Width { get; }
+        public double Width => _width.Millimeters;
 
         /// <summary>
         /// Base membrane element constructor.
         /// </summary>
         /// <param name="concrete"><see cref="BiaxialConcrete"/> object .</param>
-        /// <param name="reinforcement"><see cref="BiaxialReinforcement"/> object.</param>
+        /// <param name="reinforcement"><see cref="WebReinforcement"/> object.</param>
         /// <param name="width">The width of cross-section, in mm.</param>
-        public Membrane(BiaxialConcrete concrete, BiaxialReinforcement reinforcement, double width)
+        public Membrane(BiaxialConcrete concrete, WebReinforcement reinforcement, double width)
+			: this (concrete.Parameters, concrete.Constitutive, reinforcement, width)
         {
-            // Initiate new materials
-            Concrete      = BiaxialConcrete.Copy(concrete);
-            Reinforcement = BiaxialReinforcement.Copy(reinforcement);
+        }
 
-            Width = width;
-
-            // Set initial strains
-            AverageStrains = StrainState.Zero;
+        /// <summary>
+        /// Base membrane element constructor.
+        /// </summary>
+        /// <param name="concrete"><see cref="BiaxialConcrete"/> object .</param>
+        /// <param name="reinforcement"><see cref="WebReinforcement"/> object.</param>
+        /// <param name="width">The width of cross-section.</param>
+        public Membrane(BiaxialConcrete concrete, WebReinforcement reinforcement, Length width)
+			: this (concrete.Parameters, concrete.Constitutive, reinforcement, width)
+        {
         }
 
         /// <summary>
@@ -74,15 +83,27 @@ namespace RCMembrane
         /// </summary>
         /// <param name="concreteParameters">Concrete <see cref="Parameters"/> object.</param>
         /// <param name="concreteConstitutive">Concrete <see cref="Constitutive"/> object.</param>
-        /// <param name="reinforcement"><see cref="BiaxialReinforcement"/> object .</param>
+        /// <param name="reinforcement"><see cref="WebReinforcement"/> object .</param>
         /// <param name="width">The width of cross-section, in mm.</param>
-        public Membrane(Parameters concreteParameters, Constitutive concreteConstitutive, BiaxialReinforcement reinforcement, double width)
+        public Membrane(Parameters concreteParameters, Constitutive concreteConstitutive, WebReinforcement reinforcement, double width)
+			: this (concreteParameters, concreteConstitutive, reinforcement, Length.FromMillimeters(width))
+        {
+        }
+
+        /// <summary>
+        /// Base membrane element constructor.
+        /// </summary>
+        /// <param name="concreteParameters">Concrete <see cref="Parameters"/> object.</param>
+        /// <param name="concreteConstitutive">Concrete <see cref="Constitutive"/> object.</param>
+        /// <param name="reinforcement"><see cref="WebReinforcement"/> object .</param>
+        /// <param name="width">The width of cross-section.</param>
+        public Membrane(Parameters concreteParameters, Constitutive concreteConstitutive, WebReinforcement reinforcement, Length width)
         {
             // Initiate new materials
 			Concrete      = new BiaxialConcrete(concreteParameters, concreteConstitutive);
-            Reinforcement = BiaxialReinforcement.Copy(reinforcement);
+            Reinforcement = WebReinforcement.Copy(reinforcement);
 
-            Width = width;
+            _width = width;
 
             // Set initial strains
             AverageStrains = StrainState.Zero;
@@ -92,10 +113,10 @@ namespace RCMembrane
         /// Read membrane element based on concrete constitutive model.
         /// </summary>
         /// <param name="concrete"><see cref="BiaxialConcrete"/> object .</param>
-        /// <param name="reinforcement"><see cref="BiaxialReinforcement"/> object.</param>
+        /// <param name="reinforcement"><see cref="WebReinforcement"/> object.</param>
         /// <param name="width">The width of cross-section, in mm.</param>
         /// <param name="considerCrackSlip">Consider crack slip? Only for <see cref="DSFMMembrane"/> (default: true)</param>
-        public static Membrane ReadMembrane(BiaxialConcrete concrete, BiaxialReinforcement reinforcement, double width, bool considerCrackSlip = true)
+        public static Membrane ReadMembrane(BiaxialConcrete concrete, WebReinforcement reinforcement, double width, bool considerCrackSlip = true)
         {
 			if (concrete.Constitutive is MCFTConstitutive)
 				return new MCFTMembrane(concrete, reinforcement, width);
@@ -108,16 +129,13 @@ namespace RCMembrane
         /// </summary>
         /// <param name="concreteParameters">Concrete <see cref="Parameters"/> object.</param>
         /// <param name="concreteConstitutive">Concrete <see cref="Constitutive"/> object.</param>
-        /// <param name="reinforcement"><see cref="BiaxialReinforcement"/> object .</param>
+        /// <param name="reinforcement"><see cref="WebReinforcement"/> object .</param>
         /// <param name="width">The width of cross-section, in mm.</param>
         /// <param name="considerCrackSlip">Consider crack slip? Only for DSFM (default: true)</param>
-        public static Membrane ReadMembrane(Parameters concreteParameters, Constitutive concreteConstitutive, BiaxialReinforcement reinforcement, double width, bool considerCrackSlip = true)
-        {
-			if (concreteConstitutive is MCFTConstitutive)
-				return new MCFTMembrane(concreteParameters, concreteConstitutive, reinforcement, width);
-
-			return new DSFMMembrane(concreteParameters, concreteConstitutive, reinforcement, width, considerCrackSlip);
-        }
+        public static Membrane ReadMembrane(Parameters concreteParameters, Constitutive concreteConstitutive, WebReinforcement reinforcement, double width, bool considerCrackSlip = true) =>
+	        concreteConstitutive is MCFTConstitutive
+		        ? new MCFTMembrane(concreteParameters, concreteConstitutive, reinforcement, width)
+		        : new DSFMMembrane(concreteParameters, concreteConstitutive, reinforcement, width, considerCrackSlip);
 
         /// <summary>
         /// Get average <see cref="StressState"/>, in MPa.
@@ -147,18 +165,10 @@ namespace RCMembrane
         /// <para>sm = 21 mm + 0.155 phi / rho</para>
         /// </summary>
         /// <param name="direction">The <see cref="WebReinforcementDirection"/>.</param>
-        private double CrackSpacing(WebReinforcementDirection direction)
-        {
-	        if (direction is null || direction.BarDiameter == 0 || direction.Ratio == 0)
-		        return 21;
-
-	        double
-		        phi = direction.BarDiameter,
-		        ps  = direction.Ratio;
-
-	        return
-		        21 + 0.155 * phi / ps;
-        }
+        private double CrackSpacing(WebReinforcementDirection direction) =>
+			direction is null || direction.BarDiameter.ApproxZero() || direction.Ratio.ApproxZero()
+				? 21
+				: 21 + 0.155 * direction.BarDiameter / direction.Ratio;
 
 		/// <summary>
         /// Calculate the crack spacing in principal strain direction.
@@ -166,7 +176,7 @@ namespace RCMembrane
         protected double CrackSpacing()
         {
 	        // Get the angles
-	        var (cosThetaC, sinThetaC) = DirectionCosines(Concrete.PrincipalStrains.Theta1, true);
+	        var (cosThetaC, sinThetaC) = Concrete.PrincipalStrains.Theta1.DirectionCosines(true);
 
 			// Calculate crack spacings in X and Y
 			double
@@ -198,8 +208,8 @@ namespace RCMembrane
 				f1a    = Concrete.PrincipalStresses.Sigma1;
 
             // Calculate thetaC sine and cosine
-            var (cosTheta, sinTheta) = DirectionCosines(theta1);
-            double tanTheta          = Tangent(theta1);
+            var (cosTheta, sinTheta) = theta1.DirectionCosines();
+            double tanTheta          = theta1.Tan();
 
             // Reinforcement capacity reserve
             double
@@ -257,45 +267,35 @@ namespace RCMembrane
         /// </summary>
         public double ReferenceLength() => 0.5 * CrackSpacing();
 
-        /// <summary>
-        /// Verify if a number is zero (true if is not zero).
-        /// </summary>
-        /// <param name="number">The number.</param>
-        public bool NotZero(double number) => number != 0;
-
-        /// <summary>
-        /// Calculate the direction cosines (cos, sin) of an angle.
-        /// </summary>
-        /// <param name="angle">Angle, in radians.</param>
-        /// <param name="absoluteValue">Return cosine and sine in absolute values? (default: false).</param>
-        public (double cos, double sin) DirectionCosines(double angle, bool absoluteValue = false)
+        public override string ToString()
         {
-	        double
-		        cos = Trig.Cos(angle).CoerceZero(1E-6),
-		        sin = Trig.Sin(angle).CoerceZero(1E-6);
-
-			if (!absoluteValue)
-				return (cos, sin);
-
-			return (Math.Abs(cos), Math.Abs(sin));
+	        return
+		        "Membrane\n" +
+		        $"Width = {_width}\n" +
+		        $"{Concrete}\n" +
+		        $"{Reinforcement}\n";
         }
 
         /// <summary>
-        /// Calculate tangent of an angle.
+        /// Compare two concrete objects.
+        /// <para>Returns true if <see cref="Concrete"/> and <see cref="Reinforcement"/> are equal.</para>
         /// </summary>
-        /// <param name="angle">Angle, in radians.</param>
-        public static double Tangent(double angle)
-        {
-	        double tan;
+        /// <param name="other">The other <see cref="Membrane"/> object.</param>
+        public virtual bool Equals(Membrane other) => !(other is null) && (Concrete == other.Concrete && Reinforcement == other.Reinforcement);
 
-	        // Calculate the tangent, return 0 if 90 or 270 degrees
-	        if (angle == Constants.PiOver2 || angle == Constants.Pi3Over2)
-		        tan = 1.633e16;
+        public override bool Equals(object obj) => obj is Membrane other && Equals(other);
 
-	        else
-		        tan = Trig.Cos(angle).CoerceZero(1E-6);
+        public override int GetHashCode() => Concrete.GetHashCode() + Reinforcement.GetHashCode();
 
-	        return tan;
-        }
+        /// <summary>
+        /// Returns true if parameters and constitutive model are equal.
+        /// </summary>
+        public static bool operator == (Membrane left, Membrane right) => !(left is null) && left.Equals(right);
+
+        /// <summary>
+        /// Returns true if parameters and constitutive model are different.
+        /// </summary>
+        public static bool operator != (Membrane left, Membrane right) => !(left is null) && !left.Equals(right);
+
     }
 }

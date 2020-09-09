@@ -1,6 +1,5 @@
 ﻿using Material.Concrete;
 using Material.Reinforcement;
-using Reinforcement = Material.Reinforcement.BiaxialReinforcement;
 using Concrete      = Material.Concrete.BiaxialConcrete;
 
 namespace RCMembrane
@@ -31,7 +30,7 @@ namespace RCMembrane
 		    var steelY = new Steel(283, 200000);
 
 		    // Get reinforcement
-		    var reinforcement = new Reinforcement(6.35, 50.55, steelX, 6.35, 53.86, steelY, 70);
+		    var reinforcement = new WebReinforcement(6.35, 50.55, steelX, 6.35, 53.86, steelY, 70);
 
             return
                 Membrane.ReadMembrane(concrete, reinforcement, 70, considerCrackSlip);
@@ -54,7 +53,7 @@ namespace RCMembrane
 		    var steelXY = new Steel(428, 200000);
 
             // Get reinforcement
-            var reinforcement = new Reinforcement(2.03, 51.37, steelXY, 70);
+            var reinforcement = new WebReinforcement(2.03, 51.37, steelXY, 70);
 
             return
                 Membrane.ReadMembrane(concrete, reinforcement, 70, considerCrackSlip);
@@ -77,7 +76,7 @@ namespace RCMembrane
 		    var steelXY = new Steel(662, 200000);
 
 		    // Get reinforcement
-		    var reinforcement = new Reinforcement(3.3, 50.91, steelXY, 70);
+		    var reinforcement = new WebReinforcement(3.3, 50.91, steelXY, 70);
 
             return
                 Membrane.ReadMembrane(concrete, reinforcement, 70, considerCrackSlip);
@@ -100,7 +99,7 @@ namespace RCMembrane
 		    var steelXY = new Steel(242, 200000);
 
 		    // Get reinforcement
-		    var reinforcement = new Reinforcement(3.45, 25.2, steelXY, 70);
+		    var reinforcement = new WebReinforcement(3.45, 25.2, steelXY, 70);
 
             return
                 Membrane.ReadMembrane(concrete, reinforcement, 70, considerCrackSlip);
@@ -123,7 +122,7 @@ namespace RCMembrane
 		    var steelXY = new Steel(621, 200000);
 
 		    // Get reinforcement
-		    var reinforcement = new Reinforcement(5.79, 101.66, steelXY, 70);
+		    var reinforcement = new WebReinforcement(5.79, 101.66, steelXY, 70);
 
             return
                 Membrane.ReadMembrane(concrete, reinforcement, 70, considerCrackSlip);
@@ -146,7 +145,7 @@ namespace RCMembrane
 		    var steelXY = new Steel(266, 200000);
 
 		    // Get reinforcement
-		    var reinforcement = new Reinforcement(6.35, 50.55, steelXY, 70);
+		    var reinforcement = new WebReinforcement(6.35, 50.55, steelXY, 70);
 
             return
                 Membrane.ReadMembrane(concrete, reinforcement, 70, considerCrackSlip);
@@ -169,7 +168,7 @@ namespace RCMembrane
 		    var steelXY = new Steel(453, 200000);
 
 		    // Get reinforcement
-		    var reinforcement = new Reinforcement(6.35, 50.55, steelXY, 70);
+		    var reinforcement = new WebReinforcement(6.35, 50.55, steelXY, 70);
 
             return
                 Membrane.ReadMembrane(concrete, reinforcement, 70, considerCrackSlip);
@@ -192,7 +191,7 @@ namespace RCMembrane
 		    var steelXY = new Steel(462, 200000);
 
 		    // Get reinforcement
-		    var reinforcement = new Reinforcement(5.44, 25.37, steelXY, 70);
+		    var reinforcement = new WebReinforcement(5.44, 25.37, steelXY, 70);
 
             return
                 Membrane.ReadMembrane(concrete, reinforcement, 70, considerCrackSlip);
@@ -215,7 +214,7 @@ namespace RCMembrane
 		    var steelXY = new Steel(455, 200000);
 
 		    // Get reinforcement
-		    var reinforcement = new Reinforcement(6.35, 50.55, steelXY, 70);
+		    var reinforcement = new WebReinforcement(6.35, 50.55, steelXY, 70);
 
             return
                 Membrane.ReadMembrane(concrete, reinforcement, 70, considerCrackSlip);
@@ -238,7 +237,7 @@ namespace RCMembrane
 		    var steelXY = new Steel(276, 200000);
 
 		    // Get reinforcement
-		    var reinforcement = new Reinforcement(6.35, 50.55, steelXY, 4.7, 49.57, steelXY, 70);
+		    var reinforcement = new WebReinforcement(6.35, 50.55, steelXY, 4.7, 49.57, steelXY, 70);
 
 			return
 				Membrane.ReadMembrane(concrete, reinforcement, 70, considerCrackSlip);
@@ -261,7 +260,7 @@ namespace RCMembrane
 		    var steelXY = new Steel(235, 200000);
 
 		    // Get reinforcement
-		    var reinforcement = new Reinforcement(6.35, 50.55, steelXY, 5.44, 50.7, steelXY, 70);
+		    var reinforcement = new WebReinforcement(6.35, 50.55, steelXY, 5.44, 50.7, steelXY, 70);
 
             return
                 Membrane.ReadMembrane(concrete, reinforcement, 70, considerCrackSlip);
@@ -284,7 +283,7 @@ namespace RCMembrane
 		    var steelXY = new Steel(468, 200000);
 
 		    // Get reinforcement
-		    var reinforcement = new Reinforcement(6.35, 50.55, steelXY, 3.18, 50.43, steelXY, 70);
+		    var reinforcement = new WebReinforcement(6.35, 50.55, steelXY, 3.18, 50.43, steelXY, 70);
 
             return
                 Membrane.ReadMembrane(concrete, reinforcement, 70, considerCrackSlip);
@@ -307,7 +306,7 @@ namespace RCMembrane
 		    var steelXY = new Steel(248, 200000);
 
 		    // Get reinforcement
-		    var reinforcement = new Reinforcement(6.35, 50.55, steelXY, 0, 0, null, 70);
+		    var reinforcement = new WebReinforcement(6.35, 50.55, steelXY, 0, 0, null, 70);
 
             return
                 Membrane.ReadMembrane(concrete, reinforcement, 70, considerCrackSlip);
@@ -330,7 +329,7 @@ namespace RCMembrane
 		    var steelXY = new Steel(455, 200000);
 
 		    // Get reinforcement
-		    var reinforcement = new Reinforcement(6.35, 50.55, steelXY, 70);
+		    var reinforcement = new WebReinforcement(6.35, 50.55, steelXY, 70);
 
             return
                 Membrane.ReadMembrane(concrete, reinforcement, 70, considerCrackSlip);
@@ -353,7 +352,7 @@ namespace RCMembrane
 		    var steelXY = new Steel(255, 200000);
 
 		    // Get reinforcement
-		    var reinforcement = new Reinforcement(4.09, 50.73, steelXY, 70);
+		    var reinforcement = new WebReinforcement(4.09, 50.73, steelXY, 70);
 
             return
                 Membrane.ReadMembrane(concrete, reinforcement, 70, considerCrackSlip);
@@ -384,7 +383,7 @@ namespace RCMembrane
 	        var steelXY = new Steel(255, 200000);
 
 	        // Get reinforcement
-	        var reinforcement = new Reinforcement(4.09, 50.73, steelXY, 70);
+	        var reinforcement = new WebReinforcement(4.09, 50.73, steelXY, 70);
 
 	        return
 		        Membrane.ReadMembrane(concrete, reinforcement, 70, considerCrackSlip);
@@ -408,7 +407,7 @@ namespace RCMembrane
 	        var steelY = new Steel(412, 200000);
 
 	        // Get reinforcement
-	        var reinforcement = new Reinforcement(6.35, 50.55, steelX, 2.67, 50, steelY, 70);
+	        var reinforcement = new WebReinforcement(6.35, 50.55, steelX, 2.67, 50, steelY, 70);
 
 	        return
 		        Membrane.ReadMembrane(concrete, reinforcement, 70, considerCrackSlip);
@@ -432,7 +431,7 @@ namespace RCMembrane
 	        var steelY = new Steel(299, 200000);
 
 	        // Get reinforcement
-	        var reinforcement = new Reinforcement(6.35, 50.55, steelX, 4.01, 50.82, steelY, 70);
+	        var reinforcement = new WebReinforcement(6.35, 50.55, steelX, 4.01, 50.82, steelY, 70);
 
 	        return
 		        Membrane.ReadMembrane(concrete, reinforcement, 70, considerCrackSlip);
@@ -456,7 +455,7 @@ namespace RCMembrane
 		    var steelY = new Steel(297, 200000);
 
 		    // Get reinforcement
-		    var reinforcement = new Reinforcement(6.35, 50.55, steelX, 4.47, 50.38, steelY, 70);
+		    var reinforcement = new WebReinforcement(6.35, 50.55, steelX, 4.47, 50.38, steelY, 70);
 
             return
                 Membrane.ReadMembrane(concrete, reinforcement, 70, considerCrackSlip);
@@ -480,7 +479,7 @@ namespace RCMembrane
 		    var steelY = new Steel(302, 200000);
 
 		    // Get reinforcement
-		    var reinforcement = new Reinforcement(6.35, 50.55, steelX, 5.41, 50.52, steelY, 70);
+		    var reinforcement = new WebReinforcement(6.35, 50.55, steelX, 5.41, 50.52, steelY, 70);
 
             return
                 Membrane.ReadMembrane(concrete, reinforcement, 70, considerCrackSlip);
@@ -504,7 +503,7 @@ namespace RCMembrane
 		    var steelY = new Steel(420, 200000);
 
 		    // Get reinforcement
-		    var reinforcement = new Reinforcement(6.35, 50.55, steelX, 5.87, 50.87, steelY, 70);
+		    var reinforcement = new WebReinforcement(6.35, 50.55, steelX, 5.87, 50.87, steelY, 70);
 
             return
                 Membrane.ReadMembrane(concrete, reinforcement, 70, considerCrackSlip);
@@ -527,7 +526,7 @@ namespace RCMembrane
 		    var steelXY = new Steel(518, 200000);
 
 		    // Get reinforcement
-		    var reinforcement = new Reinforcement(6.35, 50.55, steelXY, 70);
+		    var reinforcement = new WebReinforcement(6.35, 50.55, steelXY, 70);
 
             return
                 Membrane.ReadMembrane(concrete, reinforcement, 70, considerCrackSlip);
@@ -550,7 +549,7 @@ namespace RCMembrane
 		    var steelXY = new Steel(492, 200000);
 
 		    // Get reinforcement
-		    var reinforcement = new Reinforcement(6.35, 50.55, steelXY, 70);
+		    var reinforcement = new WebReinforcement(6.35, 50.55, steelXY, 70);
 
             return
                 Membrane.ReadMembrane(concrete, reinforcement, 70, considerCrackSlip);
@@ -573,7 +572,7 @@ namespace RCMembrane
 		    var steelXY = new Steel(466, 200000);
 
 		    // Get reinforcement
-		    var reinforcement = new Reinforcement(6.35, 50.55, steelXY, 70);
+		    var reinforcement = new WebReinforcement(6.35, 50.55, steelXY, 70);
 
             return
                 Membrane.ReadMembrane(concrete, reinforcement, 70, considerCrackSlip);
@@ -597,7 +596,7 @@ namespace RCMembrane
 		    var steelY = new Steel(463, 200000);
 
 		    // Get reinforcement
-		    var reinforcement = new Reinforcement(6.35, 50.55, steelX, 4.7, 49.08, steelY, 70);
+		    var reinforcement = new WebReinforcement(6.35, 50.55, steelX, 4.7, 49.08, steelY, 70);
 
             return
                 Membrane.ReadMembrane(concrete, reinforcement, 70, considerCrackSlip);
@@ -620,7 +619,7 @@ namespace RCMembrane
 		    var steelX = new Steel(442, 200000);
 
 		    // Get reinforcement
-		    var reinforcement = new Reinforcement(6.35, 50.55, steelX, 70);
+		    var reinforcement = new WebReinforcement(6.35, 50.55, steelX, 70);
 
             return
                 Membrane.ReadMembrane(concrete, reinforcement, 70, considerCrackSlip);
@@ -643,7 +642,7 @@ namespace RCMembrane
 		    var steelX = new Steel(483, 200000);
 
 		    // Get reinforcement
-		    var reinforcement = new Reinforcement(6.35, 50.55, steelX, 70);
+		    var reinforcement = new WebReinforcement(6.35, 50.55, steelX, 70);
 
             return
                 Membrane.ReadMembrane(concrete, reinforcement, 70, considerCrackSlip);
@@ -667,7 +666,7 @@ namespace RCMembrane
 		    var steelY = new Steel(324, 200000);
 
 		    // Get reinforcement
-		    var reinforcement = new Reinforcement(6.35, 50.55, steelX, 4.47, 50.38, steelY, 70);
+		    var reinforcement = new WebReinforcement(6.35, 50.55, steelX, 4.47, 50.38, steelY, 70);
 
             return
                 Membrane.ReadMembrane(concrete, reinforcement, 70, considerCrackSlip);
@@ -691,7 +690,7 @@ namespace RCMembrane
 		    var steelY = new Steel(472, 200000);
 
 		    // Get reinforcement
-		    var reinforcement = new Reinforcement(6.35, 50.55, steelX, 4.7, 49.08, steelY, 70);
+		    var reinforcement = new WebReinforcement(6.35, 50.55, steelX, 4.7, 49.08, steelY, 70);
 
             return
                 Membrane.ReadMembrane(concrete, reinforcement, 70, considerCrackSlip);
@@ -720,7 +719,7 @@ namespace RCMembrane
 	        var steelX = new Steel(606, 200000);
 
 	        // Get reinforcement
-	        var reinforcement = new Reinforcement(8, 44.46, steelX, 0, 0, null, 70);
+	        var reinforcement = new WebReinforcement(8, 44.46, steelX, 0, 0, null, 70);
 
 	        return
 		        Membrane.ReadMembrane(concrete, reinforcement, 70, considerCrackSlip);
@@ -744,7 +743,7 @@ namespace RCMembrane
 	        var steelY = new Steel(521, 200000);
 
 	        // Get reinforcement
-	        var reinforcement = new Reinforcement(8, 44.46, steelX, 5.72, 179.07, steelY, 70);
+	        var reinforcement = new WebReinforcement(8, 44.46, steelX, 5.72, 179.07, steelY, 70);
 
 	        return
 		        Membrane.ReadMembrane(concrete, reinforcement, 70, considerCrackSlip);
@@ -768,7 +767,7 @@ namespace RCMembrane
 	        var steelY = new Steel(521, 200000);
 
 	        // Get reinforcement
-	        var reinforcement = new Reinforcement(8, 44.46, steelX, 5.72, 89.54, steelY, 70);
+	        var reinforcement = new WebReinforcement(8, 44.46, steelX, 5.72, 89.54, steelY, 70);
 
 	        return
 		        Membrane.ReadMembrane(concrete, reinforcement, 70, considerCrackSlip);
@@ -792,7 +791,7 @@ namespace RCMembrane
 	        var steelY = new Steel(521, 200000);
 
 	        // Get reinforcement
-	        var reinforcement = new Reinforcement(8, 44.46, steelX, 5.72, 89.54, steelY, 70);
+	        var reinforcement = new WebReinforcement(8, 44.46, steelX, 5.72, 89.54, steelY, 70);
 
 	        return
 		        Membrane.ReadMembrane(concrete, reinforcement, 70, considerCrackSlip);
@@ -816,7 +815,7 @@ namespace RCMembrane
 	        var steelY = new Steel(521, 200000);
 
 	        // Get reinforcement
-	        var reinforcement = new Reinforcement(8, 44.46, steelX, 5.72, 179.07, steelY, 70);
+	        var reinforcement = new WebReinforcement(8, 44.46, steelX, 5.72, 179.07, steelY, 70);
 
 	        return
 		        Membrane.ReadMembrane(concrete, reinforcement, 70, considerCrackSlip);
@@ -840,7 +839,7 @@ namespace RCMembrane
 	        var steelY = new Steel(521, 200000);
 
 	        // Get reinforcement
-	        var reinforcement = new Reinforcement(8, 44.46, steelX, 5.72, 179.07, steelY, 70);
+	        var reinforcement = new WebReinforcement(8, 44.46, steelX, 5.72, 179.07, steelY, 70);
 
 	        return
 		        Membrane.ReadMembrane(concrete, reinforcement, 70, considerCrackSlip);
@@ -864,7 +863,7 @@ namespace RCMembrane
 	        var steelY = new Steel(521, 200000);
 
 	        // Get reinforcement
-	        var reinforcement = new Reinforcement(8, 44.46, steelX, 5.72, 89.54, steelY, 70);
+	        var reinforcement = new WebReinforcement(8, 44.46, steelX, 5.72, 89.54, steelY, 70);
 
 	        return
 		        Membrane.ReadMembrane(concrete, reinforcement, 70, considerCrackSlip);
@@ -888,7 +887,7 @@ namespace RCMembrane
 	        var steelY = new Steel(521, 200000);
 
 	        // Get reinforcement
-	        var reinforcement = new Reinforcement(8, 44.46, steelX, 5.72, 59.21, steelY, 70);
+	        var reinforcement = new WebReinforcement(8, 44.46, steelX, 5.72, 59.21, steelY, 70);
 
 	        return
 		        Membrane.ReadMembrane(concrete, reinforcement, 70, considerCrackSlip);
@@ -912,7 +911,7 @@ namespace RCMembrane
 	        var steelY = new Steel(521, 200000);
 
 	        // Get reinforcement
-	        var reinforcement = new Reinforcement(8, 44.46, steelX, 5.72, 179.07, steelY, 70);
+	        var reinforcement = new WebReinforcement(8, 44.46, steelX, 5.72, 179.07, steelY, 70);
 
 	        return
 		        Membrane.ReadMembrane(concrete, reinforcement, 70, considerCrackSlip);
@@ -936,7 +935,7 @@ namespace RCMembrane
 	        var steelY = new Steel(521, 200000);
 
 	        // Get reinforcement
-	        var reinforcement = new Reinforcement(8, 44.46, steelX, 5.72, 59.21, steelY, 70);
+	        var reinforcement = new WebReinforcement(8, 44.46, steelX, 5.72, 59.21, steelY, 70);
 
 	        return
 		        Membrane.ReadMembrane(concrete, reinforcement, 70, considerCrackSlip);
@@ -965,7 +964,7 @@ namespace RCMembrane
 	        var steel = new Steel(425, 200000);
 
 	        // Get reinforcement
-	        var reinforcement = Reinforcement.HorizontalOnly(6, 74.11, steel, 70);
+	        var reinforcement = WebReinforcement.HorizontalOnly(6, 74.11, steel, 70);
 
 	        return
 		        Membrane.ReadMembrane(concrete, reinforcement, 70, considerCrackSlip);
@@ -988,7 +987,7 @@ namespace RCMembrane
 	        var steel = new Steel(425, 200000);
 
 	        // Get reinforcement
-	        var reinforcement = Reinforcement.HorizontalOnly(6, 74.11, steel, 70);
+	        var reinforcement = WebReinforcement.HorizontalOnly(6, 74.11, steel, 70);
 
             return
                 Membrane.ReadMembrane(concrete, reinforcement, 70, considerCrackSlip);
@@ -1011,7 +1010,7 @@ namespace RCMembrane
 	        var steel = new Steel(425, 200000);
 
 	        // Get reinforcement
-	        var reinforcement = Reinforcement.HorizontalOnly(6, 74.11, steel, 70);
+	        var reinforcement = WebReinforcement.HorizontalOnly(6, 74.11, steel, 70);
 
             return
                 Membrane.ReadMembrane(concrete, reinforcement, 70, considerCrackSlip);
@@ -1034,7 +1033,7 @@ namespace RCMembrane
 	        var steel = new Steel(425, 200000);
 
 	        // Get reinforcement
-	        var reinforcement = Reinforcement.HorizontalOnly(6, 74.11, steel, 70);
+	        var reinforcement = WebReinforcement.HorizontalOnly(6, 74.11, steel, 70);
 
             return
                 Membrane.ReadMembrane(concrete, reinforcement, 70, considerCrackSlip);
@@ -1057,7 +1056,7 @@ namespace RCMembrane
 	        var steel = new Steel(433, 200000);
 
 	        // Get reinforcement
-	        var reinforcement = Reinforcement.HorizontalOnly(6, 74.11, steel, 70);
+	        var reinforcement = WebReinforcement.HorizontalOnly(6, 74.11, steel, 70);
 
             return
                 Membrane.ReadMembrane(concrete, reinforcement, 70, considerCrackSlip);
@@ -1080,7 +1079,7 @@ namespace RCMembrane
 	        var steel = new Steel(433, 200000);
 
 	        // Get reinforcement
-	        var reinforcement = Reinforcement.HorizontalOnly(6, 74.11, steel, 70);
+	        var reinforcement = WebReinforcement.HorizontalOnly(6, 74.11, steel, 70);
 
             return
                 Membrane.ReadMembrane(concrete, reinforcement, 70, considerCrackSlip);
@@ -1103,7 +1102,7 @@ namespace RCMembrane
 	        var steel = new Steel(433, 200000);
 
 	        // Get reinforcement
-	        var reinforcement = Reinforcement.HorizontalOnly(6, 74.11, steel, 70);
+	        var reinforcement = WebReinforcement.HorizontalOnly(6, 74.11, steel, 70);
 
             return
                 Membrane.ReadMembrane(concrete, reinforcement, 70, considerCrackSlip);
@@ -1126,7 +1125,7 @@ namespace RCMembrane
 	        var steel = new Steel(489, 200000);
 
 	        // Get reinforcement
-	        var reinforcement = Reinforcement.HorizontalOnly(6, 40, steel, 70);
+	        var reinforcement = WebReinforcement.HorizontalOnly(6, 40, steel, 70);
 
             return
                 Membrane.ReadMembrane(concrete, reinforcement, 70, considerCrackSlip);
@@ -1149,7 +1148,7 @@ namespace RCMembrane
 	        var steel = new Steel(502, 200000);
 
 	        // Get reinforcement
-	        var reinforcement = Reinforcement.HorizontalOnly(6, 40, steel, 70);
+	        var reinforcement = WebReinforcement.HorizontalOnly(6, 40, steel, 70);
 
             return
                 Membrane.ReadMembrane(concrete, reinforcement, 70, considerCrackSlip);
@@ -1172,7 +1171,7 @@ namespace RCMembrane
 	        var steel = new Steel(502, 200000);
 
 	        // Get reinforcement
-	        var reinforcement = Reinforcement.HorizontalOnly(6, 40, steel, 70);
+	        var reinforcement = WebReinforcement.HorizontalOnly(6, 40, steel, 70);
 
             return
                 Membrane.ReadMembrane(concrete, reinforcement, 70, considerCrackSlip);
@@ -1201,7 +1200,7 @@ namespace RCMembrane
 	        var steelY = new Steel(529, 200000);
 
 	        // Get reinforcement
-	        var reinforcement = new Reinforcement(8.1, 92.7, steelX, 3.85, 178.8, steelY, 73);
+	        var reinforcement = new WebReinforcement(8.1, 92.7, steelX, 3.85, 178.8, steelY, 73);
 
 	        return
 		        Membrane.ReadMembrane(concrete, reinforcement, 73, considerCrackSlip);
@@ -1225,7 +1224,7 @@ namespace RCMembrane
 	        var steelY = new Steel(529, 200000);
 
 	        // Get reinforcement
-	        var reinforcement = new Reinforcement(8.1, 92.7, steelX, 3.85, 178.8, steelY, 73);
+	        var reinforcement = new WebReinforcement(8.1, 92.7, steelX, 3.85, 178.8, steelY, 73);
 
 	        return
 		        Membrane.ReadMembrane(concrete, reinforcement, 73, considerCrackSlip);
@@ -1249,7 +1248,7 @@ namespace RCMembrane
 	        var steelY = new Steel(529, 200000);
 
 	        // Get reinforcement
-	        var reinforcement = new Reinforcement(8.1, 92.7, steelX, 3.85, 178.8, steelY, 73);
+	        var reinforcement = new WebReinforcement(8.1, 92.7, steelX, 3.85, 178.8, steelY, 73);
 
 	        return
 		        Membrane.ReadMembrane(concrete, reinforcement, 73, considerCrackSlip);
@@ -1273,7 +1272,7 @@ namespace RCMembrane
 	        var steelY = new Steel(529, 200000);
 
 	        // Get reinforcement
-	        var reinforcement = new Reinforcement(8.1, 92.7, steelX, 3.85, 178.8, steelY, 73);
+	        var reinforcement = new WebReinforcement(8.1, 92.7, steelX, 3.85, 178.8, steelY, 73);
 
 	        return
 		        Membrane.ReadMembrane(concrete, reinforcement, 73, considerCrackSlip);
@@ -1297,7 +1296,7 @@ namespace RCMembrane
 	        var steelY = new Steel(529, 200000);
 
 	        // Get reinforcement
-	        var reinforcement = new Reinforcement(8.1, 92.7, steelX, 3.85, 178.8, steelY, 73);
+	        var reinforcement = new WebReinforcement(8.1, 92.7, steelX, 3.85, 178.8, steelY, 73);
 
 	        return
 		        Membrane.ReadMembrane(concrete, reinforcement, 73, considerCrackSlip);
@@ -1321,7 +1320,7 @@ namespace RCMembrane
 	        var steelY = new Steel(529, 200000);
 
 	        // Get reinforcement
-	        var reinforcement = new Reinforcement(8.1, 92.7, steelX, 3.85, 178.8, steelY, 73);
+	        var reinforcement = new WebReinforcement(8.1, 92.7, steelX, 3.85, 178.8, steelY, 73);
 
 	        return
 		        Membrane.ReadMembrane(concrete, reinforcement, 73, considerCrackSlip);

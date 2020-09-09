@@ -1,10 +1,11 @@
 ﻿using System;
+using Extensions.Number;
 using MathNet.Numerics;
 using MathNet.Numerics.LinearAlgebra;
 using MathNet.Numerics.RootFinding;
 using Material.Concrete;
+using Material.Reinforcement;
 using OnPlaneComponents;
-using Reinforcement   = Material.Reinforcement.BiaxialReinforcement;
 using Parameters      = Material.Concrete.Parameters;
 using UnitsNet;
 
@@ -50,46 +51,51 @@ namespace RCMembrane
         /// </summary>
         /// <inheritdoc/>
         /// <param name="considerCrackSlip">Consider crack slip? (default: true)</param>
-        public DSFMMembrane(BiaxialConcrete concrete, Reinforcement reinforcement, double width,
-			bool considerCrackSlip = true) : base(concrete, reinforcement, width)
+        public DSFMMembrane(BiaxialConcrete concrete, WebReinforcement reinforcement, double width, bool considerCrackSlip = true) 
+	        : this(concrete.Parameters, concrete.Constitutive, reinforcement, width, considerCrackSlip)
 		{
-			// Get concrete parameters
-			double
-				fc    = concrete.fc,
-				phiAg = concrete.AggregateDiameter;
-
-			// Initiate new concrete
-			Concrete = new BiaxialConcrete(fc, phiAg, ParameterModel.DSFM, ConstitutiveModel.DSFM);
-
-			// Initiate crack slip strains
-			ConsiderCrackSlip = considerCrackSlip;
-			CrackSlipStrains  = StrainState.Zero;
 		}
 
-		///<inheritdoc/>
-		/// <summary>
-		/// Membrane element for DSFM analysis.
-		/// </summary>
-		/// <param name="considerCrackSlip">Consider crack slip? (default: true)</param>
-		public DSFMMembrane(Parameters concreteParameters, Constitutive concreteConstitutive,
-			Reinforcement reinforcement, double width,
-			bool considerCrackSlip = true) : base(concreteParameters, concreteConstitutive, reinforcement, width)
-		{
-			// Initiate new concrete
-			Concrete = new BiaxialConcrete(concreteParameters, concreteConstitutive);
+        /// <summary>
+        /// Membrane element for MCFT analysis.
+        /// </summary>
+        /// <inheritdoc/>
+        /// <param name="considerCrackSlip">Consider crack slip? (default: true)</param>
+        public DSFMMembrane(BiaxialConcrete concrete, WebReinforcement reinforcement, Length width, bool considerCrackSlip = true) 
+	        : this(concrete.Parameters, concrete.Constitutive, reinforcement, width, considerCrackSlip)
+        {
+        }
 
-			// Initiate crack slip strains
-			ConsiderCrackSlip = considerCrackSlip;
-			CrackSlipStrains  = StrainState.Zero;
+
+        ///<inheritdoc/>
+        /// <summary>
+        /// Membrane element for DSFM analysis.
+        /// </summary>
+        /// <param name="considerCrackSlip">Consider crack slip? (default: true)</param>
+        public DSFMMembrane(Parameters concreteParameters, Constitutive concreteConstitutive, WebReinforcement reinforcement, double width, bool considerCrackSlip = true) 
+	        : this(concreteParameters, concreteConstitutive, reinforcement, Length.FromMillimeters(width), considerCrackSlip)
+		{
 		}
 
-		/// <summary>
-		/// Calculate <see cref="StressState"/> and <see cref="Membrane.Stiffness"/> by DSFM, given a known <see cref="StrainState"/>.
-		/// </summary>
-		/// <param name="appliedStrains">Current <see cref="StrainState"/>.</param>
-		/// <param name="loadStep">Current load step.</param>
-		/// <param name="iteration">Current iteration.</param>
-		public override void Calculate(StrainState appliedStrains, int loadStep = 0, int iteration = 0)
+        /// <summary>
+        /// Base membrane element constructor.
+        /// </summary>
+        /// <inheritdoc/>
+        /// <param name="considerCrackSlip">Consider crack slip? (default: true)</param>
+        public DSFMMembrane(Parameters concreteParameters, Constitutive concreteConstitutive, WebReinforcement reinforcement, Length width, bool considerCrackSlip = true) : base(concreteParameters, concreteConstitutive, reinforcement, width)
+        {
+	        // Initiate crack slip strains
+	        ConsiderCrackSlip = considerCrackSlip;
+	        CrackSlipStrains = StrainState.Zero;
+        }
+
+        /// <summary>
+        /// Calculate <see cref="StressState"/> and <see cref="Membrane.Stiffness"/> by DSFM, given a known <see cref="StrainState"/>.
+        /// </summary>
+        /// <param name="appliedStrains">Current <see cref="StrainState"/>.</param>
+        /// <param name="loadStep">Current load step.</param>
+        /// <param name="iteration">Current iteration.</param>
+        public override void Calculate(StrainState appliedStrains, int loadStep = 0, int iteration = 0)
 		{
 			// Set strains
 			AverageStrains = appliedStrains;
@@ -168,8 +174,8 @@ namespace RCMembrane
 				fsy = rSt?.SigmaY ?? 0;
 
 			// Calculate cosines and sines
-			var (cosNx, sinNx) = DirectionCosines(thetaNx);
-			var (cosNy, sinNy) = DirectionCosines(thetaNy);
+			var (cosNx, sinNx) = thetaNx.DirectionCosines();
+			var (cosNy, sinNy) = thetaNy.DirectionCosines();
 			double
 				cosNx2 = cosNx * cosNx,
 				cosNy2 = cosNy * cosNy;
@@ -244,7 +250,7 @@ namespace RCMembrane
 			double thetaC1 = Concrete.PrincipalStrains.Theta1;
 
 			// Calculate direction cosines
-			var (cos2ThetaC, sin2ThetaC) = DirectionCosines(2 * thetaC1);
+			var (cos2ThetaC, sin2ThetaC) = (2 * thetaC1).DirectionCosines();
 
             // Calculate the shear slip strains
             double
@@ -357,7 +363,7 @@ namespace RCMembrane
 			double
 				thetaS = thetaIc + dThetaS;
 
-			var (cos2ThetaS, sin2ThetaS) = DirectionCosines(2 * thetaS);
+			var (cos2ThetaS, sin2ThetaS) = (2 * thetaS).DirectionCosines();
 
 			return
 				yxy * cos2ThetaS + (ey - ex) * sin2ThetaS;
