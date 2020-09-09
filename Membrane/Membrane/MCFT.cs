@@ -30,7 +30,7 @@ namespace RCMembrane
         /// Membrane element for MCFT analysis.
         /// </summary>
         ///<inheritdoc/>
-        public MCFTMembrane(BiaxialConcrete concrete, WebReinforcement reinforcement, Length width) : base (concrete.Parameters, concrete.Constitutive, reinforcement, width)
+        public MCFTMembrane(BiaxialConcrete concrete, WebReinforcement reinforcement, Length width) : base (concrete, reinforcement, width)
         {
         }
 
@@ -61,7 +61,7 @@ namespace RCMembrane
         /// <param name="iteration">Current iteration.</param>
         public override void Calculate(StrainState appliedStrains, int loadStep = 0, int iteration = 0)
 		{
-			AverageStrains = appliedStrains;
+			AverageStrains = appliedStrains.Copy();
 
 			// Calculate and set concrete and steel stresses
 			Concrete.CalculatePrincipalStresses(ConcreteStrains, Reinforcement);
@@ -70,5 +70,16 @@ namespace RCMembrane
 			// Verify if concrete is cracked and check crack stresses to limit fc1
 			CrackCheck();
 		}
+
+        /// <summary>
+        /// Compare two <see cref="MCFTMembrane"/> objects.
+        /// <para>Returns true if <see cref="Membrane.Concrete"/> and <see cref="Membrane.Reinforcement"/> are equal.</para>
+        /// </summary>
+        /// <param name="other">The other <see cref="MCFTMembrane"/> object.</param>
+        public virtual bool Equals(MCFTMembrane other) => !(other is null) && base.Equals(other);
+
+        public override bool Equals(object obj) => obj is MCFTMembrane other && base.Equals(other);
+
+        public override int GetHashCode() => base.GetHashCode();
 	}
 }

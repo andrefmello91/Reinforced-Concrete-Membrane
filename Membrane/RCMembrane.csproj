@@ -61,7 +61,7 @@
     <Compile Include="Membrane\DSFM.cs" />
     <Compile Include="Membrane\MCFT.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="MembraneSolver\Solver.cs" />
+    <Compile Include="MembraneSolver\AlternateSolver.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

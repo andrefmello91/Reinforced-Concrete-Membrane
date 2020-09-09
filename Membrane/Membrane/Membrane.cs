@@ -31,11 +31,6 @@ namespace RCMembrane
 		/// </summary>
         public WebReinforcement Reinforcement { get; }
 
-        /// <summary>
-        /// Get/set stop parameters of the membrane element.
-        /// </summary>
-        public (bool S, string Message) Stop { get; set; }
-
 		/// <summary>
         /// Get/set the average <see cref="StrainState"/> in the membrane element.
         /// </summary>
@@ -127,15 +122,49 @@ namespace RCMembrane
         /// <summary>
         /// Read membrane element based on concrete constitutive model.
         /// </summary>
+        /// <param name="concrete"><see cref="BiaxialConcrete"/> object .</param>
+        /// <param name="reinforcement"><see cref="WebReinforcement"/> object.</param>
+        /// <param name="width">The width of cross-section.</param>
+        /// <param name="considerCrackSlip">Consider crack slip? Only for <see cref="DSFMMembrane"/> (default: true)</param>
+        public static Membrane ReadMembrane(BiaxialConcrete concrete, WebReinforcement reinforcement, Length width, bool considerCrackSlip = true)
+        {
+			if (concrete.Constitutive is MCFTConstitutive)
+				return new MCFTMembrane(concrete, reinforcement, width);
+
+			return new DSFMMembrane(concrete, reinforcement, width, considerCrackSlip);
+        }
+
+        /// <summary>
+        /// Read membrane element based on concrete constitutive model.
+        /// </summary>
         /// <param name="concreteParameters">Concrete <see cref="Parameters"/> object.</param>
         /// <param name="concreteConstitutive">Concrete <see cref="Constitutive"/> object.</param>
         /// <param name="reinforcement"><see cref="WebReinforcement"/> object .</param>
         /// <param name="width">The width of cross-section, in mm.</param>
-        /// <param name="considerCrackSlip">Consider crack slip? Only for DSFM (default: true)</param>
-        public static Membrane ReadMembrane(Parameters concreteParameters, Constitutive concreteConstitutive, WebReinforcement reinforcement, double width, bool considerCrackSlip = true) =>
-	        concreteConstitutive is MCFTConstitutive
-		        ? new MCFTMembrane(concreteParameters, concreteConstitutive, reinforcement, width)
-		        : new DSFMMembrane(concreteParameters, concreteConstitutive, reinforcement, width, considerCrackSlip);
+        /// <param name="considerCrackSlip">Consider crack slip? Only for <see cref="DSFMMembrane"/> (default: true)</param>
+        public static Membrane ReadMembrane(Parameters concreteParameters, Constitutive concreteConstitutive, WebReinforcement reinforcement, double width, bool considerCrackSlip = true)
+        {
+	        if (concreteConstitutive is MCFTConstitutive)
+		        return new MCFTMembrane(concreteParameters, concreteConstitutive, reinforcement, width);
+
+	        return new DSFMMembrane(concreteParameters, concreteConstitutive, reinforcement, width, considerCrackSlip);
+        }
+
+        /// <summary>
+        /// Read membrane element based on concrete constitutive model.
+        /// </summary>
+        /// <param name="concreteParameters">Concrete <see cref="Parameters"/> object.</param>
+        /// <param name="concreteConstitutive">Concrete <see cref="Constitutive"/> object.</param>
+        /// <param name="reinforcement"><see cref="WebReinforcement"/> object .</param>
+        /// <param name="width">The width of cross-section.</param>
+        /// <param name="considerCrackSlip">Consider crack slip? Only for <see cref="DSFMMembrane"/> (default: true)</param>
+        public static Membrane ReadMembrane(Parameters concreteParameters, Constitutive concreteConstitutive, WebReinforcement reinforcement, Length width, bool considerCrackSlip = true)
+        {
+	        if (concreteConstitutive is MCFTConstitutive)
+		        return new MCFTMembrane(concreteParameters, concreteConstitutive, reinforcement, width);
+
+	        return new DSFMMembrane(concreteParameters, concreteConstitutive, reinforcement, width, considerCrackSlip);
+        }
 
         /// <summary>
         /// Get average <see cref="StressState"/>, in MPa.
@@ -202,14 +231,12 @@ namespace RCMembrane
 			if (!Concrete.Cracked)
 				return;
 
-            // Get the values
-            double
-	            theta1 = Concrete.PrincipalStrains.Theta1,
-				f1a    = Concrete.PrincipalStresses.Sigma1;
+            // Get concrete tensile stress
+            double f1a = Concrete.PrincipalStresses.Sigma1;
 
             // Calculate thetaC sine and cosine
-            var (cosTheta, sinTheta) = theta1.DirectionCosines();
-            double tanTheta          = theta1.Tan();
+            var (cosTheta, sinTheta) = Concrete.PrincipalStrains.Theta1.DirectionCosines();
+            double tanTheta          = Concrete.PrincipalStrains.Theta1.Tan();
 
             // Reinforcement capacity reserve
             double
@@ -220,7 +247,7 @@ namespace RCMembrane
             double vcimaxA = MaximumShearOnCrack();
 
             // Maximum possible shear for biaxial yielding
-            double vcimaxB = Math.Abs(f1cx - f1cy) / (tanTheta + 1 / tanTheta);
+            double vcimaxB = (f1cx - f1cy).Abs() / (tanTheta + 1 / tanTheta);
 
             // Maximum shear on crack
             double vcimax = Math.Min(vcimaxA, vcimaxB);
@@ -235,7 +262,7 @@ namespace RCMembrane
 
             // Calculate the minimum tensile stress
             var f1List = new[] { f1a, f1b, f1c, f1d };
-            var fc1 = f1List.Min();
+            var fc1    = f1List.Min();
 
             // Set to concrete
             if (fc1 < f1a)
@@ -251,16 +278,7 @@ namespace RCMembrane
         /// Calculate maximum shear stress on crack, in MPa.
         /// </summary>
         /// <param name="crackOpening">Average crack opening, in mm.</param>
-        public double MaximumShearOnCrack(double crackOpening)
-        {
-	        double
-		        fc    = Concrete.fc,
-		        phiAg = Concrete.AggregateDiameter;
-
-	        // Maximum possible shear on crack interface
-	        return
-		        0.18 * Math.Sqrt(fc) / (0.31 + 24 * crackOpening / (phiAg + 16));
-        }
+        public double MaximumShearOnCrack(double crackOpening) => 0.18 * Concrete.fc.Sqrt() / (0.31 + 24 * crackOpening / (Concrete.AggregateDiameter + 16));
 
         /// <summary>
         /// Calculate reference length, in mm.
@@ -277,11 +295,11 @@ namespace RCMembrane
         }
 
         /// <summary>
-        /// Compare two concrete objects.
+        /// Compare two <see cref="Membrane"/> objects.
         /// <para>Returns true if <see cref="Concrete"/> and <see cref="Reinforcement"/> are equal.</para>
         /// </summary>
         /// <param name="other">The other <see cref="Membrane"/> object.</param>
-        public virtual bool Equals(Membrane other) => !(other is null) && (Concrete == other.Concrete && Reinforcement == other.Reinforcement);
+        public virtual bool Equals(Membrane other) => !(other is null) && Concrete == other.Concrete && Reinforcement == other.Reinforcement;
 
         public override bool Equals(object obj) => obj is Membrane other && Equals(other);
 
