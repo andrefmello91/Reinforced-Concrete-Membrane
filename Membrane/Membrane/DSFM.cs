@@ -161,17 +161,16 @@ namespace RCMembrane
 			var fc1 = Concrete.PrincipalStresses.Sigma1;
 
 			// Get reinforcement angles
-			var (thetaNx, thetaNy) = Reinforcement?.Angles(theta1) ?? (theta1, Constants.PiOver2 - theta1);
+			var (thetaNx, thetaNy) = Reinforcement?.Angles(theta1) ?? (theta1, theta1 - Constants.PiOver2);
 
 			// Get reinforcement stresses
-			var rSt = Reinforcement?.Stresses;
 			double
-				fsx = rSt?.SigmaX ?? 0,
-				fsy = rSt?.SigmaY ?? 0;
+				fsx = Reinforcement?.Stresses.SigmaX ?? 0,
+				fsy = Reinforcement?.Stresses.SigmaY ?? 0;
 
 			// Calculate cosines and sines
-			var (cosNx, sinNx) = thetaNx.DirectionCosines();
-			var (cosNy, sinNy) = thetaNy.DirectionCosines();
+			var (cosNx, sinNx) = thetaNx.DirectionCosines(true);
+			var (cosNy, sinNy) = thetaNy.DirectionCosines(true);
 			double
 				cosNx2 = cosNx * cosNx,
 				cosNy2 = cosNy * cosNy;
@@ -234,13 +233,14 @@ namespace RCMembrane
 		/// <param name="vci">Shear stress on crack surface, in MPa.</param>
 		private StrainState CrackSlip(double vci)
 		{
+			//Console.WriteLine(vci);
 			// Get shear slip strains
 			double
 				ysa = StressCrackSlip(vci),
-				ysb = RotationLagCrackSlip(),
-				ys  = ysa.Abs() >= ysb.Abs() ? ysa : ysb;
+                ysb = RotationLagCrackSlip(),
+                ys  = Math.Max(ysa, ysb);
 
-			SlipApproach = ys == ysa ? "Stress" : "Rotation lag";
+			SlipApproach = ys.Approx(ysa) ? "Stress" : "Rotation lag";
 
 			// Get concrete principal angle
 			double thetaC1 = Concrete.PrincipalStrains.Theta1;
@@ -254,7 +254,15 @@ namespace RCMembrane
 				esly  =  0.5 * ys * sin2ThetaC,
 				eslxy = ys * cos2ThetaC;
 
-			return new StrainState(eslx, esly, eslxy);
+            // Correct strains if gamma is negative
+            if (AverageStrains.GammaXY < 0)
+            {
+                eslx  = -eslx;
+                esly  = -esly;
+                eslxy = -eslxy;
+            }
+
+            return new StrainState(eslx, esly, eslxy);
 		}
 
 		/// <summary>
@@ -280,9 +288,9 @@ namespace RCMembrane
 				a  = Math.Max(0.234 * w.Pow(-0.707) - 0.2, 0),
 				ds = vci / (1.8 * w.Pow(-0.8) + a * fc);
 
-			//Console.Write("\n" + (ds/s) + "\n");
+            //Console.Write("\n" + (ds/s) + "\n");
 
-			return
+            return
 				ds / s;
 		}
 
@@ -321,14 +329,6 @@ namespace RCMembrane
 		/// </summary>
 		private double RotationLagCrackSlip()
 		{
-			// Get reinforcement ratio
-			double
-				psx = Reinforcement?.DirectionX?.Ratio ?? 0,
-				psy = Reinforcement?.DirectionY?.Ratio ?? 0;
-
-			// Get principal angle
-			double thetaE1 = AveragePrincipalStrains.Theta1;
-
 			// Get the strains
 			double
 				ex  = AverageStrains.EpsilonX,
@@ -338,14 +338,14 @@ namespace RCMembrane
 			// Calculate shear slip strain by rotation lag approach
 			double
 				thetaIc = _thetaIc ?? Constants.PiOver4,
-				dThetaE = thetaE1 - thetaIc;
+				dThetaE = AveragePrincipalStrains.Theta1 - thetaIc;
 
 			// Get theta L
-			double thetaL = psx > 0 && psy > 0
-				? 5.ToRadian()
-				: psx > 0 || psy > 0
-					? (7.5).ToRadian()
-					: 10.ToRadian();
+			double thetaL = (Reinforcement is null || !Reinforcement.XYReinforced)
+				? 10.ToRadian()
+				: Reinforcement.XYReinforced
+                    ? 5.ToRadian()
+					: 7.5.ToRadian();
 
 			// Correct thetaL if dThetaE < 0
 			if (dThetaE < 0)
@@ -362,7 +362,7 @@ namespace RCMembrane
 			var (cos2ThetaS, sin2ThetaS) = (2 * thetaS).DirectionCosines();
 
 			return
-				yxy * cos2ThetaS + (ey - ex) * sin2ThetaS;
+				(yxy * cos2ThetaS + (ey - ex) * sin2ThetaS).Abs();
 		}
 
         /// <summary>

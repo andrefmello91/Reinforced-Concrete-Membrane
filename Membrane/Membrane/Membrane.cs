@@ -1,15 +1,12 @@
 ﻿using System;
 using System.Linq;
 using Extensions.Number;
-using MathNet.Numerics;
 using MathNet.Numerics.LinearAlgebra;
 using MathNet.Numerics.LinearAlgebra.Double;
 using Material.Concrete;
 using Material.Reinforcement;
-using MathNet.Numerics.Data.Text;
 using OnPlaneComponents;
 using UnitsNet;
-using Parameters    = Material.Concrete.Parameters;
 
 namespace RCMembrane
 {

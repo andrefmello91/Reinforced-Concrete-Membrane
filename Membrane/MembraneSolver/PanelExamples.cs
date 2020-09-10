@@ -941,6 +941,54 @@ namespace RCMembrane
 		        Membrane.ReadMembrane(concrete, reinforcement, 70, considerCrackSlip);
         }
 
+        /// <summary>
+        /// PA1 Panel.
+        /// </summary>
+        /// <param name="constitutiveModel">The <see cref="ConstitutiveModel"/> for concrete</param>
+        /// <param name="considerCrackSlip">Consider crack slip? Only for <see cref="DSFMMembrane"/> (default: true).</param>
+        public static Membrane PA1(ConstitutiveModel constitutiveModel = ConstitutiveModel.MCFT, bool considerCrackSlip = true)
+        {
+	        // Get concrete parameter model
+	        var parModel = constitutiveModel == ConstitutiveModel.MCFT ? ParameterModel.MCFT : ParameterModel.DSFM;
+
+	        // Initiate concrete
+	        var concrete = new Concrete(49.9, 10, parModel, constitutiveModel);
+
+	        // Initiate steel for each direction
+	        var steelX = new Steel(522, 200000);
+	        var steelY = steelX.Copy();
+
+	        // Get reinforcement
+	        var reinforcement = new WebReinforcement(5.72, 44.5, steelX, 5.72, 89.54, steelY, 70);
+
+            return
+                Membrane.ReadMembrane(concrete, reinforcement, 70, considerCrackSlip);
+        }
+
+        /// <summary>
+        /// PA2 Panel.
+        /// </summary>
+        /// <param name="constitutiveModel">The <see cref="ConstitutiveModel"/> for concrete</param>
+        /// <param name="considerCrackSlip">Consider crack slip? Only for <see cref="DSFMMembrane"/> (default: true).</param>
+        public static Membrane PA2(ConstitutiveModel constitutiveModel = ConstitutiveModel.MCFT, bool considerCrackSlip = true)
+        {
+	        // Get concrete parameter model
+	        var parModel = constitutiveModel == ConstitutiveModel.MCFT ? ParameterModel.MCFT : ParameterModel.DSFM;
+
+	        // Initiate concrete
+	        var concrete = new Concrete(43, 10, parModel, constitutiveModel);
+
+	        // Initiate steel for each direction
+	        var steelX = new Steel(522, 200000);
+	        var steelY = steelX.Copy();
+
+	        // Get reinforcement
+	        var reinforcement = new WebReinforcement(5.72, 44.5, steelX, 5.72, 89.54, steelY, 70);
+
+            return
+                Membrane.ReadMembrane(concrete, reinforcement, 70, considerCrackSlip);
+        }
+
 
         #endregion
 

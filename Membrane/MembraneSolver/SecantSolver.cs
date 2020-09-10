@@ -85,11 +85,11 @@ namespace RCMembrane
         public static void Solve()
 	    {
 		    // Initiate the membrane
-		    var membraneMCFT = PanelExamples.PB12();
-		    var membraneDSFM = PanelExamples.PB12(ConstitutiveModel.DSFM);
+		    var membraneMCFT = PanelExamples.PHS10();
+		    var membraneDSFM = PanelExamples.PHS10(ConstitutiveModel.DSFM);
 
 		    // Initiate stresses
-		    var sigma = new StressState(0, 0, 2);
+		    var sigma = new StressState(2.5, 2.5, 10);
 
 		    // Solve
 		    SecantSolver(membraneMCFT, sigma, out string mcftFile);
@@ -109,8 +109,8 @@ namespace RCMembrane
         /// <param name="fileName">The name of saved result file. <para>See: <seealso cref="ResultFileName"/>, <seealso cref="OutputResults"/>.</para></param>
         /// <param name="numLoadSteps">The number of load steps (default: 100).</param>
         /// <param name="maxIterations">Maximum number of iterations (default: 10000).</param>
-        /// <param name="tolerance">Stress convergence tolerance (default: 1E-6).</param>
-        private static void SecantSolver(Membrane membrane, StressState appliedStresses, out string fileName, int numLoadSteps = 100, int maxIterations = 10000, double tolerance = 1E-6)
+        /// <param name="tolerance">Stress convergence tolerance (default: 6E-4).</param>
+        private static void SecantSolver(Membrane membrane, StressState appliedStresses, out string fileName, int numLoadSteps = 100, int maxIterations = 10000, double tolerance = 1E-4)
         {
             // Get initial stresses
             var f0 = (double)1 / numLoadSteps * appliedStresses;
@@ -381,6 +381,7 @@ namespace RCMembrane
         {
 	        if (membrane is DSFMMembrane dsfm && membrane.Concrete.Cracked)
 		        Console.WriteLine("LS = {0}, Iterations = {1}, Slip Approach: {2}", loadStep, iteration, dsfm.SlipApproach);
+		        //Console.WriteLine("LS = {0}, Iterations = {1}, Slip Approach: {2}\nesl ={3}", loadStep, iteration, dsfm.SlipApproach, dsfm.CrackSlipStrains);
 
 	        else
 		        Console.WriteLine("LS = {0}, Iterations = {1}", loadStep, iteration);
