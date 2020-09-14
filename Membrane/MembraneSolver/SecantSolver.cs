@@ -132,7 +132,7 @@ namespace RCMembrane
         private static void AnalysisStart(Membrane membrane, StressState appliedStresses, int numLoadSteps)
         {
 	        // Get initial stresses
-	        var f0 = (double)1 / numLoadSteps * appliedStresses;
+	        var f0 = (double) 1 / numLoadSteps * appliedStresses;
 
 	        // Calculate initial stiffness
 	        _currentStiffness = membrane.InitialStiffness;
@@ -177,19 +177,19 @@ namespace RCMembrane
 	        for (ls = 1; ls <= numLoadSteps; ls++)
 	        {
 		        // Calculate stresses
-		        var fi = ls * appliedStresses;
+		        var fi = (double) ls / numLoadSteps * appliedStresses;
 
 				// Iterate to find solution
 				Iterate(membrane, fi, ls, tolerance, maxIterations);
 
 				// Solution reached:
-				if (!_stop)
-					continue;
-
-				// Solution not reached
-				// Decrement ls to correct output file
-		        ls--;
-		        break;
+				if (_stop)
+				{
+					// Solution not reached
+					// Decrement ls to correct output file
+					ls--;
+					break;
+				}
 	        }
 
 	        finalLoadStep = ls;
