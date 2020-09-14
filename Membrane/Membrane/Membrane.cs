@@ -182,9 +182,7 @@ namespace RCMembrane
         /// Calculate <see cref="AverageStresses"/> and <see cref="Stiffness"/>, given a known <see cref="StrainState"/>.
         /// </summary>
         /// <param name="appliedStrains">Current applied <see cref="StrainState"/>.</param>
-        /// <param name="loadStep">Current load step.</param>
-        /// <param name="iteration">Current iteration.</param>
-        public abstract void Calculate(StrainState appliedStrains, int loadStep = 0, int iteration = 0);
+        public abstract void Calculate(StrainState appliedStrains);
 
 		/// <summary>
         /// Calculate the crack spacing at <paramref name="direction"/> (in mm), according to Kaklauskas (2019) expression.

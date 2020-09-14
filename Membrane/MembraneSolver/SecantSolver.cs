@@ -85,20 +85,20 @@ namespace RCMembrane
         public static void Solve()
 	    {
 		    // Initiate the membrane
-		    var membraneMCFT = PanelExamples.PHS10();
-		    var membraneDSFM = PanelExamples.PHS10(ConstitutiveModel.DSFM);
+		    var membraneMCFT = PanelExamples.PA2();
+		    var membraneDSFM = PanelExamples.PA2(ConstitutiveModel.DSFM);
 
 		    // Initiate stresses
-		    var sigma = new StressState(2.5, 2.5, 10);
+		    var sigma = new StressState(0, 0, 8);
 
 		    // Solve
 		    SecantSolver(membraneMCFT, sigma, out string mcftFile);
 		    SecantSolver(membraneDSFM, sigma, out string dsfmFile);
 
 		    Console.WriteLine("Done! Press any key to exit.");
-		    System.Diagnostics.Process.Start(mcftFile);
-		    System.Diagnostics.Process.Start(dsfmFile);
-		    Console.ReadKey();
+            System.Diagnostics.Process.Start(mcftFile);
+            System.Diagnostics.Process.Start(dsfmFile);
+            Console.ReadKey();
 	    }
 
         /// <summary>
@@ -110,77 +110,139 @@ namespace RCMembrane
         /// <param name="numLoadSteps">The number of load steps (default: 100).</param>
         /// <param name="maxIterations">Maximum number of iterations (default: 10000).</param>
         /// <param name="tolerance">Stress convergence tolerance (default: 6E-4).</param>
-        private static void SecantSolver(Membrane membrane, StressState appliedStresses, out string fileName, int numLoadSteps = 100, int maxIterations = 10000, double tolerance = 1E-4)
+        private static void SecantSolver(Membrane membrane, StressState appliedStresses, out string fileName, int numLoadSteps = 100, int maxIterations = 10000, double tolerance = 4E-4)
         {
-            // Get initial stresses
-            var f0 = (double)1 / numLoadSteps * appliedStresses;
-
-            // Calculate initial stiffness
-            _currentStiffness = membrane.InitialStiffness;
-
-            // Calculate initial strains
-            _currentStrains = StrainState.FromStresses(f0, _currentStiffness);
-
 			// Initialize fields and write a starting message
-            AnalysisStart(membrane, numLoadSteps);
+            AnalysisStart(membrane, appliedStresses, numLoadSteps);
 
-            // Initiate load steps
-            int ls;
-            for (ls = 1; ls <= numLoadSteps; ls++)
-            {
-                // Calculate stresses
-                var fi = ls * f0;
-
-                for (int it = 1; it <= maxIterations; it++)
-                {
-                    // Do analysis
-                    membrane.Calculate(_currentStrains, ls, it);
-
-					// Verify if concrete cracks in this load step and write a message
-					ConcreteCrackedMessage(membrane, ls);
-
-					// Calculate and update residual
-					ResidualUpdate(membrane, fi);
-
-                    // Calculate convergence
-                    var conv = Convergence(_currentResidual, fi);
-
-					// If convergence is reached
-                    if (ConvergenceReached(conv, tolerance, it))
-                    {
-						// Write message
-						ConvergenceMessage(membrane, ls, it);
-
-                        // Set results on output matrices
-                        SaveResults(membrane, fi, ls);
-
-                        break;
-                    }
-					
-					// If reached max iterations
-                    if (it == maxIterations)
-                    {
-						// Write message
-						NoConvergenceMessage(ls);
-						break;
-                    }
-
-	                // Update stiffness and strains
-	                SecantStiffnessUpdate();
-	                StrainUpdate();
-                }
-
-                if (_stop)
-                {
-	                // Decrement ls to correct output file
-	                ls--;
-	                break;
-                }
-            }
+			// Analyze by steps
+			StepAnalysis(membrane, appliedStresses, numLoadSteps, tolerance, maxIterations, out int finalLoadStep);
 
             // Output results
-            OutputResults(membrane, ls, out fileName);
+            OutputResults(membrane, finalLoadStep, out fileName);
 			AnalysisDone(membrane);
+        }
+
+        /// <summary>
+        /// Initialize auxiliary fields and write a starting message in <see cref="Console"/>.
+        /// </summary>
+        /// <param name="membrane">The <see cref="Membrane"/> object in analysis.</param>
+        /// <param name="appliedStresses">Applied <see cref="StressState"/>, in MPa.</param>
+        /// <param name="numLoadSteps">The number of load steps.</param>
+        private static void AnalysisStart(Membrane membrane, StressState appliedStresses, int numLoadSteps)
+        {
+	        // Get initial stresses
+	        var f0 = (double)1 / numLoadSteps * appliedStresses;
+
+	        // Calculate initial stiffness
+	        _currentStiffness = membrane.InitialStiffness;
+
+	        // Calculate initial strains
+	        _currentStrains = StrainState.FromStresses(f0, _currentStiffness);
+
+	        // Initiate solution values
+	        _lastStiffness   = _currentStiffness.Clone();
+	        _lastStrains     = StrainState.Zero;
+	        _lastResidual    = StressState.Zero;
+	        _currentResidual = StressState.Zero;
+
+	        // Initiate output matrices
+	        _strainOutput          = new StrainState[numLoadSteps];
+	        _stressOutput          = new StressState[numLoadSteps];
+	        _principalStressOutput = new PrincipalStressState[numLoadSteps];
+
+	        _concretePrincipalStrainOutput = new PrincipalStrainState[numLoadSteps];
+	        _averagePrincipalStrainOutput  = new PrincipalStrainState[numLoadSteps];
+
+	        // Auxiliary verifiers
+	        _stop      = false;
+	        _crackStep = null;
+
+	        Console.WriteLine("\nStarting {0} analysis...\n", membrane is MCFTMembrane ? "MCFT" : "DSFM");
+        }
+
+        /// <summary>
+        /// Do analysis by load steps.
+        /// </summary>
+        /// <param name="membrane">The membrane object.</param>
+        /// <param name="appliedStresses">Applied <see cref="StressState"/>, in MPa.</param>
+        /// <param name="numLoadSteps">The number of load steps to perform.</param>
+        /// <param name="tolerance">The convergence tolerance.</param>
+        /// <param name="maxIterations">Maximum number of iterations for each load step.</param>
+        /// <param name="finalLoadStep">The last calculated load step.</param>
+        private static void StepAnalysis(Membrane membrane, StressState appliedStresses, int numLoadSteps, double tolerance, int maxIterations, out int finalLoadStep)
+        {
+	        // Initiate load steps
+	        int ls;
+	        for (ls = 1; ls <= numLoadSteps; ls++)
+	        {
+		        // Calculate stresses
+		        var fi = ls * appliedStresses;
+
+				// Iterate to find solution
+				Iterate(membrane, fi, ls, tolerance, maxIterations);
+
+				// Solution reached:
+				if (!_stop)
+					continue;
+
+				// Solution not reached
+				// Decrement ls to correct output file
+		        ls--;
+		        break;
+	        }
+
+	        finalLoadStep = ls;
+        }
+
+        /// <summary>
+        /// Iterate to find solution.
+        /// </summary>
+        /// <param name="membrane">The membrane object.</param>
+        /// <param name="stepStresses">Applied <see cref="StressState"/> for this load step, in MPa.</param>
+        /// <param name="loadStep">Current load step.</param>
+        /// <param name="tolerance">The convergence tolerance (default: 1E-3).</param>
+        /// <param name="maxIterations">Maximum number of iterations for each load step (default: 1000).</param>
+        private static void Iterate(Membrane membrane, StressState stepStresses, int loadStep, double tolerance, int maxIterations)
+        {
+	        for (int it = 1; it <= maxIterations; it++)
+	        {
+		        // Do analysis
+		        membrane.Calculate(_currentStrains);
+
+		        // Verify if concrete cracks in this load step and write a message
+		        ConcreteCrackedMessage(membrane, loadStep);
+
+		        // Calculate and update residual
+		        ResidualUpdate(membrane, stepStresses);
+
+		        // Calculate convergence
+		        var conv = Convergence(_currentResidual, stepStresses);
+
+		        // If convergence is reached
+		        if (ConvergenceReached(conv, tolerance, it))
+		        {
+			        // Write message
+			        ConvergenceMessage(membrane, loadStep, it);
+
+			        // Set results on output matrices
+			        SaveResults(membrane, stepStresses, loadStep);
+
+			        break;
+		        }
+
+		        // If reached max iterations
+		        if (it == maxIterations)
+		        {
+			        // Write message
+			        NoConvergenceMessage(loadStep);
+			        break;
+		        }
+
+		        // Update stiffness and strains
+		        SecantStiffnessUpdate();
+		        StrainUpdate();
+	        }
         }
 
         /// <summary>
@@ -317,34 +379,6 @@ namespace RCMembrane
 
             // Save results
             DelimitedWriter.Write(fileName, result, ";", outputReaders, null, null, double.NaN);
-        }
-
-        /// <summary>
-        /// Initialize auxiliary fields and write a starting message in <see cref="Console"/>.
-        /// </summary>
-        /// <param name="membrane">The <see cref="Membrane"/> object in analysis.</param>
-        /// <param name="numLoadSteps">The number of load steps.</param>
-        private static void AnalysisStart(Membrane membrane, int numLoadSteps)
-        {
-	        // Initiate solution values
-	        _lastStiffness   = _currentStiffness.Clone();
-	        _lastStrains     = StrainState.Zero;
-	        _lastResidual    = StressState.Zero;
-	        _currentResidual = StressState.Zero;
-
-	        // Initiate output matrices
-	        _strainOutput          = new StrainState[numLoadSteps];
-	        _stressOutput          = new StressState[numLoadSteps];
-	        _principalStressOutput = new PrincipalStressState[numLoadSteps];
-
-	        _concretePrincipalStrainOutput = new PrincipalStrainState[numLoadSteps];
-	        _averagePrincipalStrainOutput  = new PrincipalStrainState[numLoadSteps];
-
-	        // Auxiliary verifiers
-	        _stop      = false;
-	        _crackStep = null;
-
-            Console.WriteLine("\nStarting {0} analysis...\n", membrane is MCFTMembrane ? "MCFT" : "DSFM");
         }
 
         /// <summary>

@@ -57,9 +57,7 @@ namespace RCMembrane
         /// Calculate <see cref="StressState"/> and <see cref="Membrane.Stiffness"/> by MCFT, given a known <see cref="StrainState"/>.
         /// </summary>
         /// <param name="appliedStrains">Current <see cref="StrainState"/>.</param>
-        /// <param name="loadStep">Current load step.</param>
-        /// <param name="iteration">Current iteration.</param>
-        public override void Calculate(StrainState appliedStrains, int loadStep = 0, int iteration = 0)
+        public override void Calculate(StrainState appliedStrains)
 		{
 			AverageStrains = appliedStrains.Copy();
 
