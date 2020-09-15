@@ -5,6 +5,7 @@ using MathNet.Numerics.LinearAlgebra;
 using MathNet.Numerics.LinearAlgebra.Double;
 using Material.Concrete;
 using Material.Reinforcement;
+using MathNet.Numerics;
 using OnPlaneComponents;
 using UnitsNet;
 
@@ -54,7 +55,7 @@ namespace RCMembrane
         /// <param name="concrete"><see cref="BiaxialConcrete"/> object .</param>
         /// <param name="reinforcement"><see cref="WebReinforcement"/> object.</param>
         /// <param name="width">The width of cross-section, in mm.</param>
-        public Membrane(BiaxialConcrete concrete, WebReinforcement reinforcement, double width)
+        protected Membrane(BiaxialConcrete concrete, WebReinforcement reinforcement, double width)
 			: this (concrete.Parameters, concrete.Constitutive, reinforcement, width)
         {
         }
@@ -65,7 +66,7 @@ namespace RCMembrane
         /// <param name="concrete"><see cref="BiaxialConcrete"/> object .</param>
         /// <param name="reinforcement"><see cref="WebReinforcement"/> object.</param>
         /// <param name="width">The width of cross-section.</param>
-        public Membrane(BiaxialConcrete concrete, WebReinforcement reinforcement, Length width)
+        protected Membrane(BiaxialConcrete concrete, WebReinforcement reinforcement, Length width)
 			: this (concrete.Parameters, concrete.Constitutive, reinforcement, width)
         {
         }
@@ -77,7 +78,7 @@ namespace RCMembrane
         /// <param name="concreteConstitutive">Concrete <see cref="Constitutive"/> object.</param>
         /// <param name="reinforcement"><see cref="WebReinforcement"/> object .</param>
         /// <param name="width">The width of cross-section, in mm.</param>
-        public Membrane(in Parameters concreteParameters, in Constitutive concreteConstitutive, WebReinforcement reinforcement, double width)
+        protected Membrane(Parameters concreteParameters, Constitutive concreteConstitutive, WebReinforcement reinforcement, double width)
 			: this (concreteParameters, concreteConstitutive, reinforcement, Length.FromMillimeters(width))
         {
         }
@@ -89,7 +90,7 @@ namespace RCMembrane
         /// <param name="concreteConstitutive">Concrete <see cref="Constitutive"/> object.</param>
         /// <param name="reinforcement"><see cref="WebReinforcement"/> object .</param>
         /// <param name="width">The width of cross-section.</param>
-        public Membrane(in Parameters concreteParameters, in Constitutive concreteConstitutive, WebReinforcement reinforcement, Length width)
+        protected Membrane(Parameters concreteParameters, Constitutive concreteConstitutive, WebReinforcement reinforcement, Length width)
         {
             // Initiate new materials
 			Concrete      = new BiaxialConcrete(concreteParameters, concreteConstitutive);
@@ -229,9 +230,13 @@ namespace RCMembrane
             // Get concrete tensile stress
             double f1a = Concrete.PrincipalStresses.Sigma1;
 
-            // Calculate thetaC sine and cosine
-            var (cosTheta, sinTheta) = Concrete.PrincipalStrains.Theta1.DirectionCosines();
-            double tanTheta          = Concrete.PrincipalStrains.Theta1.Tan();
+			// Get reinforcement angles related to crack
+			var (thetaNx, thetaNy) = Reinforcement?.Angles(Concrete.PrincipalStrains.Theta1) ?? (Concrete.PrincipalStrains.Theta1, Concrete.PrincipalStrains.Theta1 - Constants.PiOver2);
+			double
+				cosNx = thetaNx.Cos(true),
+				cosNy = thetaNy.Cos(true),
+				tanNx = thetaNx.Tan(true),
+				tanNy = thetaNy.Tan(true);
 
             // Reinforcement capacity reserve
             double
@@ -242,18 +247,18 @@ namespace RCMembrane
             double vcimaxA = MaximumShearOnCrack();
 
             // Maximum possible shear for biaxial yielding
-            double vcimaxB = (f1cx - f1cy).Abs() / (tanTheta + 1 / tanTheta);
+            double vcimaxB = (f1cx - f1cy).Abs() / (tanNx + tanNy);
 
             // Maximum shear on crack
             double vcimax = Math.Min(vcimaxA, vcimaxB);
 
             // Biaxial yielding condition
-            double f1b = f1cx * cosTheta * cosTheta + f1cy * sinTheta * sinTheta;
+            double f1b = f1cx * cosNx * cosNx + f1cy * cosNy * cosNy;
 
             // Maximum tensile stress for equilibrium in X and Y
             double
-                f1c = f1cx + vcimax * tanTheta,
-                f1d = f1cy + vcimax / tanTheta;
+                f1c = f1cx + vcimax * tanNx,
+                f1d = f1cy + vcimax * tanNy;
 
             // Calculate the minimum tensile stress
             var f1List = new[] { f1a, f1b, f1c, f1d };

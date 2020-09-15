@@ -38,7 +38,7 @@ namespace RCMembrane
         /// Membrane element for MCFT analysis.
         /// </summary>
         ///<inheritdoc/>
-		public MCFTMembrane(in Parameters concreteParameters, in Constitutive concreteConstitutive, WebReinforcement reinforcement, double width) : base(concreteParameters, concreteConstitutive, reinforcement, width)
+		public MCFTMembrane(Parameters concreteParameters, Constitutive concreteConstitutive, WebReinforcement reinforcement, double width) : base(concreteParameters, concreteConstitutive, reinforcement, width)
 		{
 		}
 
@@ -49,7 +49,7 @@ namespace RCMembrane
         /// <param name="concreteConstitutive">Concrete <see cref="Constitutive"/> object.</param>
         /// <param name="reinforcement"><see cref="WebReinforcement"/> object .</param>
         /// <param name="width">The width of cross-section.</param>
-        public MCFTMembrane(in Parameters concreteParameters, in Constitutive concreteConstitutive, WebReinforcement reinforcement, Length width) : base(concreteParameters, concreteConstitutive, reinforcement, width)
+        public MCFTMembrane(Parameters concreteParameters, Constitutive concreteConstitutive, WebReinforcement reinforcement, Length width) : base(concreteParameters, concreteConstitutive, reinforcement, width)
         {
         }
 
