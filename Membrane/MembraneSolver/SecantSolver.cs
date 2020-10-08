@@ -85,11 +85,11 @@ namespace RCMembrane
         public static void Solve()
 	    {
 		    // Initiate the membrane
-		    var membraneMCFT = PanelExamples.PB10();
-		    var membraneDSFM = PanelExamples.PB10(ConstitutiveModel.DSFM);
+		    var membraneMCFT = PanelExamples.PB16();
+		    var membraneDSFM = PanelExamples.PB16(ConstitutiveModel.DSFM);
 
 		    // Initiate stresses
-		    var sigma = new StressState(5.9, 0, 1);
+		    var sigma = new StressState(4, 0, 2);
 
 		    // Solve
 		    SecantSolver(membraneMCFT, sigma, out string mcftFile);
@@ -109,7 +109,7 @@ namespace RCMembrane
         /// <param name="fileName">The name of saved result file. <para>See: <seealso cref="ResultFileName"/>, <seealso cref="OutputResults"/>.</para></param>
         /// <param name="numLoadSteps">The number of load steps (default: 100).</param>
         /// <param name="maxIterations">Maximum number of iterations (default: 10000).</param>
-        /// <param name="tolerance">Stress convergence tolerance (default: 6E-4).</param>
+        /// <param name="tolerance">Stress convergence tolerance (default: 4E-4).</param>
         private static void SecantSolver(Membrane membrane, StressState appliedStresses, out string fileName, int numLoadSteps = 100, int maxIterations = 10000, double tolerance = 4E-4)
         {
 			// Initialize fields and write a starting message
