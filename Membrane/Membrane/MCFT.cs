@@ -1,6 +1,8 @@
 ﻿using MathNet.Numerics.LinearAlgebra;
 using Material.Concrete;
+using Material.Concrete.Biaxial;
 using Material.Reinforcement;
+using Material.Reinforcement.Biaxial;
 using OnPlaneComponents;
 using UnitsNet;
 using Parameters    = Material.Concrete.Parameters;
@@ -22,15 +24,8 @@ namespace RCMembrane
         /// Membrane element for MCFT analysis.
         /// </summary>
         ///<inheritdoc/>
-        public MCFTMembrane(BiaxialConcrete concrete, WebReinforcement reinforcement, double width) : base(concrete, reinforcement, width)
-		{
-		}
-
-        /// <summary>
-        /// Membrane element for MCFT analysis.
-        /// </summary>
-        ///<inheritdoc/>
-        public MCFTMembrane(BiaxialConcrete concrete, WebReinforcement reinforcement, Length width) : base (concrete, reinforcement, width)
+        public MCFTMembrane(BiaxialConcrete concrete, WebReinforcement reinforcement, double width)
+	        : this(concrete.Parameters, reinforcement, width)
         {
         }
 
@@ -38,18 +33,28 @@ namespace RCMembrane
         /// Membrane element for MCFT analysis.
         /// </summary>
         ///<inheritdoc/>
-		public MCFTMembrane(Parameters concreteParameters, Constitutive concreteConstitutive, WebReinforcement reinforcement, double width) : base(concreteParameters, concreteConstitutive, reinforcement, width)
+        public MCFTMembrane(BiaxialConcrete concrete, WebReinforcement reinforcement, Length width) 
+	        : this (concrete.Parameters, reinforcement, width)
+        {
+        }
+
+        /// <summary>
+        /// Membrane element for MCFT analysis.
+        /// </summary>
+        ///<inheritdoc/>
+		public MCFTMembrane(Parameters concreteParameters, WebReinforcement reinforcement, double width)
+	        : this(concreteParameters, reinforcement, Length.FromMillimeters(width))
 		{
 		}
 
         /// <summary>
-        /// Base membrane element constructor.
+        /// Membrane element for MCFT analysis.
         /// </summary>
         /// <param name="concreteParameters">Concrete <see cref="Parameters"/> object.</param>
-        /// <param name="concreteConstitutive">Concrete <see cref="Constitutive"/> object.</param>
         /// <param name="reinforcement"><see cref="WebReinforcement"/> object .</param>
         /// <param name="width">The width of cross-section.</param>
-        public MCFTMembrane(Parameters concreteParameters, Constitutive concreteConstitutive, WebReinforcement reinforcement, Length width) : base(concreteParameters, concreteConstitutive, reinforcement, width)
+        public MCFTMembrane(Parameters concreteParameters, WebReinforcement reinforcement, Length width)
+	        : base(concreteParameters, reinforcement, width, ConstitutiveModel.MCFT)
         {
         }
 

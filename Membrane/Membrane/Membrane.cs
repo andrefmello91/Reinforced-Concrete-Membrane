@@ -4,7 +4,9 @@ using Extensions.Number;
 using MathNet.Numerics.LinearAlgebra;
 using MathNet.Numerics.LinearAlgebra.Double;
 using Material.Concrete;
+using Material.Concrete.Biaxial;
 using Material.Reinforcement;
+using Material.Reinforcement.Biaxial;
 using MathNet.Numerics;
 using OnPlaneComponents;
 using UnitsNet;
@@ -56,7 +58,7 @@ namespace RCMembrane
         /// <param name="reinforcement"><see cref="WebReinforcement"/> object.</param>
         /// <param name="width">The width of cross-section, in mm.</param>
         protected Membrane(BiaxialConcrete concrete, WebReinforcement reinforcement, double width)
-			: this (concrete.Parameters, concrete.Constitutive, reinforcement, width)
+			: this (concrete.Parameters, reinforcement, width, concrete.Model)
         {
         }
 
@@ -67,7 +69,7 @@ namespace RCMembrane
         /// <param name="reinforcement"><see cref="WebReinforcement"/> object.</param>
         /// <param name="width">The width of cross-section.</param>
         protected Membrane(BiaxialConcrete concrete, WebReinforcement reinforcement, Length width)
-			: this (concrete.Parameters, concrete.Constitutive, reinforcement, width)
+			: this (concrete.Parameters, reinforcement, width, concrete.Model)
         {
         }
 
@@ -75,11 +77,11 @@ namespace RCMembrane
         /// Base membrane element constructor.
         /// </summary>
         /// <param name="concreteParameters">Concrete <see cref="Parameters"/> object.</param>
-        /// <param name="concreteConstitutive">Concrete <see cref="Constitutive"/> object.</param>
         /// <param name="reinforcement"><see cref="WebReinforcement"/> object .</param>
         /// <param name="width">The width of cross-section, in mm.</param>
-        protected Membrane(Parameters concreteParameters, Constitutive concreteConstitutive, WebReinforcement reinforcement, double width)
-			: this (concreteParameters, concreteConstitutive, reinforcement, Length.FromMillimeters(width))
+        /// <param name="model">Concrete <see cref="ConstitutiveModel"/>.</param>
+        protected Membrane(Parameters concreteParameters, WebReinforcement reinforcement, double width, ConstitutiveModel model)
+			: this (concreteParameters, reinforcement, Length.FromMillimeters(width), model)
         {
         }
 
@@ -87,13 +89,13 @@ namespace RCMembrane
         /// Base membrane element constructor.
         /// </summary>
         /// <param name="concreteParameters">Concrete <see cref="Parameters"/> object.</param>
-        /// <param name="concreteConstitutive">Concrete <see cref="Constitutive"/> object.</param>
         /// <param name="reinforcement"><see cref="WebReinforcement"/> object .</param>
         /// <param name="width">The width of cross-section.</param>
-        protected Membrane(Parameters concreteParameters, Constitutive concreteConstitutive, WebReinforcement reinforcement, Length width)
+        /// <param name="model">Concrete <see cref="ConstitutiveModel"/>.</param>
+        protected Membrane(Parameters concreteParameters, WebReinforcement reinforcement, Length width, ConstitutiveModel model)
         {
             // Initiate new materials
-			Concrete      = new BiaxialConcrete(concreteParameters, concreteConstitutive);
+			Concrete      = new BiaxialConcrete(concreteParameters, model);
             Reinforcement = reinforcement.Copy();
 
             _width = width;
@@ -109,13 +111,8 @@ namespace RCMembrane
         /// <param name="reinforcement"><see cref="WebReinforcement"/> object.</param>
         /// <param name="width">The width of cross-section, in mm.</param>
         /// <param name="considerCrackSlip">Consider crack slip? Only for <see cref="DSFMMembrane"/> (default: true)</param>
-        public static Membrane ReadMembrane(BiaxialConcrete concrete, WebReinforcement reinforcement, double width, bool considerCrackSlip = true)
-        {
-			if (concrete.Constitutive is MCFTConstitutive)
-				return new MCFTMembrane(concrete, reinforcement, width);
-
-			return new DSFMMembrane(concrete, reinforcement, width, considerCrackSlip);
-        }
+        public static Membrane Read(BiaxialConcrete concrete, WebReinforcement reinforcement, double width, bool considerCrackSlip = true) =>
+	        Read(concrete, reinforcement, Length.FromMillimeters(width), considerCrackSlip);
 
         /// <summary>
         /// Read membrane element based on concrete constitutive model.
@@ -124,9 +121,9 @@ namespace RCMembrane
         /// <param name="reinforcement"><see cref="WebReinforcement"/> object.</param>
         /// <param name="width">The width of cross-section.</param>
         /// <param name="considerCrackSlip">Consider crack slip? Only for <see cref="DSFMMembrane"/> (default: true)</param>
-        public static Membrane ReadMembrane(BiaxialConcrete concrete, WebReinforcement reinforcement, Length width, bool considerCrackSlip = true)
+        public static Membrane Read(BiaxialConcrete concrete, WebReinforcement reinforcement, Length width, bool considerCrackSlip = true)
         {
-			if (concrete.Constitutive is MCFTConstitutive)
+			if (concrete.Model is ConstitutiveModel.MCFT)
 				return new MCFTMembrane(concrete, reinforcement, width);
 
 			return new DSFMMembrane(concrete, reinforcement, width, considerCrackSlip);
@@ -136,32 +133,25 @@ namespace RCMembrane
         /// Read membrane element based on concrete constitutive model.
         /// </summary>
         /// <param name="concreteParameters">Concrete <see cref="Parameters"/> object.</param>
-        /// <param name="concreteConstitutive">Concrete <see cref="Constitutive"/> object.</param>
         /// <param name="reinforcement"><see cref="WebReinforcement"/> object .</param>
         /// <param name="width">The width of cross-section, in mm.</param>
         /// <param name="considerCrackSlip">Consider crack slip? Only for <see cref="DSFMMembrane"/> (default: true)</param>
-        public static Membrane ReadMembrane(Parameters concreteParameters, Constitutive concreteConstitutive, WebReinforcement reinforcement, double width, bool considerCrackSlip = true)
-        {
-	        if (concreteConstitutive is MCFTConstitutive)
-		        return new MCFTMembrane(concreteParameters, concreteConstitutive, reinforcement, width);
-
-	        return new DSFMMembrane(concreteParameters, concreteConstitutive, reinforcement, width, considerCrackSlip);
-        }
+        public static Membrane Read(Parameters concreteParameters, WebReinforcement reinforcement, double width, ConstitutiveModel model = ConstitutiveModel.MCFT, bool considerCrackSlip = true) =>
+	        Read(concreteParameters, reinforcement, Length.FromMillimeters(width), model, considerCrackSlip);
 
         /// <summary>
         /// Read membrane element based on concrete constitutive model.
         /// </summary>
         /// <param name="concreteParameters">Concrete <see cref="Parameters"/> object.</param>
-        /// <param name="concreteConstitutive">Concrete <see cref="Constitutive"/> object.</param>
         /// <param name="reinforcement"><see cref="WebReinforcement"/> object .</param>
         /// <param name="width">The width of cross-section.</param>
         /// <param name="considerCrackSlip">Consider crack slip? Only for <see cref="DSFMMembrane"/> (default: true)</param>
-        public static Membrane ReadMembrane(Parameters concreteParameters, Constitutive concreteConstitutive, WebReinforcement reinforcement, Length width, bool considerCrackSlip = true)
+        public static Membrane Read(Parameters concreteParameters, WebReinforcement reinforcement, Length width, ConstitutiveModel model = ConstitutiveModel.MCFT, bool considerCrackSlip = true)
         {
-	        if (concreteConstitutive is MCFTConstitutive)
-		        return new MCFTMembrane(concreteParameters, concreteConstitutive, reinforcement, width);
+	        if (model is ConstitutiveModel.MCFT)
+		        return new MCFTMembrane(concreteParameters, reinforcement, width);
 
-	        return new DSFMMembrane(concreteParameters, concreteConstitutive, reinforcement, width, considerCrackSlip);
+	        return new DSFMMembrane(concreteParameters, reinforcement, width, considerCrackSlip);
         }
 
         /// <summary>

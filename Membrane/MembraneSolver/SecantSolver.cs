@@ -85,11 +85,11 @@ namespace RCMembrane
         public static void Solve()
 	    {
 		    // Initiate the membrane
-		    var membraneMCFT = PanelExamples.PB16();
-		    var membraneDSFM = PanelExamples.PB16(ConstitutiveModel.DSFM);
+		    var membraneMCFT = PanelExamples.PV20();
+		    var membraneDSFM = PanelExamples.PV20(ConstitutiveModel.DSFM);
 
 		    // Initiate stresses
-		    var sigma = new StressState(4, 0, 2);
+		    var sigma = new StressState(0, 0, 5);
 
 		    // Solve
 		    SecantSolver(membraneMCFT, sigma, out string mcftFile);

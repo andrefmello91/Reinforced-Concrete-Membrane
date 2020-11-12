@@ -1,7 +1,8 @@
 ﻿using Material.Concrete;
 using Material.Reinforcement;
+using Material.Reinforcement.Biaxial;
 using MathNet.Numerics;
-using Concrete      = Material.Concrete.BiaxialConcrete;
+using Concrete      = Material.Concrete.Biaxial.BiaxialConcrete;
 
 namespace RCMembrane
 {
@@ -34,7 +35,7 @@ namespace RCMembrane
 		    var reinforcement = new WebReinforcement(6.35, 50.55, steelX, 6.35, 53.86, steelY, 70);
 
             return
-                Membrane.ReadMembrane(concrete, reinforcement, 70, considerCrackSlip);
+                Membrane.Read(concrete, reinforcement, 70, considerCrackSlip);
         }
 
         /// <summary>
@@ -57,7 +58,7 @@ namespace RCMembrane
             var reinforcement = new WebReinforcement(2.03, 51.37, steelXY, 70);
 
             return
-                Membrane.ReadMembrane(concrete, reinforcement, 70, considerCrackSlip);
+                Membrane.Read(concrete, reinforcement, 70, considerCrackSlip);
         }
 
         /// <summary>
@@ -80,7 +81,7 @@ namespace RCMembrane
 		    var reinforcement = new WebReinforcement(3.3, 50.91, steelXY, 70);
 
             return
-                Membrane.ReadMembrane(concrete, reinforcement, 70, considerCrackSlip);
+                Membrane.Read(concrete, reinforcement, 70, considerCrackSlip);
         }
 
         /// <summary>
@@ -103,7 +104,7 @@ namespace RCMembrane
 		    var reinforcement = new WebReinforcement(3.45, 25.2, steelXY, 70);
 
             return
-                Membrane.ReadMembrane(concrete, reinforcement, 70, considerCrackSlip);
+                Membrane.Read(concrete, reinforcement, 70, considerCrackSlip);
         }
 
         /// <summary>
@@ -126,7 +127,7 @@ namespace RCMembrane
 		    var reinforcement = new WebReinforcement(5.79, 101.66, steelXY, 70);
 
             return
-                Membrane.ReadMembrane(concrete, reinforcement, 70, considerCrackSlip);
+                Membrane.Read(concrete, reinforcement, 70, considerCrackSlip);
         }
 
         /// <summary>
@@ -149,7 +150,7 @@ namespace RCMembrane
 		    var reinforcement = new WebReinforcement(6.35, 50.55, steelXY, 70);
 
             return
-                Membrane.ReadMembrane(concrete, reinforcement, 70, considerCrackSlip);
+                Membrane.Read(concrete, reinforcement, 70, considerCrackSlip);
         }
 
         /// <summary>
@@ -172,7 +173,7 @@ namespace RCMembrane
 		    var reinforcement = new WebReinforcement(6.35, 50.55, steelXY, 70);
 
             return
-                Membrane.ReadMembrane(concrete, reinforcement, 70, considerCrackSlip);
+                Membrane.Read(concrete, reinforcement, 70, considerCrackSlip);
         }
 
         /// <summary>
@@ -195,7 +196,7 @@ namespace RCMembrane
 		    var reinforcement = new WebReinforcement(5.44, 25.37, steelXY, 70);
 
             return
-                Membrane.ReadMembrane(concrete, reinforcement, 70, considerCrackSlip);
+                Membrane.Read(concrete, reinforcement, 70, considerCrackSlip);
         }
 
         /// <summary>
@@ -218,7 +219,7 @@ namespace RCMembrane
 		    var reinforcement = new WebReinforcement(6.35, 50.55, steelXY, 70);
 
             return
-                Membrane.ReadMembrane(concrete, reinforcement, 70, considerCrackSlip);
+                Membrane.Read(concrete, reinforcement, 70, considerCrackSlip);
         }
 
         /// <summary>
@@ -241,7 +242,7 @@ namespace RCMembrane
 		    var reinforcement = new WebReinforcement(6.35, 50.55, steelXY, 4.7, 49.57, steelXY, 70);
 
 			return
-				Membrane.ReadMembrane(concrete, reinforcement, 70, considerCrackSlip);
+				Membrane.Read(concrete, reinforcement, 70, considerCrackSlip);
         }
 
         /// <summary>
@@ -264,7 +265,7 @@ namespace RCMembrane
 		    var reinforcement = new WebReinforcement(6.35, 50.55, steelXY, 5.44, 50.7, steelXY, 70);
 
             return
-                Membrane.ReadMembrane(concrete, reinforcement, 70, considerCrackSlip);
+                Membrane.Read(concrete, reinforcement, 70, considerCrackSlip);
         }
 
         /// <summary>
@@ -287,7 +288,7 @@ namespace RCMembrane
 		    var reinforcement = new WebReinforcement(6.35, 50.55, steelXY, 3.18, 50.43, steelXY, 70);
 
             return
-                Membrane.ReadMembrane(concrete, reinforcement, 70, considerCrackSlip);
+                Membrane.Read(concrete, reinforcement, 70, considerCrackSlip);
         }
 
         /// <summary>
@@ -310,7 +311,7 @@ namespace RCMembrane
 		    var reinforcement = new WebReinforcement(6.35, 50.55, steelXY, 0, 0, null, 70);
 
             return
-                Membrane.ReadMembrane(concrete, reinforcement, 70, considerCrackSlip);
+                Membrane.Read(concrete, reinforcement, 70, considerCrackSlip);
         }
 
         /// <summary>
@@ -333,7 +334,7 @@ namespace RCMembrane
 		    var reinforcement = new WebReinforcement(6.35, 50.55, steelXY, 70);
 
             return
-                Membrane.ReadMembrane(concrete, reinforcement, 70, considerCrackSlip);
+                Membrane.Read(concrete, reinforcement, 70, considerCrackSlip);
         }
 
         /// <summary>
@@ -356,7 +357,7 @@ namespace RCMembrane
 		    var reinforcement = new WebReinforcement(4.09, 50.73, steelXY, 70);
 
             return
-                Membrane.ReadMembrane(concrete, reinforcement, 70, considerCrackSlip);
+                Membrane.Read(concrete, reinforcement, 70, considerCrackSlip);
         }
 
         /// <summary>
@@ -387,7 +388,7 @@ namespace RCMembrane
 	        var reinforcement = new WebReinforcement(4.09, 50.73, steelXY, 70);
 
 	        return
-		        Membrane.ReadMembrane(concrete, reinforcement, 70, considerCrackSlip);
+		        Membrane.Read(concrete, reinforcement, 70, considerCrackSlip);
         }
 
         /// <summary>
@@ -411,7 +412,7 @@ namespace RCMembrane
 	        var reinforcement = new WebReinforcement(6.35, 50.55, steelX, 2.67, 50, steelY, 70);
 
 	        return
-		        Membrane.ReadMembrane(concrete, reinforcement, 70, considerCrackSlip);
+		        Membrane.Read(concrete, reinforcement, 70, considerCrackSlip);
         }
 
         /// <summary>
@@ -435,7 +436,7 @@ namespace RCMembrane
 	        var reinforcement = new WebReinforcement(6.35, 50.55, steelX, 4.01, 50.82, steelY, 70);
 
 	        return
-		        Membrane.ReadMembrane(concrete, reinforcement, 70, considerCrackSlip);
+		        Membrane.Read(concrete, reinforcement, 70, considerCrackSlip);
         }
 
         /// <summary>
@@ -459,7 +460,7 @@ namespace RCMembrane
 		    var reinforcement = new WebReinforcement(6.35, 50.55, steelX, 4.47, 50.38, steelY, 70);
 
             return
-                Membrane.ReadMembrane(concrete, reinforcement, 70, considerCrackSlip);
+                Membrane.Read(concrete, reinforcement, 70, considerCrackSlip);
         }
 
         /// <summary>
@@ -483,7 +484,7 @@ namespace RCMembrane
 		    var reinforcement = new WebReinforcement(6.35, 50.55, steelX, 5.41, 50.52, steelY, 70);
 
             return
-                Membrane.ReadMembrane(concrete, reinforcement, 70, considerCrackSlip);
+                Membrane.Read(concrete, reinforcement, 70, considerCrackSlip);
         }
 
         /// <summary>
@@ -507,7 +508,7 @@ namespace RCMembrane
 		    var reinforcement = new WebReinforcement(6.35, 50.55, steelX, 5.87, 50.87, steelY, 70);
 
             return
-                Membrane.ReadMembrane(concrete, reinforcement, 70, considerCrackSlip);
+                Membrane.Read(concrete, reinforcement, 70, considerCrackSlip);
         }
 
         /// <summary>
@@ -530,7 +531,7 @@ namespace RCMembrane
 		    var reinforcement = new WebReinforcement(6.35, 50.55, steelXY, 70);
 
             return
-                Membrane.ReadMembrane(concrete, reinforcement, 70, considerCrackSlip);
+                Membrane.Read(concrete, reinforcement, 70, considerCrackSlip);
         }
 
         /// <summary>
@@ -553,7 +554,7 @@ namespace RCMembrane
 		    var reinforcement = new WebReinforcement(6.35, 50.55, steelXY, 70);
 
             return
-                Membrane.ReadMembrane(concrete, reinforcement, 70, considerCrackSlip);
+                Membrane.Read(concrete, reinforcement, 70, considerCrackSlip);
         }
 
         /// <summary>
@@ -576,7 +577,7 @@ namespace RCMembrane
 		    var reinforcement = new WebReinforcement(6.35, 50.55, steelXY, 70);
 
             return
-                Membrane.ReadMembrane(concrete, reinforcement, 70, considerCrackSlip);
+                Membrane.Read(concrete, reinforcement, 70, considerCrackSlip);
         }
 
         /// <summary>
@@ -600,7 +601,7 @@ namespace RCMembrane
 		    var reinforcement = new WebReinforcement(6.35, 50.55, steelX, 4.7, 49.08, steelY, 70);
 
             return
-                Membrane.ReadMembrane(concrete, reinforcement, 70, considerCrackSlip);
+                Membrane.Read(concrete, reinforcement, 70, considerCrackSlip);
         }
 
         /// <summary>
@@ -623,7 +624,7 @@ namespace RCMembrane
 		    var reinforcement = new WebReinforcement(6.35, 50.55, steelX, 70);
 
             return
-                Membrane.ReadMembrane(concrete, reinforcement, 70, considerCrackSlip);
+                Membrane.Read(concrete, reinforcement, 70, considerCrackSlip);
         }
 
         /// <summary>
@@ -646,7 +647,7 @@ namespace RCMembrane
 		    var reinforcement = new WebReinforcement(6.35, 50.55, steelX, 70);
 
             return
-                Membrane.ReadMembrane(concrete, reinforcement, 70, considerCrackSlip);
+                Membrane.Read(concrete, reinforcement, 70, considerCrackSlip);
         }
 
         /// <summary>
@@ -670,7 +671,7 @@ namespace RCMembrane
 		    var reinforcement = new WebReinforcement(6.35, 50.55, steelX, 4.47, 50.38, steelY, 70);
 
             return
-                Membrane.ReadMembrane(concrete, reinforcement, 70, considerCrackSlip);
+                Membrane.Read(concrete, reinforcement, 70, considerCrackSlip);
         }
 
         /// <summary>
@@ -694,7 +695,7 @@ namespace RCMembrane
 		    var reinforcement = new WebReinforcement(6.35, 50.55, steelX, 4.7, 49.08, steelY, 70);
 
             return
-                Membrane.ReadMembrane(concrete, reinforcement, 70, considerCrackSlip);
+                Membrane.Read(concrete, reinforcement, 70, considerCrackSlip);
         }
 
         #endregion
@@ -723,7 +724,7 @@ namespace RCMembrane
 	        var reinforcement = new WebReinforcement(8, 44.46, steelX, 0, 0, null, 70);
 
 	        return
-		        Membrane.ReadMembrane(concrete, reinforcement, 70, considerCrackSlip);
+		        Membrane.Read(concrete, reinforcement, 70, considerCrackSlip);
         }
 
         /// <summary>
@@ -747,7 +748,7 @@ namespace RCMembrane
 	        var reinforcement = new WebReinforcement(8, 44.46, steelX, 5.72, 179.07, steelY, 70);
 
 	        return
-		        Membrane.ReadMembrane(concrete, reinforcement, 70, considerCrackSlip);
+		        Membrane.Read(concrete, reinforcement, 70, considerCrackSlip);
         }
 
         /// <summary>
@@ -771,7 +772,7 @@ namespace RCMembrane
 	        var reinforcement = new WebReinforcement(8, 44.46, steelX, 5.72, 89.54, steelY, 70);
 
 	        return
-		        Membrane.ReadMembrane(concrete, reinforcement, 70, considerCrackSlip);
+		        Membrane.Read(concrete, reinforcement, 70, considerCrackSlip);
         }
 
         /// <summary>
@@ -795,7 +796,7 @@ namespace RCMembrane
 	        var reinforcement = new WebReinforcement(8, 44.46, steelX, 5.72, 89.54, steelY, 70);
 
 	        return
-		        Membrane.ReadMembrane(concrete, reinforcement, 70, considerCrackSlip);
+		        Membrane.Read(concrete, reinforcement, 70, considerCrackSlip);
         }
 
         /// <summary>
@@ -819,7 +820,7 @@ namespace RCMembrane
 	        var reinforcement = new WebReinforcement(8, 44.46, steelX, 5.72, 179.07, steelY, 70);
 
 	        return
-		        Membrane.ReadMembrane(concrete, reinforcement, 70, considerCrackSlip);
+		        Membrane.Read(concrete, reinforcement, 70, considerCrackSlip);
         }
 
         /// <summary>
@@ -843,7 +844,7 @@ namespace RCMembrane
 	        var reinforcement = new WebReinforcement(8, 44.46, steelX, 5.72, 179.07, steelY, 70);
 
 	        return
-		        Membrane.ReadMembrane(concrete, reinforcement, 70, considerCrackSlip);
+		        Membrane.Read(concrete, reinforcement, 70, considerCrackSlip);
         }
 
         /// <summary>
@@ -867,7 +868,7 @@ namespace RCMembrane
 	        var reinforcement = new WebReinforcement(8, 44.46, steelX, 5.72, 89.54, steelY, 70);
 
 	        return
-		        Membrane.ReadMembrane(concrete, reinforcement, 70, considerCrackSlip);
+		        Membrane.Read(concrete, reinforcement, 70, considerCrackSlip);
         }
 		
         /// <summary>
@@ -891,7 +892,7 @@ namespace RCMembrane
 	        var reinforcement = new WebReinforcement(8, 44.46, steelX, 5.72, 59.21, steelY, 70);
 
 	        return
-		        Membrane.ReadMembrane(concrete, reinforcement, 70, considerCrackSlip);
+		        Membrane.Read(concrete, reinforcement, 70, considerCrackSlip);
         }
 
         /// <summary>
@@ -915,7 +916,7 @@ namespace RCMembrane
 	        var reinforcement = new WebReinforcement(8, 44.46, steelX, 5.72, 179.07, steelY, 70);
 
 	        return
-		        Membrane.ReadMembrane(concrete, reinforcement, 70, considerCrackSlip);
+		        Membrane.Read(concrete, reinforcement, 70, considerCrackSlip);
         }
 		
         /// <summary>
@@ -939,7 +940,7 @@ namespace RCMembrane
 	        var reinforcement = new WebReinforcement(8, 44.46, steelX, 5.72, 59.21, steelY, 70);
 
 	        return
-		        Membrane.ReadMembrane(concrete, reinforcement, 70, considerCrackSlip);
+		        Membrane.Read(concrete, reinforcement, 70, considerCrackSlip);
         }
 
         /// <summary>
@@ -963,7 +964,7 @@ namespace RCMembrane
 	        var reinforcement = new WebReinforcement(5.72, 44.5, steelX, 5.72, 89.54, steelY, 70);
 
             return
-                Membrane.ReadMembrane(concrete, reinforcement, 70, considerCrackSlip);
+                Membrane.Read(concrete, reinforcement, 70, considerCrackSlip);
         }
 
         /// <summary>
@@ -987,7 +988,7 @@ namespace RCMembrane
 	        var reinforcement = new WebReinforcement(5.72, 44.5, steelX, 5.72, 89.54, steelY, 70);
 
             return
-                Membrane.ReadMembrane(concrete, reinforcement, 70, considerCrackSlip);
+                Membrane.Read(concrete, reinforcement, 70, considerCrackSlip);
         }
 
 
@@ -1016,7 +1017,7 @@ namespace RCMembrane
 	        var reinforcement = WebReinforcement.DirectionXOnly(6, 74.11, steel, 70);
 
 	        return
-		        Membrane.ReadMembrane(concrete, reinforcement, 70, considerCrackSlip);
+		        Membrane.Read(concrete, reinforcement, 70, considerCrackSlip);
         }
 
         /// <summary>
@@ -1039,7 +1040,7 @@ namespace RCMembrane
 	        var reinforcement = WebReinforcement.DirectionXOnly(6, 74.11, steel, 70);
 
             return
-                Membrane.ReadMembrane(concrete, reinforcement, 70, considerCrackSlip);
+                Membrane.Read(concrete, reinforcement, 70, considerCrackSlip);
         }
 
         /// <summary>
@@ -1062,7 +1063,7 @@ namespace RCMembrane
 	        var reinforcement = WebReinforcement.DirectionXOnly(6, 74.11, steel, 70);
 
             return
-                Membrane.ReadMembrane(concrete, reinforcement, 70, considerCrackSlip);
+                Membrane.Read(concrete, reinforcement, 70, considerCrackSlip);
         }
 
         /// <summary>
@@ -1085,7 +1086,7 @@ namespace RCMembrane
 	        var reinforcement = WebReinforcement.DirectionXOnly(6, 74.11, steel, 70);
 
             return
-                Membrane.ReadMembrane(concrete, reinforcement, 70, considerCrackSlip);
+                Membrane.Read(concrete, reinforcement, 70, considerCrackSlip);
         }
 
         /// <summary>
@@ -1108,7 +1109,7 @@ namespace RCMembrane
 	        var reinforcement = WebReinforcement.DirectionXOnly(6, 74.11, steel, 70);
 
             return
-                Membrane.ReadMembrane(concrete, reinforcement, 70, considerCrackSlip);
+                Membrane.Read(concrete, reinforcement, 70, considerCrackSlip);
         }
 
         /// <summary>
@@ -1131,7 +1132,7 @@ namespace RCMembrane
 	        var reinforcement = WebReinforcement.DirectionXOnly(6, 74.11, steel, 70);
 
             return
-                Membrane.ReadMembrane(concrete, reinforcement, 70, considerCrackSlip);
+                Membrane.Read(concrete, reinforcement, 70, considerCrackSlip);
         }
 
         /// <summary>
@@ -1154,7 +1155,7 @@ namespace RCMembrane
 	        var reinforcement = WebReinforcement.DirectionXOnly(6, 74.11, steel, 70);
 
             return
-                Membrane.ReadMembrane(concrete, reinforcement, 70, considerCrackSlip);
+                Membrane.Read(concrete, reinforcement, 70, considerCrackSlip);
         }
 
         /// <summary>
@@ -1177,7 +1178,7 @@ namespace RCMembrane
 	        var reinforcement = WebReinforcement.DirectionXOnly(6, 40, steel, 70);
 
             return
-                Membrane.ReadMembrane(concrete, reinforcement, 70, considerCrackSlip);
+                Membrane.Read(concrete, reinforcement, 70, considerCrackSlip);
         }
 
         /// <summary>
@@ -1200,7 +1201,7 @@ namespace RCMembrane
 	        var reinforcement = WebReinforcement.DirectionXOnly(6, 40, steel, 70);
 
             return
-                Membrane.ReadMembrane(concrete, reinforcement, 70, considerCrackSlip);
+                Membrane.Read(concrete, reinforcement, 70, considerCrackSlip);
         }
 
         /// <summary>
@@ -1223,7 +1224,7 @@ namespace RCMembrane
 	        var reinforcement = WebReinforcement.DirectionXOnly(6, 40, steel, 70);
 
             return
-                Membrane.ReadMembrane(concrete, reinforcement, 70, considerCrackSlip);
+                Membrane.Read(concrete, reinforcement, 70, considerCrackSlip);
         }
 
         /// <summary>
@@ -1246,7 +1247,7 @@ namespace RCMembrane
 	        var reinforcement = WebReinforcement.DirectionXOnly(6, 40, steel, 70);
 
             return
-                Membrane.ReadMembrane(concrete, reinforcement, 70, considerCrackSlip);
+                Membrane.Read(concrete, reinforcement, 70, considerCrackSlip);
         }
 
         /// <summary>
@@ -1269,7 +1270,7 @@ namespace RCMembrane
 	        var reinforcement = WebReinforcement.DirectionXOnly(6, 36.72, steel, 70);
 
             return
-                Membrane.ReadMembrane(concrete, reinforcement, 70, considerCrackSlip);
+                Membrane.Read(concrete, reinforcement, 70, considerCrackSlip);
         }
 
         /// <summary>
@@ -1292,7 +1293,7 @@ namespace RCMembrane
 	        var reinforcement = WebReinforcement.DirectionXOnly(6, 36.72, steel, 70);
 
             return
-                Membrane.ReadMembrane(concrete, reinforcement, 70, considerCrackSlip);
+                Membrane.Read(concrete, reinforcement, 70, considerCrackSlip);
         }
 
         /// <summary>
@@ -1315,7 +1316,7 @@ namespace RCMembrane
 	        var reinforcement = WebReinforcement.DirectionXOnly(6, 36.72, steel, 70);
 
             return
-                Membrane.ReadMembrane(concrete, reinforcement, 70, considerCrackSlip);
+                Membrane.Read(concrete, reinforcement, 70, considerCrackSlip);
         }
 
         /// <summary>
@@ -1338,7 +1339,7 @@ namespace RCMembrane
 	        var reinforcement = WebReinforcement.DirectionXOnly(6, 36.72, steel, 70);
 
             return
-                Membrane.ReadMembrane(concrete, reinforcement, 70, considerCrackSlip);
+                Membrane.Read(concrete, reinforcement, 70, considerCrackSlip);
         }
 
         /// <summary>
@@ -1361,7 +1362,7 @@ namespace RCMembrane
 	        var reinforcement = WebReinforcement.DirectionXOnly(6, 36.72, steel, 70);
 
             return
-                Membrane.ReadMembrane(concrete, reinforcement, 70, considerCrackSlip);
+                Membrane.Read(concrete, reinforcement, 70, considerCrackSlip);
         }
 
         /// <summary>
@@ -1384,7 +1385,7 @@ namespace RCMembrane
 	        var reinforcement = WebReinforcement.DirectionXOnly(6, 36.72, steel, 70);
 
             return
-                Membrane.ReadMembrane(concrete, reinforcement, 70, considerCrackSlip);
+                Membrane.Read(concrete, reinforcement, 70, considerCrackSlip);
         }
 
         /// <summary>
@@ -1407,7 +1408,7 @@ namespace RCMembrane
 	        var reinforcement = WebReinforcement.DirectionXOnly(6, 40, steel, 70);
 
             return
-                Membrane.ReadMembrane(concrete, reinforcement, 70, considerCrackSlip);
+                Membrane.Read(concrete, reinforcement, 70, considerCrackSlip);
         }
 
         /// <summary>
@@ -1430,7 +1431,7 @@ namespace RCMembrane
 	        var reinforcement = WebReinforcement.DirectionXOnly(6, 40, steel, 70);
 
             return
-                Membrane.ReadMembrane(concrete, reinforcement, 70, considerCrackSlip);
+                Membrane.Read(concrete, reinforcement, 70, considerCrackSlip);
         }
 
         #endregion
@@ -1459,7 +1460,7 @@ namespace RCMembrane
 	        var reinforcement = new WebReinforcement(8.1, 92.7, steelX, 3.85, 178.8, steelY, 73);
 
 	        return
-		        Membrane.ReadMembrane(concrete, reinforcement, 73, considerCrackSlip);
+		        Membrane.Read(concrete, reinforcement, 73, considerCrackSlip);
         }
 
         /// <summary>
@@ -1483,7 +1484,7 @@ namespace RCMembrane
 	        var reinforcement = new WebReinforcement(8.1, 92.7, steelX, 3.85, 178.8, steelY, 73);
 
 	        return
-		        Membrane.ReadMembrane(concrete, reinforcement, 73, considerCrackSlip);
+		        Membrane.Read(concrete, reinforcement, 73, considerCrackSlip);
         }
 
         /// <summary>
@@ -1507,7 +1508,7 @@ namespace RCMembrane
 	        var reinforcement = new WebReinforcement(8.1, 92.7, steelX, 3.85, 178.8, steelY, 73);
 
 	        return
-		        Membrane.ReadMembrane(concrete, reinforcement, 73, considerCrackSlip);
+		        Membrane.Read(concrete, reinforcement, 73, considerCrackSlip);
         }
 
         /// <summary>
@@ -1531,7 +1532,7 @@ namespace RCMembrane
 	        var reinforcement = new WebReinforcement(8.1, 92.7, steelX, 3.85, 178.8, steelY, 73);
 
 	        return
-		        Membrane.ReadMembrane(concrete, reinforcement, 73, considerCrackSlip);
+		        Membrane.Read(concrete, reinforcement, 73, considerCrackSlip);
         }
 
         /// <summary>
@@ -1555,7 +1556,7 @@ namespace RCMembrane
 	        var reinforcement = new WebReinforcement(8.1, 92.7, steelX, 3.85, 178.8, steelY, 73);
 
 	        return
-		        Membrane.ReadMembrane(concrete, reinforcement, 73, considerCrackSlip);
+		        Membrane.Read(concrete, reinforcement, 73, considerCrackSlip);
         }
 
         /// <summary>
@@ -1579,7 +1580,7 @@ namespace RCMembrane
 	        var reinforcement = new WebReinforcement(8.1, 92.7, steelX, 3.85, 178.8, steelY, 73);
 
 	        return
-		        Membrane.ReadMembrane(concrete, reinforcement, 73, considerCrackSlip);
+		        Membrane.Read(concrete, reinforcement, 73, considerCrackSlip);
         }
 
         #endregion
@@ -1608,7 +1609,7 @@ namespace RCMembrane
 	        var reinforcement = new WebReinforcement(10, 148.06, steel, 178);
 
 	        return
-		        Membrane.ReadMembrane(concrete, reinforcement, 178, considerCrackSlip);
+		        Membrane.Read(concrete, reinforcement, 178, considerCrackSlip);
         }
 
         /// <summary>
@@ -1631,7 +1632,7 @@ namespace RCMembrane
 	        var reinforcement = new WebReinforcement(15, 166.43, steel, 178);
 
 	        return
-		        Membrane.ReadMembrane(concrete, reinforcement, 178, considerCrackSlip);
+		        Membrane.Read(concrete, reinforcement, 178, considerCrackSlip);
         }
 
         /// <summary>
@@ -1654,7 +1655,7 @@ namespace RCMembrane
 	        var reinforcement = new WebReinforcement(20, 197.31, steel, 178);
 
 	        return
-		        Membrane.ReadMembrane(concrete, reinforcement, 178, considerCrackSlip);
+		        Membrane.Read(concrete, reinforcement, 178, considerCrackSlip);
         }
 
         /// <summary>
@@ -1677,7 +1678,7 @@ namespace RCMembrane
 	        var reinforcement = new WebReinforcement(25, 184.96, steel, 178);
 
 	        return
-		        Membrane.ReadMembrane(concrete, reinforcement, 178, considerCrackSlip);
+		        Membrane.Read(concrete, reinforcement, 178, considerCrackSlip);
         }
 
         /// <summary>
@@ -1701,7 +1702,7 @@ namespace RCMembrane
 	        var reinforcement = new WebReinforcement(15, 166.43, steelX, 10, 148.06, steelY, 178);
 
 	        return
-		        Membrane.ReadMembrane(concrete, reinforcement, 178, considerCrackSlip);
+		        Membrane.Read(concrete, reinforcement, 178, considerCrackSlip);
         }
 
         /// <summary>
@@ -1725,7 +1726,7 @@ namespace RCMembrane
 	        var reinforcement = new WebReinforcement(20, 197.31, steelX, 15, 166.43, steelY, 178);
 
 	        return
-		        Membrane.ReadMembrane(concrete, reinforcement, 178, considerCrackSlip);
+		        Membrane.Read(concrete, reinforcement, 178, considerCrackSlip);
         }
 
         /// <summary>
@@ -1749,7 +1750,7 @@ namespace RCMembrane
 	        var reinforcement = new WebReinforcement(20, 197.31, steelX, 10, 148.06, steelY, 178);
 
 	        return
-		        Membrane.ReadMembrane(concrete, reinforcement, 178, considerCrackSlip);
+		        Membrane.Read(concrete, reinforcement, 178, considerCrackSlip);
         }
 
         /// <summary>
@@ -1773,7 +1774,7 @@ namespace RCMembrane
 	        var reinforcement = new WebReinforcement(25, 184.96, steelX, 10, 148.06, steelY, 178);
 
 	        return
-		        Membrane.ReadMembrane(concrete, reinforcement, 178, considerCrackSlip);
+		        Membrane.Read(concrete, reinforcement, 178, considerCrackSlip);
         }
 
         /// <summary>
@@ -1797,7 +1798,7 @@ namespace RCMembrane
 	        var reinforcement = new WebReinforcement(25, 184.96, steelX, 15, 166.43, steelY, 178);
 
 	        return
-		        Membrane.ReadMembrane(concrete, reinforcement, 178, considerCrackSlip);
+		        Membrane.Read(concrete, reinforcement, 178, considerCrackSlip);
         }
 
         /// <summary>
@@ -1821,7 +1822,7 @@ namespace RCMembrane
 	        var reinforcement = new WebReinforcement(25, 184.96, steelX, 20, 197.31, steelY, 178);
 
 	        return
-		        Membrane.ReadMembrane(concrete, reinforcement, 178, considerCrackSlip);
+		        Membrane.Read(concrete, reinforcement, 178, considerCrackSlip);
         }
 
 
@@ -1851,7 +1852,7 @@ namespace RCMembrane
 	        var reinforcement = new WebReinforcement(11.3, 188, steel, 178);
 
 	        return
-		        Membrane.ReadMembrane(concrete, reinforcement, 178, considerCrackSlip);
+		        Membrane.Read(concrete, reinforcement, 178, considerCrackSlip);
         }
 
         /// <summary>
@@ -1874,7 +1875,7 @@ namespace RCMembrane
 	        var reinforcement = new WebReinforcement(11.3, 94, steel, 178);
 
 	        return
-		        Membrane.ReadMembrane(concrete, reinforcement, 178, considerCrackSlip);
+		        Membrane.Read(concrete, reinforcement, 178, considerCrackSlip);
         }
 
         /// <summary>
@@ -1897,7 +1898,7 @@ namespace RCMembrane
 	        var reinforcement = new WebReinforcement(16, 94, steel, 178);
 
 	        return
-		        Membrane.ReadMembrane(concrete, reinforcement, 178, considerCrackSlip);
+		        Membrane.Read(concrete, reinforcement, 178, considerCrackSlip);
         }
 
         /// <summary>
@@ -1920,7 +1921,7 @@ namespace RCMembrane
 	        var reinforcement = new WebReinforcement(19.5, 94, steel, 178);
 
 	        return
-		        Membrane.ReadMembrane(concrete, reinforcement, 178, considerCrackSlip);
+		        Membrane.Read(concrete, reinforcement, 178, considerCrackSlip);
         }
 
         /// <summary>
@@ -1943,7 +1944,7 @@ namespace RCMembrane
 	        var reinforcement = new WebReinforcement(25.2, 94, steel, 203);
 
 	        return
-		        Membrane.ReadMembrane(concrete, reinforcement, 203, considerCrackSlip);
+		        Membrane.Read(concrete, reinforcement, 203, considerCrackSlip);
         }
 
         /// <summary>
@@ -1967,7 +1968,7 @@ namespace RCMembrane
 	        var reinforcement = new WebReinforcement(16, 94, steelX, 11.3, 94, steelY, 178);
 
 	        return
-		        Membrane.ReadMembrane(concrete, reinforcement, 178, considerCrackSlip);
+		        Membrane.Read(concrete, reinforcement, 178, considerCrackSlip);
         }
 
         /// <summary>
@@ -1991,7 +1992,7 @@ namespace RCMembrane
 	        var reinforcement = new WebReinforcement(19.5, 94, steelX, 11.3, 94, steelY, 178);
 
 	        return
-		        Membrane.ReadMembrane(concrete, reinforcement, 178, considerCrackSlip);
+		        Membrane.Read(concrete, reinforcement, 178, considerCrackSlip);
         }
 
         /// <summary>
@@ -2015,7 +2016,7 @@ namespace RCMembrane
 	        var reinforcement = new WebReinforcement(25.2, 94, steelX, 11.3, 94, steelY, 178);
 
 	        return
-		        Membrane.ReadMembrane(concrete, reinforcement, 178, considerCrackSlip);
+		        Membrane.Read(concrete, reinforcement, 178, considerCrackSlip);
         }
 
         /// <summary>
@@ -2039,7 +2040,7 @@ namespace RCMembrane
 	        var reinforcement = new WebReinforcement(19.5, 188, steelX, 11.3, 188, steelY, 178);
 
 	        return
-		        Membrane.ReadMembrane(concrete, reinforcement, 178, considerCrackSlip);
+		        Membrane.Read(concrete, reinforcement, 178, considerCrackSlip);
         }
 
         #endregion
@@ -2069,7 +2070,7 @@ namespace RCMembrane
 	        var reinforcement = new WebReinforcement(11.3, 108, steelX, 19.5, 108, steelY, 287);
 
 	        return
-		        Membrane.ReadMembrane(concrete, reinforcement, 287, considerCrackSlip);
+		        Membrane.Read(concrete, reinforcement, 287, considerCrackSlip);
         }
 
         /// <summary>
@@ -2093,7 +2094,7 @@ namespace RCMembrane
 	        var reinforcement = new WebReinforcement(11.3, 108, steelX, 16, 108, steelY, 287);
 
 	        return
-		        Membrane.ReadMembrane(concrete, reinforcement, 287, considerCrackSlip);
+		        Membrane.Read(concrete, reinforcement, 287, considerCrackSlip);
         }
 
         /// <summary>
@@ -2117,7 +2118,7 @@ namespace RCMembrane
 	        var reinforcement = new WebReinforcement(11.3, 108, steelX, 11.3, 108, steelY, 287);
 
 	        return
-		        Membrane.ReadMembrane(concrete, reinforcement, 287, considerCrackSlip);
+		        Membrane.Read(concrete, reinforcement, 287, considerCrackSlip);
         }
 
 
@@ -2148,7 +2149,7 @@ namespace RCMembrane
 	        var reinforcement = new WebReinforcement(5.72, 44.5, steelX, 5.72, 89, steelY, 70);
 
 	        return
-		        Membrane.ReadMembrane(concrete, reinforcement, 70, considerCrackSlip);
+		        Membrane.Read(concrete, reinforcement, 70, considerCrackSlip);
         }
 
         /// <summary>
@@ -2172,7 +2173,7 @@ namespace RCMembrane
 	        var reinforcement = new WebReinforcement(5.72, 44.5, steelX, 5.72, 89, steelY, 70);
 
 	        return
-		        Membrane.ReadMembrane(concrete, reinforcement, 70, considerCrackSlip);
+		        Membrane.Read(concrete, reinforcement, 70, considerCrackSlip);
         }
 
         /// <summary>
@@ -2196,7 +2197,7 @@ namespace RCMembrane
 	        var reinforcement = new WebReinforcement(5.72, 44.5, steelX, 5.72, 89, steelY, 70);
 
 	        return
-		        Membrane.ReadMembrane(concrete, reinforcement, 70, considerCrackSlip);
+		        Membrane.Read(concrete, reinforcement, 70, considerCrackSlip);
         }
 
         /// <summary>
@@ -2220,7 +2221,7 @@ namespace RCMembrane
 	        var reinforcement = new WebReinforcement(5.72, 44.5, steelX, 5.72, 89, steelY, 70);
 
 	        return
-		        Membrane.ReadMembrane(concrete, reinforcement, 70, considerCrackSlip);
+		        Membrane.Read(concrete, reinforcement, 70, considerCrackSlip);
         }
 
         #endregion
