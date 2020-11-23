@@ -6,3 +6,5 @@
 /Membrane/bin/Debug
 /Membrane/obj/Debug
 /packages
+/.vs
+/Membrane/obj/Release
