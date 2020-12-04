@@ -200,7 +200,7 @@ namespace RCMembrane
 
 	        // Calculate crack spacing
 	        return
-		        1 / (sinThetaC / smx + cosThetaC / smy);
+		        1.0 / (sinThetaC / smx + cosThetaC / smy);
         }
 
 		/// <summary>

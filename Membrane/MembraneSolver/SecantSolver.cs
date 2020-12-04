@@ -132,7 +132,7 @@ namespace RCMembrane
         private static void AnalysisStart(Membrane membrane, StressState appliedStresses, int numLoadSteps)
         {
 	        // Get initial stresses
-	        var f0 = (double) 1 / numLoadSteps * appliedStresses;
+	        var f0 = 1.0 / numLoadSteps * appliedStresses;
 
 	        // Calculate initial stiffness
 	        _currentStiffness = membrane.InitialStiffness;

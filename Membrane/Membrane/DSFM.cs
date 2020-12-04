@@ -341,7 +341,7 @@ namespace RCMembrane
 				dThetaE = AveragePrincipalStrains.Theta1 - thetaIc;
 
 			// Get theta L
-			double thetaL = (Reinforcement is null || !Reinforcement.XYReinforced)
+			double thetaL = Reinforcement is null || !Reinforcement.XYReinforced
 				? 10.ToRadian()
 				: Reinforcement.XYReinforced
                     ? 5.ToRadian()
