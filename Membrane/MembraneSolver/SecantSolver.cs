@@ -80,20 +80,55 @@ namespace RCMembrane
 	    private static bool _stop;
 
         /// <summary>
+        /// Current load step.
+        /// </summary>
+	    private static int _loadStep;
+
+        /// <summary>
+        /// Number of successfully calculated load steps.
+        /// </summary>
+	    private static int _calculatedLoadSteps;
+
+        /// <summary>
+        /// Number of load steps.
+        /// </summary>
+	    private static int _numLoadSteps;
+
+        /// <summary>
+        /// Current iteration.
+        /// </summary
+        private static int _iteration;
+
+        /// <summary>
+        /// Maximum number of iterations.
+        /// </summary
+        private static int _maxIterations;
+
+        /// <summary>
+        /// Convergence tolerance.
+        /// </summary
+        private static double _tolerance;
+
+        /// <summary>
+        /// Get current load factor.
+        /// </summary>
+        private static double LoadFactor => (double)_loadStep / _numLoadSteps;
+
+        /// <summary>
         /// Simple console solver, with example from <see cref="PanelExamples"/>.
         /// </summary>
         public static void Solve()
 	    {
 		    // Initiate the membrane
-		    var membraneMCFT = PanelExamples.PV20();
-		    var membraneDSFM = PanelExamples.PV20(ConstitutiveModel.DSFM);
+		    var membraneMCFT = PanelExamples.PL6();
+		    var membraneDSFM = PanelExamples.PL6(ConstitutiveModel.DSFM);
 
 		    // Initiate stresses
-		    var sigma = new StressState(0, 0, 5);
+		    var sigma = new StressState(2.98 * 3, 0, 3);
 
 		    // Solve
-		    SecantSolver(membraneMCFT, sigma, out string mcftFile);
-		    SecantSolver(membraneDSFM, sigma, out string dsfmFile);
+		    SecantSolver(membraneMCFT, sigma, out var mcftFile);
+		    SecantSolver(membraneDSFM, sigma, out var dsfmFile);
 
 		    Console.WriteLine("Done! Press any key to exit.");
             System.Diagnostics.Process.Start(mcftFile);
@@ -113,13 +148,13 @@ namespace RCMembrane
         private static void SecantSolver(Membrane membrane, StressState appliedStresses, out string fileName, int numLoadSteps = 100, int maxIterations = 10000, double tolerance = 4E-4)
         {
 			// Initialize fields and write a starting message
-            AnalysisStart(membrane, appliedStresses, numLoadSteps);
+            AnalysisStart(membrane, appliedStresses, numLoadSteps, maxIterations, tolerance);
 
 			// Analyze by steps
-			StepAnalysis(membrane, appliedStresses, numLoadSteps, tolerance, maxIterations, out int finalLoadStep);
+			StepAnalysis(membrane, appliedStresses);
 
             // Output results
-            OutputResults(membrane, finalLoadStep, out fileName);
+            OutputResults(membrane, out fileName);
 			AnalysisDone(membrane);
         }
 
@@ -129,10 +164,18 @@ namespace RCMembrane
         /// <param name="membrane">The <see cref="Membrane"/> object in analysis.</param>
         /// <param name="appliedStresses">Applied <see cref="StressState"/>, in MPa.</param>
         /// <param name="numLoadSteps">The number of load steps.</param>
-        private static void AnalysisStart(Membrane membrane, StressState appliedStresses, int numLoadSteps)
+        /// <param name="maxIterations">Maximum number of iterations (default: 10000).</param>
+        /// <param name="tolerance">Stress convergence tolerance (default: 4E-4).</param>
+        private static void AnalysisStart(Membrane membrane, StressState appliedStresses, int numLoadSteps, int maxIterations, double tolerance)
         {
+            // Set values
+            _numLoadSteps  = numLoadSteps;
+            _maxIterations = maxIterations;
+            _tolerance     = tolerance;
+            _loadStep      = 1;
+
 	        // Get initial stresses
-	        var f0 = 1.0 / numLoadSteps * appliedStresses;
+	        var f0 = LoadFactor * appliedStresses;
 
 	        // Calculate initial stiffness
 	        _currentStiffness = membrane.InitialStiffness;
@@ -147,12 +190,12 @@ namespace RCMembrane
 	        _currentResidual = StressState.Zero;
 
 	        // Initiate output matrices
-	        _strainOutput          = new StrainState[numLoadSteps];
-	        _stressOutput          = new StressState[numLoadSteps];
-	        _principalStressOutput = new PrincipalStressState[numLoadSteps];
+	        _strainOutput          = new StrainState[_numLoadSteps];
+	        _stressOutput          = new StressState[_numLoadSteps];
+	        _principalStressOutput = new PrincipalStressState[_numLoadSteps];
 
-	        _concretePrincipalStrainOutput = new PrincipalStrainState[numLoadSteps];
-	        _averagePrincipalStrainOutput  = new PrincipalStrainState[numLoadSteps];
+	        _concretePrincipalStrainOutput = new PrincipalStrainState[_numLoadSteps];
+	        _averagePrincipalStrainOutput  = new PrincipalStrainState[_numLoadSteps];
 
 	        // Auxiliary verifiers
 	        _stop      = false;
@@ -166,33 +209,28 @@ namespace RCMembrane
         /// </summary>
         /// <param name="membrane">The membrane object.</param>
         /// <param name="appliedStresses">Applied <see cref="StressState"/>, in MPa.</param>
-        /// <param name="numLoadSteps">The number of load steps to perform.</param>
-        /// <param name="tolerance">The convergence tolerance.</param>
-        /// <param name="maxIterations">Maximum number of iterations for each load step.</param>
-        /// <param name="finalLoadStep">The last calculated load step.</param>
-        private static void StepAnalysis(Membrane membrane, StressState appliedStresses, int numLoadSteps, double tolerance, int maxIterations, out int finalLoadStep)
+        private static void StepAnalysis(Membrane membrane, StressState appliedStresses)
         {
 	        // Initiate load steps
-	        int ls;
-	        for (ls = 1; ls <= numLoadSteps; ls++)
+	        for (_loadStep = 1; _loadStep <= _numLoadSteps; _loadStep++)
 	        {
 		        // Calculate stresses
-		        var fi = (double) ls / numLoadSteps * appliedStresses;
+		        var fi = LoadFactor * appliedStresses;
 
 				// Iterate to find solution
-				Iterate(membrane, fi, ls, tolerance, maxIterations);
+				Iterate(membrane, fi);
 
 				// Solution reached:
 				if (_stop)
 				{
 					// Solution not reached
 					// Decrement ls to correct output file
-					ls--;
+					_loadStep--;
 					break;
 				}
 	        }
 
-	        finalLoadStep = ls;
+	        _calculatedLoadSteps = _loadStep;
         }
 
         /// <summary>
@@ -200,18 +238,15 @@ namespace RCMembrane
         /// </summary>
         /// <param name="membrane">The membrane object.</param>
         /// <param name="stepStresses">Applied <see cref="StressState"/> for this load step, in MPa.</param>
-        /// <param name="loadStep">Current load step.</param>
-        /// <param name="tolerance">The convergence tolerance (default: 1E-3).</param>
-        /// <param name="maxIterations">Maximum number of iterations for each load step (default: 1000).</param>
-        private static void Iterate(Membrane membrane, StressState stepStresses, int loadStep, double tolerance, int maxIterations)
+        private static void Iterate(Membrane membrane, StressState stepStresses)
         {
-	        for (int it = 1; it <= maxIterations; it++)
+	        for (_iteration = 1; _iteration <= _maxIterations; _iteration++)
 	        {
 		        // Do analysis
 		        membrane.Calculate(_currentStrains);
 
 		        // Verify if concrete cracks in this load step and write a message
-		        ConcreteCrackedMessage(membrane, loadStep);
+		        ConcreteCrackedMessage(membrane);
 
 		        // Calculate and update residual
 		        ResidualUpdate(membrane, stepStresses);
@@ -220,22 +255,22 @@ namespace RCMembrane
 		        var conv = Convergence(_currentResidual, stepStresses);
 
 		        // If convergence is reached
-		        if (ConvergenceReached(conv, tolerance, it))
+		        if (ConvergenceReached(conv))
 		        {
 			        // Write message
-			        ConvergenceMessage(membrane, loadStep, it);
+			        ConvergenceMessage(membrane);
 
 			        // Set results on output matrices
-			        SaveResults(membrane, stepStresses, loadStep);
+			        SaveResults(membrane, stepStresses);
 
 			        break;
 		        }
 
 		        // If reached max iterations
-		        if (it == maxIterations)
+		        if (_iteration == _maxIterations)
 		        {
 			        // Write message
-			        NoConvergenceMessage(loadStep);
+			        NoConvergenceMessage();
 			        break;
 		        }
 
@@ -274,10 +309,8 @@ namespace RCMembrane
         /// Verify if convergence is reached.
         /// </summary>
         /// <param name="convergence">Calculated convergence.</param>
-        /// <param name="tolerance">Stress convergence tolerance..</param>
-        /// <param name="iteration">Current iteration.</param>
         /// <param name="minIterations">Minimum number of iterations (default: 2).</param>
-        private static bool ConvergenceReached(double convergence, double tolerance, int iteration, int minIterations = 2) => convergence <= tolerance && iteration >= minIterations;
+        private static bool ConvergenceReached(double convergence, int minIterations = 2) => convergence <= _tolerance && _iteration >= minIterations;
 
         /// <summary>
         /// Calculate the secant stiffness <see cref="Matrix"/> of current iteration.
@@ -333,11 +366,10 @@ namespace RCMembrane
         /// </summary>
         /// <param name="membrane">The <see cref="Membrane"/> element analyzed.</param>
         /// <param name="appliedStresses">Current applied <see cref="StressState"/>.</param>
-        /// <param name="loadStep">The current load step.</param>
-        private static void SaveResults(Membrane membrane, StressState appliedStresses, int loadStep)
+        private static void SaveResults(Membrane membrane, StressState appliedStresses)
         {
             // Get row
-            int i = loadStep - 1;
+            int i = _loadStep - 1;
 
             _strainOutput[i]          = membrane.AverageStrains;
             _stressOutput[i]          = appliedStresses;
@@ -352,17 +384,16 @@ namespace RCMembrane
         /// </summary>
         /// <param name="membrane">The <see cref="Membrane"/> element analyzed.</param>
         /// <param name="fileName">The name of saved result file. <para>See: <seealso cref="ResultFileName"/>.</para></param>
-        /// <param name="calculatedLoadSteps">The number of calculated load steps.</param>
-        private static void OutputResults(Membrane membrane, int calculatedLoadSteps, out string fileName)
+        private static void OutputResults(Membrane membrane, out string fileName)
         {
             // Get readers for result
             string[]
                 outputReaders = { "ex", "ey", "exy", "", "fx", "fy", "fxy", "", "ec1", "ec2", "theta1e", "", "fc1", "fc2", "theta1f" };
 
             // Result matrices
-            var result = Matrix.Build.Dense(calculatedLoadSteps, outputReaders.Length, double.NaN);
+            var result = Matrix.Build.Dense(_calculatedLoadSteps, outputReaders.Length, double.NaN);
 
-            for (int i = 0; i < calculatedLoadSteps; i++)
+            for (int i = 0; i < _calculatedLoadSteps; i++)
             {
                 // Set stress and strain states
                 result.SetSubMatrix(i, 0, _strainOutput[i].AsVector().ToRowMatrix());
@@ -385,23 +416,19 @@ namespace RCMembrane
         /// Write a ending message in <see cref="Console"/>.
         /// </summary>
         /// <param name="membrane">The <see cref="Membrane"/> object in analysis.</param>
-        private static void AnalysisDone(Membrane membrane)
-        {
-            Console.WriteLine("\n{0} analysis done.\n", membrane is MCFTMembrane ? "MCFT" : "DSFM");
-        }
+        private static void AnalysisDone(Membrane membrane) => Console.WriteLine("\n{0} analysis done.\n", membrane is MCFTMembrane ? "MCFT" : "DSFM");
 
         /// <summary>
         /// Write a message in the load step that concrete cracks.
         /// </summary>
         /// <param name="membrane">The <see cref="Membrane"/> object in analysis.</param>
-        /// <param name="loadStep">The current load step.</param>
-        private static void ConcreteCrackedMessage(Membrane membrane, int loadStep)
+        private static void ConcreteCrackedMessage(Membrane membrane)
         {
 	        if (_crackStep.HasValue || !membrane.Concrete.Cracked)
 		        return;
 
 			// Set and write message
-	        _crackStep = loadStep;
+	        _crackStep = _loadStep;
 	        Console.WriteLine("Concrete cracked at step {0}", _crackStep.Value);
         }
 
@@ -409,27 +436,24 @@ namespace RCMembrane
         /// Write a message after achieving convergence.
         /// </summary>
         /// <param name="membrane">The <see cref="Membrane"/> object in analysis.</param>
-        /// <param name="loadStep">The current load step.</param>
-        /// <param name="iteration">The current iteration</param>
-        private static void ConvergenceMessage(Membrane membrane, int loadStep, int iteration)
+        private static void ConvergenceMessage(Membrane membrane)
         {
 	        if (membrane is DSFMMembrane dsfm && membrane.Concrete.Cracked)
-		        Console.WriteLine("LS = {0}, Iterations = {1}, Slip Approach: {2}", loadStep, iteration, dsfm.SlipApproach);
+		        Console.WriteLine("LS = {0}, Iterations = {1}, Slip Approach: {2}", _loadStep, _iteration, dsfm.SlipApproach);
 		        //Console.WriteLine("LS = {0}, Iterations = {1}, Slip Approach: {2}\nesl ={3}", loadStep, iteration, dsfm.SlipApproach, dsfm.CrackSlipStrains);
 
 	        else
-		        Console.WriteLine("LS = {0}, Iterations = {1}", loadStep, iteration);
+		        Console.WriteLine("LS = {0}, Iterations = {1}", _loadStep, _iteration);
         }
 
         /// <summary>
         /// Write a message if convergence is not reached.
         /// </summary>
-        /// <param name="loadStep">The current load step.</param>
-        private static void NoConvergenceMessage(int loadStep)
+        private static void NoConvergenceMessage()
 		{
 			// Set stop
 			_stop = true;
-			Console.WriteLine("LS = {0}, {1}", loadStep, "CONVERGENCE NOT REACHED");
+			Console.WriteLine("LS = {0}, {1}", _loadStep, "CONVERGENCE NOT REACHED");
 		}
 
         /// <summary>
