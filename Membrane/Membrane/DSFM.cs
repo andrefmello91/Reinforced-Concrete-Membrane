@@ -176,55 +176,41 @@ namespace RCMembrane
 				cosNy2 = cosNy * cosNy;
 
 			// Solve the nonlinear equation by Brent Method
-			bool solution = false;
-			double de1Cr = 0;
-			try
+			if (Brent.TryFindRoot(CrackEquilibrium, 0, 0.005, 1E-9, 1000, out var de1Cr))
 			{
-				solution = Brent.TryFindRoot(CrackEquilibrium, 0, 0.005, 1E-6, 1000, out de1Cr);
+				// Calculate local strains
+				double
+					esCrx = ex + de1Cr * cosNx2,
+					esCry = ey + de1Cr * cosNy2;
 
-				// Function to check equilibrium
-				double CrackEquilibrium(double de1CrIt)
-				{
-					// Calculate local strains
-					double
-						esCrxIt = ex + de1CrIt * cosNx2,
-						esCryIt = ey + de1CrIt * cosNy2;
+				// Calculate reinforcement stresses
+				double
+					fscrx = Reinforcement?.DirectionX?.CalculateStress(esCrx) ?? 0,
+					fscry = Reinforcement?.DirectionY?.CalculateStress(esCry) ?? 0;
 
-					// Calculate reinforcement stresses
-					double
-						fscrxIt = Reinforcement?.DirectionX?.CalculateStress(esCrxIt) ?? 0,
-						fscryIt = Reinforcement?.DirectionY?.CalculateStress(esCryIt) ?? 0;
-
-					// Check equilibrium (must be zero)
-					return
-						(fscrxIt - fsx) * cosNx2 + (fscryIt - fsy) * cosNy2 - fc1;
-				}
-			}
-			catch
-			{
-				solution = false;
-			}
-			finally
-			{
-				// Verify if it reached convergence
-				if (solution)
-				{
-					// Calculate local strains
-					double
-						esCrx = ex + de1Cr * cosNx2,
-						esCry = ey + de1Cr * cosNy2;
-
-					// Calculate reinforcement stresses
-					double
-						fscrx = Reinforcement?.DirectionX?.CalculateStress(esCrx) ?? 0,
-						fscry = Reinforcement?.DirectionY?.CalculateStress(esCry) ?? 0;
-
-					// Calculate shear stress
-					vci = (fscrx - fsx) * cosNx * sinNx + (fscry - fsy) * cosNy * sinNy;
-				}
+				// Calculate shear stress
+				vci = (fscrx - fsx) * cosNx * sinNx + (fscry - fsy) * cosNy * sinNy;
 			}
 
 			return vci;
+
+			// Function to check equilibrium
+			double CrackEquilibrium(double de1CrIt)
+			{
+				// Calculate local strains
+				double
+					esCrxIt = ex + de1CrIt * cosNx2,
+					esCryIt = ey + de1CrIt * cosNy2;
+
+				// Calculate reinforcement stresses
+				double
+					fscrxIt = Reinforcement?.DirectionX?.CalculateStress(esCrxIt) ?? 0,
+					fscryIt = Reinforcement?.DirectionY?.CalculateStress(esCryIt) ?? 0;
+
+				// Check equilibrium (must be zero)
+				return
+					(fscrxIt - fsx) * cosNx2 + (fscryIt - fsy) * cosNy2 - fc1;
+			}
 		}
 
 		/// <summary>
@@ -240,7 +226,7 @@ namespace RCMembrane
                 ysb = RotationLagCrackSlip(),
                 ys  = Math.Max(ysa, ysb);
 
-			SlipApproach = ys.Approx(ysa) ? "Stress" : "Rotation lag";
+			SlipApproach = ys == ysa ? "Stress" : "Rotation lag";
 
 			// Get concrete principal angle
 			double thetaC1 = Concrete.PrincipalStrains.Theta1;
@@ -275,7 +261,7 @@ namespace RCMembrane
 				return 0;
 
 			// Get concrete principal tensile strain and strength
-			double fc  = Concrete.fc;
+			double fc = Concrete.fc;
 
 			// Calculate crack spacings and width
 			double s = CrackSpacing();
