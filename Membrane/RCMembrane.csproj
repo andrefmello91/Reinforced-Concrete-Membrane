@@ -56,7 +56,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="MembraneSolver\PanelExamples.cs" />
-    <Compile Include="MembraneSolver\SecantSolver.cs" />
+    <Compile Include="MembraneSolver\MembraneSolver.cs" />
     <Compile Include="Membrane\Membrane.cs" />
     <Compile Include="Membrane\DSFM.cs" />
     <Compile Include="Membrane\MCFT.cs" />
