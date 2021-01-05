@@ -170,43 +170,57 @@ namespace RCMembrane
         public Matrix<double> InitialStiffness => Reinforcement is null ? Concrete.InitialStiffness : Concrete.InitialStiffness + Reinforcement.InitialStiffness;
 
         /// <summary>
-        /// Calculate <see cref="AverageStresses"/> and <see cref="Stiffness"/>, given a known <see cref="StrainState"/>.
-        /// </summary>
-        /// <param name="appliedStrains">Current applied <see cref="StrainState"/>.</param>
-        public abstract void Calculate(StrainState appliedStrains);
-
-		/// <summary>
         /// Calculate the crack spacing at <paramref name="direction"/> (in mm), according to Kaklauskas (2019) expression.
         /// <para>sm = 21 mm + 0.155 phi / rho</para>
         /// </summary>
         /// <param name="direction">The <see cref="WebReinforcementDirection"/>.</param>
-        private double CrackSpacing(WebReinforcementDirection direction) =>
-			direction is null || direction.BarDiameter.ApproxZero() || direction.Ratio.ApproxZero()
-				? 21
-				: 21 + 0.155 * direction.BarDiameter / direction.Ratio;
+        public static double CrackSpacing(WebReinforcementDirection direction) =>
+	        direction is null || direction.BarDiameter.ApproxZero() || direction.Ratio.ApproxZero()
+		        ? 21
+		        : 21 + 0.155 * direction.BarDiameter / direction.Ratio;
 
-		/// <summary>
-        /// Calculate the crack spacing in principal strain direction.
+        /// <summary>
+        /// Calculate the crack spacing (in mm) in principal strain direction.
         /// </summary>
-        protected double CrackSpacing()
+        /// <param name="reinforcement">The <see cref="WebReinforcement"/>.</param>
+        /// <param name="principalStrains">The <see cref="PrincipalStrainState"/> in concrete.</param>
+        public static double CrackSpacing(WebReinforcement reinforcement, PrincipalStrainState principalStrains)
         {
 	        // Get the angles
-	        var (cosThetaC, sinThetaC) = Concrete.PrincipalStrains.Theta1.DirectionCosines(true);
+	        var (cosThetaC, sinThetaC) = principalStrains.Theta1.DirectionCosines(true);
 
-			// Calculate crack spacings in X and Y
-			double
-				smx = CrackSpacing(Reinforcement.DirectionX),
-				smy = CrackSpacing(Reinforcement.DirectionY);
+	        // Calculate crack spacings in X and Y
+	        double
+		        smx = CrackSpacing(reinforcement.DirectionX),
+		        smy = CrackSpacing(reinforcement.DirectionY);
 
 	        // Calculate crack spacing
 	        return
 		        1.0 / (sinThetaC / smx + cosThetaC / smy);
         }
 
+        /// <summary>
+        /// Calculate the average crack opening, in mm.
+        /// </summary>
+        /// <param name="reinforcement">The <see cref="WebReinforcement"/>.</param>
+        /// <param name="principalStrains">The <see cref="PrincipalStrainState"/>.</param>
+        public static double CrackOpening(WebReinforcement reinforcement, PrincipalStrainState principalStrains) => principalStrains.Epsilon1 * CrackSpacing(reinforcement, principalStrains);
+
+        /// <summary>
+        /// Calculate <see cref="AverageStresses"/> and <see cref="Stiffness"/>, given a known <see cref="StrainState"/>.
+        /// </summary>
+        /// <param name="appliedStrains">Current applied <see cref="StrainState"/>.</param>
+        public abstract void Calculate(StrainState appliedStrains);
+
+        /// <summary>
+        /// Calculate the crack spacing in principal strain direction.
+        /// </summary>
+        protected double CrackSpacing() => CrackSpacing(Reinforcement, Concrete.PrincipalStrains);
+
 		/// <summary>
         /// Calculate the average crack opening, in mm.
         /// </summary>
-		protected double CrackOpening() => Concrete.PrincipalStrains.Epsilon1 * CrackSpacing();
+		protected double CrackOpening() => CrackOpening(Reinforcement, Concrete.PrincipalStrains);
 
         /// <summary>
         /// Limit tensile principal stress by crack check procedure, by Bentz (2000).
