@@ -1,7 +1,6 @@
 ﻿using Material.Concrete;
 using Material.Reinforcement;
 using Material.Reinforcement.Biaxial;
-using MathNet.Numerics;
 using Concrete      = Material.Concrete.Biaxial.BiaxialConcrete;
 
 namespace RCMembrane

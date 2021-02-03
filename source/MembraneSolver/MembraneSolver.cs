@@ -1,5 +1,5 @@
 ﻿using System;
-using Extensions.Number;
+using Extensions;
 using Material.Concrete;
 using MathNet.Numerics;
 using MathNet.Numerics.Data.Text;
@@ -374,7 +374,7 @@ namespace RCMembrane
 		private void ResidualUpdate()
 		{
 			// Set new values
-            _lastResidual    = _currentResidual.Copy();
+            _lastResidual    = _currentResidual.Clone();
 			_currentResidual = Element.AverageStresses - _stepStresses;
         }
 
@@ -384,7 +384,7 @@ namespace RCMembrane
         private void StrainUpdate()
         {
 			// Get current strains
-			var eCur = _currentStrains.Copy();
+			var eCur = _currentStrains.Clone();
 
             // Increment strains
 			_currentStrains += StrainState.FromStresses(-_currentResidual, _currentStiffness);
