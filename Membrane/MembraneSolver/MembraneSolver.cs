@@ -5,6 +5,7 @@ using MathNet.Numerics;
 using MathNet.Numerics.Data.Text;
 using MathNet.Numerics.LinearAlgebra;
 using MathNet.Numerics.LinearAlgebra.Double;
+
 using OnPlaneComponents;
 
 namespace RCMembrane
@@ -421,7 +422,7 @@ namespace RCMembrane
                 outputReaders = { "ex", "ey", "exy", "", "fx", "fy", "fxy", "", "ec1", "ec2", "theta1e", "", "fc1", "fc2", "theta1f" };
 
             // Result matrices
-            var result = Matrix.Build.Dense(_calculatedLoadSteps, outputReaders.Length, double.NaN);
+            var result = Matrix<double>.Build.Dense(_calculatedLoadSteps, outputReaders.Length, double.NaN);
 
             for (int i = 0; i < _calculatedLoadSteps; i++)
             {

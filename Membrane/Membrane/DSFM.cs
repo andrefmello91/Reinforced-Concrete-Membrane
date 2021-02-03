@@ -1,7 +1,7 @@
 ﻿using System;
 using Extensions.Number;
 using MathNet.Numerics;
-using MathNet.Numerics.LinearAlgebra;
+using MathNet.Numerics.LinearAlgebra.Double;
 using MathNet.Numerics.RootFinding;
 using Material.Concrete;
 using Material.Concrete.Biaxial;

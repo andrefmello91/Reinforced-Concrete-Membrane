@@ -1,4 +1,4 @@
-﻿using MathNet.Numerics.LinearAlgebra;
+﻿using MathNet.Numerics.LinearAlgebra.Double;
 using Material.Concrete;
 using Material.Concrete.Biaxial;
 using Material.Reinforcement;

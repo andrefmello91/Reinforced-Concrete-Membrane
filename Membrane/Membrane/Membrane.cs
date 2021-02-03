@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Linq;
 using Extensions.Number;
-using MathNet.Numerics.LinearAlgebra;
 using MathNet.Numerics.LinearAlgebra.Double;
+
 using Material.Concrete;
 using Material.Concrete.Biaxial;
 using Material.Reinforcement;
 using Material.Reinforcement.Biaxial;
 using MathNet.Numerics;
+using MathNet.Numerics.LinearAlgebra;
 using OnPlaneComponents;
 using UnitsNet;
 
@@ -204,7 +205,10 @@ namespace RCMembrane
         /// </summary>
         /// <param name="reinforcement">The <see cref="WebReinforcement"/>.</param>
         /// <param name="principalStrains">The <see cref="PrincipalStrainState"/>.</param>
-        public static double CrackOpening(WebReinforcement reinforcement, PrincipalStrainState principalStrains) => principalStrains.Epsilon1 * CrackSpacing(reinforcement, principalStrains);
+        public static double CrackOpening(WebReinforcement reinforcement, PrincipalStrainState principalStrains) =>
+	        principalStrains.Epsilon1 <= 0 || principalStrains.Epsilon1.ApproxZero(1E-9) 
+		        ? 0 
+		        : principalStrains.Epsilon1  * CrackSpacing(reinforcement, principalStrains);
 
         /// <summary>
         /// Calculate <see cref="AverageStresses"/> and <see cref="Stiffness"/>, given a known <see cref="StrainState"/>.

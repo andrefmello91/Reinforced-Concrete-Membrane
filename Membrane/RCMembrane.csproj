@@ -31,11 +31,11 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="MathNet.Numerics, Version=4.12.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\SPMTool\packages\MathNet.Numerics.4.12.0\lib\net461\MathNet.Numerics.dll</HintPath>
+    <Reference Include="MathNet.Numerics, Version=4.15.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\SPMElements\packages\MathNet.Numerics.4.15.0\lib\net461\MathNet.Numerics.dll</HintPath>
     </Reference>
-    <Reference Include="MathNet.Numerics.Data.Text, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\MathNet.Numerics.Data.Text.4.0.0\lib\net40\MathNet.Numerics.Data.Text.dll</HintPath>
+    <Reference Include="MathNet.Numerics.Data.Text, Version=4.1.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\SPMElements\packages\MathNet.Numerics.Data.Text.4.1.0\lib\net461\MathNet.Numerics.Data.Text.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -51,7 +51,7 @@
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
     <Reference Include="UnitsNet, Version=4.0.0.0, Culture=neutral, PublicKeyToken=f8601875a1f041da, processorArchitecture=MSIL">
-      <HintPath>..\..\SPMTool\packages\UnitsNet.4.73.0\lib\net40\UnitsNet.dll</HintPath>
+      <HintPath>..\..\SPMElements\packages\UnitsNet.4.83.0\lib\net40\UnitsNet.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -73,10 +73,6 @@
     <ProjectReference Include="..\..\Material\Material\Material.csproj">
       <Project>{5e103ad6-45a8-4b2d-816c-5ccec09380e6}</Project>
       <Name>Material</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\On-Plane-Components\OnPlaneComponents\OnPlaneComponents.csproj">
-      <Project>{5ea278f4-5f43-4cd7-9627-9f46411a871e}</Project>
-      <Name>OnPlaneComponents</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup />
