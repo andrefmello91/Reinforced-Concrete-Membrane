@@ -8,7 +8,7 @@ using MathNet.Numerics.LinearAlgebra.Double;
 
 using OnPlaneComponents;
 
-namespace RCMembrane
+namespace RCMembrane.Solver
 {
 	/// <summary>
 	/// Simple solver class.

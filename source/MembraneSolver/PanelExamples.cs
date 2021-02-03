@@ -3,7 +3,7 @@ using Material.Reinforcement;
 using Material.Reinforcement.Biaxial;
 using Concrete      = Material.Concrete.Biaxial.BiaxialConcrete;
 
-namespace RCMembrane
+namespace RCMembrane.Examples
 {
     /// <summary>
     /// Class with some panel examples.
