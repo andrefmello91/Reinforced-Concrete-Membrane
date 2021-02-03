@@ -1,7 +1,6 @@
 ﻿using Material.Concrete;
 using Material.Reinforcement;
 using Material.Reinforcement.Biaxial;
-using Concrete      = Material.Concrete.Biaxial.BiaxialConcrete;
 
 namespace RCMembrane.Examples
 {
@@ -24,7 +23,7 @@ namespace RCMembrane.Examples
 			var parModel = constitutiveModel == ConstitutiveModel.MCFT ? ParameterModel.MCFT : ParameterModel.DSFM;
 
 			// Initiate concrete
-		    var concrete = new Concrete(34.5, 6, parModel, constitutiveModel);
+			var parameters = new Parameters(34.5, 6, parModel);
 
 		    // Initiate steel for each direction
 		    var steelX = new Steel(483, 200000);
@@ -34,7 +33,7 @@ namespace RCMembrane.Examples
 		    var reinforcement = new WebReinforcement(6.35, 50.55, steelX, 6.35, 53.86, steelY, 70);
 
             return
-                Membrane.Read(concrete, reinforcement, 70, considerCrackSlip);
+                Membrane.Read(parameters, reinforcement, 70, constitutiveModel, considerCrackSlip);
         }
 
         /// <summary>
@@ -48,7 +47,7 @@ namespace RCMembrane.Examples
 			var parModel = constitutiveModel == ConstitutiveModel.MCFT ? ParameterModel.MCFT : ParameterModel.DSFM;
 
 			// Initiate concrete
-		    var concrete = new Concrete(23.5, 6, parModel, constitutiveModel);
+		    var parameters = new Parameters(23.5, 6, parModel);
 
 		    // Initiate steel for each direction
 		    var steelXY = new Steel(428, 200000);
@@ -57,7 +56,7 @@ namespace RCMembrane.Examples
             var reinforcement = new WebReinforcement(2.03, 51.37, steelXY, 70);
 
             return
-                Membrane.Read(concrete, reinforcement, 70, considerCrackSlip);
+                Membrane.Read(parameters, reinforcement, 70, constitutiveModel, considerCrackSlip);
         }
 
         /// <summary>
@@ -71,7 +70,7 @@ namespace RCMembrane.Examples
 			var parModel = constitutiveModel == ConstitutiveModel.MCFT ? ParameterModel.MCFT : ParameterModel.DSFM;
 
 			// Initiate concrete
-		    var concrete = new Concrete(26.6, 6, parModel, constitutiveModel);
+			var parameters = new Parameters(26.6, 6, parModel);
 
 		    // Initiate steel for each direction
 		    var steelXY = new Steel(662, 200000);
@@ -80,7 +79,7 @@ namespace RCMembrane.Examples
 		    var reinforcement = new WebReinforcement(3.3, 50.91, steelXY, 70);
 
             return
-                Membrane.Read(concrete, reinforcement, 70, considerCrackSlip);
+                Membrane.Read(parameters, reinforcement, 70, constitutiveModel, considerCrackSlip);
         }
 
         /// <summary>
@@ -94,7 +93,7 @@ namespace RCMembrane.Examples
 			var parModel = constitutiveModel == ConstitutiveModel.MCFT ? ParameterModel.MCFT : ParameterModel.DSFM;
 
 			// Initiate concrete
-		    var concrete = new Concrete(26.6, 6, parModel, constitutiveModel);
+			var parameters = new Parameters(26.6, 6, parModel);
 
 		    // Initiate steel for each direction
 		    var steelXY = new Steel(242, 200000);
@@ -103,7 +102,7 @@ namespace RCMembrane.Examples
 		    var reinforcement = new WebReinforcement(3.45, 25.2, steelXY, 70);
 
             return
-                Membrane.Read(concrete, reinforcement, 70, considerCrackSlip);
+                Membrane.Read(parameters, reinforcement, 70, constitutiveModel, considerCrackSlip);
         }
 
         /// <summary>
@@ -117,7 +116,7 @@ namespace RCMembrane.Examples
 			var parModel = constitutiveModel == ConstitutiveModel.MCFT ? ParameterModel.MCFT : ParameterModel.DSFM;
 
 			// Initiate concrete
-		    var concrete = new Concrete(28.3, 6, parModel, constitutiveModel);
+			var parameters = new Parameters(28.3, 6, parModel);
 
 		    // Initiate steel for each direction
 		    var steelXY = new Steel(621, 200000);
@@ -126,7 +125,7 @@ namespace RCMembrane.Examples
 		    var reinforcement = new WebReinforcement(5.79, 101.66, steelXY, 70);
 
             return
-                Membrane.Read(concrete, reinforcement, 70, considerCrackSlip);
+                Membrane.Read(parameters, reinforcement, 70, constitutiveModel, considerCrackSlip);
         }
 
         /// <summary>
@@ -140,7 +139,7 @@ namespace RCMembrane.Examples
 			var parModel = constitutiveModel == ConstitutiveModel.MCFT ? ParameterModel.MCFT : ParameterModel.DSFM;
 
 			// Initiate concrete
-		    var concrete = new Concrete(29.8, 6, parModel, constitutiveModel);
+			var parameters = new Parameters(29.8, 6, parModel);
 
 		    // Initiate steel for each direction
 		    var steelXY = new Steel(266, 200000);
@@ -149,7 +148,7 @@ namespace RCMembrane.Examples
 		    var reinforcement = new WebReinforcement(6.35, 50.55, steelXY, 70);
 
             return
-                Membrane.Read(concrete, reinforcement, 70, considerCrackSlip);
+                Membrane.Read(parameters, reinforcement, 70, constitutiveModel, considerCrackSlip);
         }
 
         /// <summary>
@@ -163,16 +162,12 @@ namespace RCMembrane.Examples
 			var parModel = constitutiveModel == ConstitutiveModel.MCFT ? ParameterModel.MCFT : ParameterModel.DSFM;
 
 			// Initiate concrete
-		    var concrete = new Concrete(31, 6, parModel, constitutiveModel);
-
-		    // Initiate steel for each direction
-		    var steelXY = new Steel(453, 200000);
-
-		    // Get reinforcement
-		    var reinforcement = new WebReinforcement(6.35, 50.55, steelXY, 70);
+		    var parameters = new Parameters(31, 6, parModel);
+            var steelXY = new Steel(453, 200000);
+            var reinforcement = new WebReinforcement(6.35, 50.55, steelXY, 70);
 
             return
-                Membrane.Read(concrete, reinforcement, 70, considerCrackSlip);
+	            Membrane.Read(parameters, reinforcement, 70, constitutiveModel, considerCrackSlip);
         }
 
         /// <summary>
@@ -186,7 +181,7 @@ namespace RCMembrane.Examples
 			var parModel = constitutiveModel == ConstitutiveModel.MCFT ? ParameterModel.MCFT : ParameterModel.DSFM;
 
 			// Initiate concrete
-		    var concrete = new Concrete(29.8, 6, parModel, constitutiveModel);
+			var parameters = new Parameters(29.8, 6, parModel);
 
 		    // Initiate steel for each direction
 		    var steelXY = new Steel(462, 200000);
@@ -195,7 +190,7 @@ namespace RCMembrane.Examples
 		    var reinforcement = new WebReinforcement(5.44, 25.37, steelXY, 70);
 
             return
-                Membrane.Read(concrete, reinforcement, 70, considerCrackSlip);
+                Membrane.Read(parameters, reinforcement, 70, constitutiveModel, considerCrackSlip);
         }
 
         /// <summary>
@@ -209,7 +204,7 @@ namespace RCMembrane.Examples
 			var parModel = constitutiveModel == ConstitutiveModel.MCFT ? ParameterModel.MCFT : ParameterModel.DSFM;
 
 			// Initiate concrete
-		    var concrete = new Concrete(11.6, 6, parModel, constitutiveModel);
+			var parameters = new Parameters(11.6, 6, parModel);
 
 		    // Initiate steel for each direction
 		    var steelXY = new Steel(455, 200000);
@@ -218,7 +213,7 @@ namespace RCMembrane.Examples
 		    var reinforcement = new WebReinforcement(6.35, 50.55, steelXY, 70);
 
             return
-                Membrane.Read(concrete, reinforcement, 70, considerCrackSlip);
+                Membrane.Read(parameters, reinforcement, 70, constitutiveModel, considerCrackSlip);
         }
 
         /// <summary>
@@ -232,7 +227,7 @@ namespace RCMembrane.Examples
 			var parModel = constitutiveModel == ConstitutiveModel.MCFT ? ParameterModel.MCFT : ParameterModel.DSFM;
 
 			// Initiate concrete
-		    var concrete = new Concrete(14.5, 6, parModel, constitutiveModel);
+			var parameters = new Parameters(14.5, 6, parModel);
 
 		    // Initiate steel for each direction
 		    var steelXY = new Steel(276, 200000);
@@ -241,7 +236,7 @@ namespace RCMembrane.Examples
 		    var reinforcement = new WebReinforcement(6.35, 50.55, steelXY, 4.7, 49.57, steelXY, 70);
 
 			return
-				Membrane.Read(concrete, reinforcement, 70, considerCrackSlip);
+				Membrane.Read(parameters, reinforcement, 70, constitutiveModel, considerCrackSlip);
         }
 
         /// <summary>
@@ -255,7 +250,7 @@ namespace RCMembrane.Examples
 			var parModel = constitutiveModel == ConstitutiveModel.MCFT ? ParameterModel.MCFT : ParameterModel.DSFM;
 
 			// Initiate concrete
-		    var concrete = new Concrete(15.6, 6, parModel, constitutiveModel);
+			var parameters = new Parameters(15.6, 6, parModel);
 
 		    // Initiate steel for each direction
 		    var steelXY = new Steel(235, 200000);
@@ -264,7 +259,7 @@ namespace RCMembrane.Examples
 		    var reinforcement = new WebReinforcement(6.35, 50.55, steelXY, 5.44, 50.7, steelXY, 70);
 
             return
-                Membrane.Read(concrete, reinforcement, 70, considerCrackSlip);
+                Membrane.Read(parameters, reinforcement, 70, constitutiveModel, considerCrackSlip);
         }
 
         /// <summary>
@@ -278,7 +273,7 @@ namespace RCMembrane.Examples
 			var parModel = constitutiveModel == ConstitutiveModel.MCFT ? ParameterModel.MCFT : ParameterModel.DSFM;
 
 			// Initiate concrete
-		    var concrete = new Concrete(16, 6, parModel, constitutiveModel);
+			var parameters = new Parameters(16, 6, parModel);
 
 		    // Initiate steel for each direction
 		    var steelXY = new Steel(468, 200000);
@@ -287,7 +282,7 @@ namespace RCMembrane.Examples
 		    var reinforcement = new WebReinforcement(6.35, 50.55, steelXY, 3.18, 50.43, steelXY, 70);
 
             return
-                Membrane.Read(concrete, reinforcement, 70, considerCrackSlip);
+                Membrane.Read(parameters, reinforcement, 70, constitutiveModel, considerCrackSlip);
         }
 
         /// <summary>
@@ -301,16 +296,10 @@ namespace RCMembrane.Examples
 			var parModel = constitutiveModel == ConstitutiveModel.MCFT ? ParameterModel.MCFT : ParameterModel.DSFM;
 
 			// Initiate concrete
-		    var concrete = new Concrete(18.2, 6, parModel, constitutiveModel);
-
-		    // Initiate steel for each direction
-		    var steelXY = new Steel(248, 200000);
-
-		    // Get reinforcement
-		    var reinforcement = new WebReinforcement(6.35, 50.55, steelXY, 0, 0, null, 70);
-
-            return
-                Membrane.Read(concrete, reinforcement, 70, considerCrackSlip);
+		    var parameters = new Parameters(18.2, 6, parModel);
+            var steelXY = new Steel(248, 200000);
+            var reinforcement = new WebReinforcement(6.35, 50.55, steelXY, 0, 0, null, 70);
+            return Membrane.Read(parameters, reinforcement, 70, constitutiveModel, considerCrackSlip);
         }
 
         /// <summary>
@@ -324,16 +313,10 @@ namespace RCMembrane.Examples
 			var parModel = constitutiveModel == ConstitutiveModel.MCFT ? ParameterModel.MCFT : ParameterModel.DSFM;
 
 			// Initiate concrete
-		    var concrete = new Concrete(20.4, 6, parModel, constitutiveModel);
-
-		    // Initiate steel for each direction
-		    var steelXY = new Steel(455, 200000);
-
-		    // Get reinforcement
-		    var reinforcement = new WebReinforcement(6.35, 50.55, steelXY, 70);
-
-            return
-                Membrane.Read(concrete, reinforcement, 70, considerCrackSlip);
+		    var parameters = new Parameters(20.4, 6, parModel);
+            var steelXY = new Steel(455, 200000);
+            var reinforcement = new WebReinforcement(6.35, 50.55, steelXY, 70);
+            return Membrane.Read(parameters, reinforcement, 70, constitutiveModel, considerCrackSlip);
         }
 
         /// <summary>
@@ -347,7 +330,7 @@ namespace RCMembrane.Examples
 			var parModel = constitutiveModel == ConstitutiveModel.MCFT ? ParameterModel.MCFT : ParameterModel.DSFM;
 
 			// Initiate concrete
-		    var concrete = new Concrete(21.7, 6, parModel, constitutiveModel);
+			var parameters = new Parameters(21.7, 6, parModel);
 
 		    // Initiate steel for each direction
 		    var steelXY = new Steel(255, 200000);
@@ -356,7 +339,7 @@ namespace RCMembrane.Examples
 		    var reinforcement = new WebReinforcement(4.09, 50.73, steelXY, 70);
 
             return
-                Membrane.Read(concrete, reinforcement, 70, considerCrackSlip);
+                Membrane.Read(parameters, reinforcement, 70, constitutiveModel, considerCrackSlip);
         }
 
         /// <summary>
@@ -378,16 +361,10 @@ namespace RCMembrane.Examples
 	        var parModel = constitutiveModel == ConstitutiveModel.MCFT ? ParameterModel.MCFT : ParameterModel.DSFM;
 
 	        // Initiate concrete
-	        var concrete = new Concrete(18.6, 6, parModel, constitutiveModel);
-
-	        // Initiate steel for each direction
-	        var steelXY = new Steel(255, 200000);
-
-	        // Get reinforcement
-	        var reinforcement = new WebReinforcement(4.09, 50.73, steelXY, 70);
-
-	        return
-		        Membrane.Read(concrete, reinforcement, 70, considerCrackSlip);
+	        var parameters = new Parameters(18.6, 6, parModel);
+            var steelXY = new Steel(255, 200000);
+            var reinforcement = new WebReinforcement(4.09, 50.73, steelXY, 70);
+            return Membrane.Read(parameters, reinforcement, 70, constitutiveModel, considerCrackSlip);
         }
 
         /// <summary>
@@ -400,8 +377,8 @@ namespace RCMembrane.Examples
 	        // Get concrete parameter model
 	        var parModel = constitutiveModel == ConstitutiveModel.MCFT ? ParameterModel.MCFT : ParameterModel.DSFM;
 
-	        // Initiate concrete
-	        var concrete = new Concrete(19.5, 6, parModel, constitutiveModel);
+			// Initiate concrete
+			var parameters = new Parameters(19.5, 6, parModel);
 
 	        // Initiate steel for each direction
 	        var steelX = new Steel(431, 200000);
@@ -411,7 +388,7 @@ namespace RCMembrane.Examples
 	        var reinforcement = new WebReinforcement(6.35, 50.55, steelX, 2.67, 50, steelY, 70);
 
 	        return
-		        Membrane.Read(concrete, reinforcement, 70, considerCrackSlip);
+		        Membrane.Read(parameters, reinforcement, 70, constitutiveModel, considerCrackSlip);
         }
 
         /// <summary>
@@ -424,8 +401,8 @@ namespace RCMembrane.Examples
 	        // Get concrete parameter model
 	        var parModel = constitutiveModel == ConstitutiveModel.MCFT ? ParameterModel.MCFT : ParameterModel.DSFM;
 
-	        // Initiate concrete
-	        var concrete = new Concrete(19, 6, parModel, constitutiveModel);
+			// Initiate concrete
+			var parameters = new Parameters(19, 6, parModel);
 
 	        // Initiate steel for each direction
 	        var steelX = new Steel(458, 200000);
@@ -435,7 +412,7 @@ namespace RCMembrane.Examples
 	        var reinforcement = new WebReinforcement(6.35, 50.55, steelX, 4.01, 50.82, steelY, 70);
 
 	        return
-		        Membrane.Read(concrete, reinforcement, 70, considerCrackSlip);
+		        Membrane.Read(parameters, reinforcement, 70, constitutiveModel, considerCrackSlip);
         }
 
         /// <summary>
@@ -449,7 +426,7 @@ namespace RCMembrane.Examples
 			var parModel = constitutiveModel == ConstitutiveModel.MCFT ? ParameterModel.MCFT : ParameterModel.DSFM;
 
 			// Initiate concrete
-		    var concrete = new Concrete(19.6, 6, parModel, constitutiveModel);
+		    var parameters = new Parameters(19.6, 6, parModel);
 
 		    // Initiate steel for each direction
 		    var steelX = new Steel(460, 200000);
@@ -459,7 +436,7 @@ namespace RCMembrane.Examples
 		    var reinforcement = new WebReinforcement(6.35, 50.55, steelX, 4.47, 50.38, steelY, 70);
 
             return
-                Membrane.Read(concrete, reinforcement, 70, considerCrackSlip);
+                Membrane.Read(parameters, reinforcement, 70, constitutiveModel, considerCrackSlip);
         }
 
         /// <summary>
@@ -473,7 +450,7 @@ namespace RCMembrane.Examples
 			var parModel = constitutiveModel == ConstitutiveModel.MCFT ? ParameterModel.MCFT : ParameterModel.DSFM;
 
 			// Initiate concrete
-		    var concrete = new Concrete(19.5, 6, parModel, constitutiveModel);
+		    var parameters = new Parameters(19.5, 6, parModel);
 
 		    // Initiate steel for each direction
 		    var steelX = new Steel(458, 200000);
@@ -483,7 +460,7 @@ namespace RCMembrane.Examples
 		    var reinforcement = new WebReinforcement(6.35, 50.55, steelX, 5.41, 50.52, steelY, 70);
 
             return
-                Membrane.Read(concrete, reinforcement, 70, considerCrackSlip);
+                Membrane.Read(parameters, reinforcement, 70, constitutiveModel, considerCrackSlip);
         }
 
         /// <summary>
@@ -497,7 +474,7 @@ namespace RCMembrane.Examples
 			var parModel = constitutiveModel == ConstitutiveModel.MCFT ? ParameterModel.MCFT : ParameterModel.DSFM;
 
 			// Initiate concrete
-		    var concrete = new Concrete(19.6, 6, parModel, constitutiveModel);
+		    var parameters = new Parameters(19.6, 6, parModel);
 
 		    // Initiate steel for each direction
 		    var steelX = new Steel(458, 200000);
@@ -507,7 +484,7 @@ namespace RCMembrane.Examples
 		    var reinforcement = new WebReinforcement(6.35, 50.55, steelX, 5.87, 50.87, steelY, 70);
 
             return
-                Membrane.Read(concrete, reinforcement, 70, considerCrackSlip);
+                Membrane.Read(parameters, reinforcement, 70, constitutiveModel, considerCrackSlip);
         }
 
         /// <summary>
@@ -521,16 +498,10 @@ namespace RCMembrane.Examples
 			var parModel = constitutiveModel == ConstitutiveModel.MCFT ? ParameterModel.MCFT : ParameterModel.DSFM;
 
 			// Initiate concrete
-		    var concrete = new Concrete(20.5, 6, parModel, constitutiveModel);
-
-		    // Initiate steel for each direction
-		    var steelXY = new Steel(518, 200000);
-
-		    // Get reinforcement
-		    var reinforcement = new WebReinforcement(6.35, 50.55, steelXY, 70);
-
-            return
-                Membrane.Read(concrete, reinforcement, 70, considerCrackSlip);
+		    var parameters = new Parameters(20.5, 6, parModel);
+            var steelXY = new Steel(518, 200000);
+            var reinforcement = new WebReinforcement(6.35, 50.55, steelXY, 70);
+            return Membrane.Read(parameters, reinforcement, 70, constitutiveModel, considerCrackSlip);
         }
 
         /// <summary>
@@ -544,16 +515,10 @@ namespace RCMembrane.Examples
 			var parModel = constitutiveModel == ConstitutiveModel.MCFT ? ParameterModel.MCFT : ParameterModel.DSFM;
 
 			// Initiate concrete
-		    var concrete = new Concrete(23.8, 6, parModel, constitutiveModel);
-
-		    // Initiate steel for each direction
-		    var steelXY = new Steel(492, 200000);
-
-		    // Get reinforcement
-		    var reinforcement = new WebReinforcement(6.35, 50.55, steelXY, 70);
-
-            return
-                Membrane.Read(concrete, reinforcement, 70, considerCrackSlip);
+		    var parameters = new Parameters(23.8, 6, parModel);
+            var steelXY = new Steel(492, 200000);
+            var reinforcement = new WebReinforcement(6.35, 50.55, steelXY, 70);
+            return Membrane.Read(parameters, reinforcement, 70, constitutiveModel, considerCrackSlip);
         }
 
         /// <summary>
@@ -567,16 +532,10 @@ namespace RCMembrane.Examples
 			var parModel = constitutiveModel == ConstitutiveModel.MCFT ? ParameterModel.MCFT : ParameterModel.DSFM;
 
 			// Initiate concrete
-		    var concrete = new Concrete(19.2, 6, parModel, constitutiveModel);
-
-		    // Initiate steel for each direction
-		    var steelXY = new Steel(466, 200000);
-
-		    // Get reinforcement
-		    var reinforcement = new WebReinforcement(6.35, 50.55, steelXY, 70);
-
-            return
-                Membrane.Read(concrete, reinforcement, 70, considerCrackSlip);
+		    var parameters = new Parameters(19.2, 6, parModel);
+            var steelXY = new Steel(466, 200000);
+            var reinforcement = new WebReinforcement(6.35, 50.55, steelXY, 70);
+            return Membrane.Read(parameters, reinforcement, 70, constitutiveModel, considerCrackSlip);
         }
 
         /// <summary>
@@ -590,7 +549,7 @@ namespace RCMembrane.Examples
 			var parModel = constitutiveModel == ConstitutiveModel.MCFT ? ParameterModel.MCFT : ParameterModel.DSFM;
 
 			// Initiate concrete
-		    var concrete = new Concrete(21.3, 6, parModel, constitutiveModel);
+		    var parameters = new Parameters(21.3, 6, parModel);
 
 		    // Initiate steel for each direction
 		    var steelX = new Steel(456, 200000);
@@ -600,7 +559,7 @@ namespace RCMembrane.Examples
 		    var reinforcement = new WebReinforcement(6.35, 50.55, steelX, 4.7, 49.08, steelY, 70);
 
             return
-                Membrane.Read(concrete, reinforcement, 70, considerCrackSlip);
+                Membrane.Read(parameters, reinforcement, 70, constitutiveModel, considerCrackSlip);
         }
 
         /// <summary>
@@ -614,7 +573,7 @@ namespace RCMembrane.Examples
 			var parModel = constitutiveModel == ConstitutiveModel.MCFT ? ParameterModel.MCFT : ParameterModel.DSFM;
 
 			// Initiate concrete
-		    var concrete = new Concrete(20.5, 6, parModel, constitutiveModel);
+		    var parameters = new Parameters(20.5, 6, parModel);
 
 		    // Initiate steel for each direction
 		    var steelX = new Steel(442, 200000);
@@ -623,7 +582,7 @@ namespace RCMembrane.Examples
 		    var reinforcement = new WebReinforcement(6.35, 50.55, steelX, 70);
 
             return
-                Membrane.Read(concrete, reinforcement, 70, considerCrackSlip);
+                Membrane.Read(parameters, reinforcement, 70, constitutiveModel, considerCrackSlip);
         }
 
         /// <summary>
@@ -637,7 +596,7 @@ namespace RCMembrane.Examples
 			var parModel = constitutiveModel == ConstitutiveModel.MCFT ? ParameterModel.MCFT : ParameterModel.DSFM;
 
 			// Initiate concrete
-		    var concrete = new Concrete(19, 6, parModel, constitutiveModel);
+		    var parameters = new Parameters(19, 6, parModel);
 
 		    // Initiate steel for each direction
 		    var steelX = new Steel(483, 200000);
@@ -646,7 +605,7 @@ namespace RCMembrane.Examples
 		    var reinforcement = new WebReinforcement(6.35, 50.55, steelX, 70);
 
             return
-                Membrane.Read(concrete, reinforcement, 70, considerCrackSlip);
+                Membrane.Read(parameters, reinforcement, 70, constitutiveModel, considerCrackSlip);
         }
 
         /// <summary>
@@ -660,7 +619,7 @@ namespace RCMembrane.Examples
 			var parModel = constitutiveModel == ConstitutiveModel.MCFT ? ParameterModel.MCFT : ParameterModel.DSFM;
 
 			// Initiate concrete
-		    var concrete = new Concrete(21.7, 6, parModel, constitutiveModel);
+		    var parameters = new Parameters(21.7, 6, parModel);
 
 		    // Initiate steel for each direction
 		    var steelX = new Steel(441, 200000);
@@ -670,7 +629,7 @@ namespace RCMembrane.Examples
 		    var reinforcement = new WebReinforcement(6.35, 50.55, steelX, 4.47, 50.38, steelY, 70);
 
             return
-                Membrane.Read(concrete, reinforcement, 70, considerCrackSlip);
+                Membrane.Read(parameters, reinforcement, 70, constitutiveModel, considerCrackSlip);
         }
 
         /// <summary>
@@ -684,7 +643,7 @@ namespace RCMembrane.Examples
 			var parModel = constitutiveModel == ConstitutiveModel.MCFT ? ParameterModel.MCFT : ParameterModel.DSFM;
 
 			// Initiate concrete
-		    var concrete = new Concrete(19.1, 6, parModel, constitutiveModel);
+		    var parameters = new Parameters(19.1, 6, parModel);
 
 		    // Initiate steel for each direction
 		    var steelX = new Steel(437, 200000);
@@ -694,7 +653,7 @@ namespace RCMembrane.Examples
 		    var reinforcement = new WebReinforcement(6.35, 50.55, steelX, 4.7, 49.08, steelY, 70);
 
             return
-                Membrane.Read(concrete, reinforcement, 70, considerCrackSlip);
+                Membrane.Read(parameters, reinforcement, 70, constitutiveModel, considerCrackSlip);
         }
 
         #endregion
@@ -714,7 +673,7 @@ namespace RCMembrane.Examples
 	        var parModel = constitutiveModel == ConstitutiveModel.MCFT ? ParameterModel.MCFT : ParameterModel.DSFM;
 
 	        // Initiate concrete
-	        var concrete = new Concrete(72.2, 10, parModel, constitutiveModel);
+	        var parameters = new Parameters(72.2, 10, parModel);
 
 	        // Initiate steel for each direction
 	        var steelX = new Steel(606, 200000);
@@ -723,7 +682,7 @@ namespace RCMembrane.Examples
 	        var reinforcement = new WebReinforcement(8, 44.46, steelX, 0, 0, null, 70);
 
 	        return
-		        Membrane.Read(concrete, reinforcement, 70, considerCrackSlip);
+		        Membrane.Read(parameters, reinforcement, 70, constitutiveModel, considerCrackSlip);
         }
 
         /// <summary>
@@ -737,7 +696,7 @@ namespace RCMembrane.Examples
 	        var parModel = constitutiveModel == ConstitutiveModel.MCFT ? ParameterModel.MCFT : ParameterModel.DSFM;
 
 	        // Initiate concrete
-	        var concrete = new Concrete(66.1, 10, parModel, constitutiveModel);
+	        var parameters = new Parameters(66.1, 10, parModel);
 
 	        // Initiate steel for each direction
 	        var steelX = new Steel(606, 200000);
@@ -747,7 +706,7 @@ namespace RCMembrane.Examples
 	        var reinforcement = new WebReinforcement(8, 44.46, steelX, 5.72, 179.07, steelY, 70);
 
 	        return
-		        Membrane.Read(concrete, reinforcement, 70, considerCrackSlip);
+		        Membrane.Read(parameters, reinforcement, 70, constitutiveModel, considerCrackSlip);
         }
 
         /// <summary>
@@ -761,7 +720,7 @@ namespace RCMembrane.Examples
 	        var parModel = constitutiveModel == ConstitutiveModel.MCFT ? ParameterModel.MCFT : ParameterModel.DSFM;
 
 	        // Initiate concrete
-	        var concrete = new Concrete(58.4, 10, parModel, constitutiveModel);
+	        var parameters = new Parameters(58.4, 10, parModel);
 
 	        // Initiate steel for each direction
 	        var steelX = new Steel(606, 200000);
@@ -771,7 +730,7 @@ namespace RCMembrane.Examples
 	        var reinforcement = new WebReinforcement(8, 44.46, steelX, 5.72, 89.54, steelY, 70);
 
 	        return
-		        Membrane.Read(concrete, reinforcement, 70, considerCrackSlip);
+		        Membrane.Read(parameters, reinforcement, 70, constitutiveModel, considerCrackSlip);
         }
 
         /// <summary>
@@ -785,7 +744,7 @@ namespace RCMembrane.Examples
 	        var parModel = constitutiveModel == ConstitutiveModel.MCFT ? ParameterModel.MCFT : ParameterModel.DSFM;
 
 	        // Initiate concrete
-	        var concrete = new Concrete(68.5, 10, parModel, constitutiveModel);
+	        var parameters = new Parameters(68.5, 10, parModel);
 
 	        // Initiate steel for each direction
 	        var steelX = new Steel(606, 200000);
@@ -795,7 +754,7 @@ namespace RCMembrane.Examples
 	        var reinforcement = new WebReinforcement(8, 44.46, steelX, 5.72, 89.54, steelY, 70);
 
 	        return
-		        Membrane.Read(concrete, reinforcement, 70, considerCrackSlip);
+		        Membrane.Read(parameters, reinforcement, 70, constitutiveModel, considerCrackSlip);
         }
 
         /// <summary>
@@ -809,7 +768,7 @@ namespace RCMembrane.Examples
 	        var parModel = constitutiveModel == ConstitutiveModel.MCFT ? ParameterModel.MCFT : ParameterModel.DSFM;
 
 	        // Initiate concrete
-	        var concrete = new Concrete(52.1, 10, parModel, constitutiveModel);
+	        var parameters = new Parameters(52.1, 10, parModel);
 
 	        // Initiate steel for each direction
 	        var steelX = new Steel(606, 200000);
@@ -819,7 +778,7 @@ namespace RCMembrane.Examples
 	        var reinforcement = new WebReinforcement(8, 44.46, steelX, 5.72, 179.07, steelY, 70);
 
 	        return
-		        Membrane.Read(concrete, reinforcement, 70, considerCrackSlip);
+		        Membrane.Read(parameters, reinforcement, 70, constitutiveModel, considerCrackSlip);
         }
 
         /// <summary>
@@ -833,7 +792,7 @@ namespace RCMembrane.Examples
 	        var parModel = constitutiveModel == ConstitutiveModel.MCFT ? ParameterModel.MCFT : ParameterModel.DSFM;
 
 	        // Initiate concrete
-	        var concrete = new Concrete(49.7, 10, parModel, constitutiveModel);
+	        var parameters = new Parameters(49.7, 10, parModel);
 
 	        // Initiate steel for each direction
 	        var steelX = new Steel(606, 200000);
@@ -843,7 +802,7 @@ namespace RCMembrane.Examples
 	        var reinforcement = new WebReinforcement(8, 44.46, steelX, 5.72, 179.07, steelY, 70);
 
 	        return
-		        Membrane.Read(concrete, reinforcement, 70, considerCrackSlip);
+		        Membrane.Read(parameters, reinforcement, 70, constitutiveModel, considerCrackSlip);
         }
 
         /// <summary>
@@ -857,7 +816,7 @@ namespace RCMembrane.Examples
 	        var parModel = constitutiveModel == ConstitutiveModel.MCFT ? ParameterModel.MCFT : ParameterModel.DSFM;
 
 	        // Initiate concrete
-	        var concrete = new Concrete(53.6, 10, parModel, constitutiveModel);
+	        var parameters = new Parameters(53.6, 10, parModel);
 
 	        // Initiate steel for each direction
 	        var steelX = new Steel(606, 200000);
@@ -867,7 +826,7 @@ namespace RCMembrane.Examples
 	        var reinforcement = new WebReinforcement(8, 44.46, steelX, 5.72, 89.54, steelY, 70);
 
 	        return
-		        Membrane.Read(concrete, reinforcement, 70, considerCrackSlip);
+		        Membrane.Read(parameters, reinforcement, 70, constitutiveModel, considerCrackSlip);
         }
 		
         /// <summary>
@@ -881,7 +840,7 @@ namespace RCMembrane.Examples
 	        var parModel = constitutiveModel == ConstitutiveModel.MCFT ? ParameterModel.MCFT : ParameterModel.DSFM;
 
 	        // Initiate concrete
-	        var concrete = new Concrete(55.9, 10, parModel, constitutiveModel);
+	        var parameters = new Parameters(55.9, 10, parModel);
 
 	        // Initiate steel for each direction
 	        var steelX = new Steel(606, 200000);
@@ -891,7 +850,7 @@ namespace RCMembrane.Examples
 	        var reinforcement = new WebReinforcement(8, 44.46, steelX, 5.72, 59.21, steelY, 70);
 
 	        return
-		        Membrane.Read(concrete, reinforcement, 70, considerCrackSlip);
+		        Membrane.Read(parameters, reinforcement, 70, constitutiveModel, considerCrackSlip);
         }
 
         /// <summary>
@@ -905,7 +864,7 @@ namespace RCMembrane.Examples
 	        var parModel = constitutiveModel == ConstitutiveModel.MCFT ? ParameterModel.MCFT : ParameterModel.DSFM;
 
 	        // Initiate concrete
-	        var concrete = new Concrete(56, 10, parModel, constitutiveModel);
+	        var parameters = new Parameters(56, 10, parModel);
 
 	        // Initiate steel for each direction
 	        var steelX = new Steel(606, 200000);
@@ -915,7 +874,7 @@ namespace RCMembrane.Examples
 	        var reinforcement = new WebReinforcement(8, 44.46, steelX, 5.72, 179.07, steelY, 70);
 
 	        return
-		        Membrane.Read(concrete, reinforcement, 70, considerCrackSlip);
+		        Membrane.Read(parameters, reinforcement, 70, constitutiveModel, considerCrackSlip);
         }
 		
         /// <summary>
@@ -929,7 +888,7 @@ namespace RCMembrane.Examples
 	        var parModel = constitutiveModel == ConstitutiveModel.MCFT ? ParameterModel.MCFT : ParameterModel.DSFM;
 
 	        // Initiate concrete
-	        var concrete = new Concrete(51.4, 10, parModel, constitutiveModel);
+	        var parameters = new Parameters(51.4, 10, parModel);
 
 	        // Initiate steel for each direction
 	        var steelX = new Steel(606, 200000);
@@ -939,7 +898,7 @@ namespace RCMembrane.Examples
 	        var reinforcement = new WebReinforcement(8, 44.46, steelX, 5.72, 59.21, steelY, 70);
 
 	        return
-		        Membrane.Read(concrete, reinforcement, 70, considerCrackSlip);
+		        Membrane.Read(parameters, reinforcement, 70, constitutiveModel, considerCrackSlip);
         }
 
         /// <summary>
@@ -953,17 +912,17 @@ namespace RCMembrane.Examples
 	        var parModel = constitutiveModel == ConstitutiveModel.MCFT ? ParameterModel.MCFT : ParameterModel.DSFM;
 
 	        // Initiate concrete
-	        var concrete = new Concrete(49.9, 10, parModel, constitutiveModel);
+	        var parameters = new Parameters(49.9, 10, parModel);
 
 	        // Initiate steel for each direction
 	        var steelX = new Steel(522, 200000);
-	        var steelY = steelX.Copy();
+	        var steelY = steelX.Clone();
 
 	        // Get reinforcement
 	        var reinforcement = new WebReinforcement(5.72, 44.5, steelX, 5.72, 89.54, steelY, 70);
 
             return
-                Membrane.Read(concrete, reinforcement, 70, considerCrackSlip);
+                Membrane.Read(parameters, reinforcement, 70, constitutiveModel, considerCrackSlip);
         }
 
         /// <summary>
@@ -977,17 +936,17 @@ namespace RCMembrane.Examples
 	        var parModel = constitutiveModel == ConstitutiveModel.MCFT ? ParameterModel.MCFT : ParameterModel.DSFM;
 
 	        // Initiate concrete
-	        var concrete = new Concrete(43, 10, parModel, constitutiveModel);
+	        var parameters = new Parameters(43, 10, parModel);
 
 	        // Initiate steel for each direction
 	        var steelX = new Steel(522, 200000);
-	        var steelY = steelX.Copy();
+	        var steelY = steelX.Clone();
 
 	        // Get reinforcement
 	        var reinforcement = new WebReinforcement(5.72, 44.5, steelX, 5.72, 89.54, steelY, 70);
 
             return
-                Membrane.Read(concrete, reinforcement, 70, considerCrackSlip);
+                Membrane.Read(parameters, reinforcement, 70, constitutiveModel, considerCrackSlip);
         }
 
 
@@ -1007,7 +966,7 @@ namespace RCMembrane.Examples
 	        var parModel = constitutiveModel == ConstitutiveModel.MCFT ? ParameterModel.MCFT : ParameterModel.DSFM;
 
 	        // Initiate concrete
-	        var concrete = new Concrete(16.4, 9.5, parModel, constitutiveModel);
+	        var parameters = new Parameters(16.4, 9.5, parModel);
 
 	        // Initiate steel for each direction
 	        var steel = new Steel(425, 200000);
@@ -1016,7 +975,7 @@ namespace RCMembrane.Examples
 	        var reinforcement = WebReinforcement.DirectionXOnly(6, 74.11, steel, 70);
 
 	        return
-		        Membrane.Read(concrete, reinforcement, 70, considerCrackSlip);
+		        Membrane.Read(parameters, reinforcement, 70, constitutiveModel, considerCrackSlip);
         }
 
         /// <summary>
@@ -1030,7 +989,7 @@ namespace RCMembrane.Examples
 	        var parModel = constitutiveModel == ConstitutiveModel.MCFT ? ParameterModel.MCFT : ParameterModel.DSFM;
 
 	        // Initiate concrete
-	        var concrete = new Concrete(17.7, 9.5, parModel, constitutiveModel);
+	        var parameters = new Parameters(17.7, 9.5, parModel);
 
 	        // Initiate steel for each direction
 	        var steel = new Steel(425, 200000);
@@ -1039,7 +998,7 @@ namespace RCMembrane.Examples
 	        var reinforcement = WebReinforcement.DirectionXOnly(6, 74.11, steel, 70);
 
             return
-                Membrane.Read(concrete, reinforcement, 70, considerCrackSlip);
+                Membrane.Read(parameters, reinforcement, 70, constitutiveModel, considerCrackSlip);
         }
 
         /// <summary>
@@ -1053,7 +1012,7 @@ namespace RCMembrane.Examples
 	        var parModel = constitutiveModel == ConstitutiveModel.MCFT ? ParameterModel.MCFT : ParameterModel.DSFM;
 
 	        // Initiate concrete
-	        var concrete = new Concrete(20.2, 9.5, parModel, constitutiveModel);
+	        var parameters = new Parameters(20.2, 9.5, parModel);
 
 	        // Initiate steel for each direction
 	        var steel = new Steel(425, 200000);
@@ -1062,7 +1021,7 @@ namespace RCMembrane.Examples
 	        var reinforcement = WebReinforcement.DirectionXOnly(6, 74.11, steel, 70);
 
             return
-                Membrane.Read(concrete, reinforcement, 70, considerCrackSlip);
+                Membrane.Read(parameters, reinforcement, 70, constitutiveModel, considerCrackSlip);
         }
 
         /// <summary>
@@ -1076,7 +1035,7 @@ namespace RCMembrane.Examples
 	        var parModel = constitutiveModel == ConstitutiveModel.MCFT ? ParameterModel.MCFT : ParameterModel.DSFM;
 
 	        // Initiate concrete
-	        var concrete = new Concrete(20.4, 9.5, parModel, constitutiveModel);
+	        var parameters = new Parameters(20.4, 9.5, parModel);
 
 	        // Initiate steel for each direction
 	        var steel = new Steel(425, 200000);
@@ -1085,7 +1044,7 @@ namespace RCMembrane.Examples
 	        var reinforcement = WebReinforcement.DirectionXOnly(6, 74.11, steel, 70);
 
             return
-                Membrane.Read(concrete, reinforcement, 70, considerCrackSlip);
+                Membrane.Read(parameters, reinforcement, 70, constitutiveModel, considerCrackSlip);
         }
 
         /// <summary>
@@ -1099,7 +1058,7 @@ namespace RCMembrane.Examples
 	        var parModel = constitutiveModel == ConstitutiveModel.MCFT ? ParameterModel.MCFT : ParameterModel.DSFM;
 
 	        // Initiate concrete
-	        var concrete = new Concrete(24, 9.5, parModel, constitutiveModel);
+	        var parameters = new Parameters(24, 9.5, parModel);
 
 	        // Initiate steel for each direction
 	        var steel = new Steel(433, 200000);
@@ -1108,7 +1067,7 @@ namespace RCMembrane.Examples
 	        var reinforcement = WebReinforcement.DirectionXOnly(6, 74.11, steel, 70);
 
             return
-                Membrane.Read(concrete, reinforcement, 70, considerCrackSlip);
+                Membrane.Read(parameters, reinforcement, 70, constitutiveModel, considerCrackSlip);
         }
 
         /// <summary>
@@ -1122,7 +1081,7 @@ namespace RCMembrane.Examples
 	        var parModel = constitutiveModel == ConstitutiveModel.MCFT ? ParameterModel.MCFT : ParameterModel.DSFM;
 
 	        // Initiate concrete
-	        var concrete = new Concrete(25.9, 9.5, parModel, constitutiveModel);
+	        var parameters = new Parameters(25.9, 9.5, parModel);
 
 	        // Initiate steel for each direction
 	        var steel = new Steel(433, 200000);
@@ -1131,7 +1090,7 @@ namespace RCMembrane.Examples
 	        var reinforcement = WebReinforcement.DirectionXOnly(6, 74.11, steel, 70);
 
             return
-                Membrane.Read(concrete, reinforcement, 70, considerCrackSlip);
+                Membrane.Read(parameters, reinforcement, 70, constitutiveModel, considerCrackSlip);
         }
 
         /// <summary>
@@ -1145,7 +1104,7 @@ namespace RCMembrane.Examples
 	        var parModel = constitutiveModel == ConstitutiveModel.MCFT ? ParameterModel.MCFT : ParameterModel.DSFM;
 
 	        // Initiate concrete
-	        var concrete = new Concrete(23.1, 9.5, parModel, constitutiveModel);
+	        var parameters = new Parameters(23.1, 9.5, parModel);
 
 	        // Initiate steel for each direction
 	        var steel = new Steel(433, 200000);
@@ -1154,7 +1113,7 @@ namespace RCMembrane.Examples
 	        var reinforcement = WebReinforcement.DirectionXOnly(6, 74.11, steel, 70);
 
             return
-                Membrane.Read(concrete, reinforcement, 70, considerCrackSlip);
+                Membrane.Read(parameters, reinforcement, 70, constitutiveModel, considerCrackSlip);
         }
 
         /// <summary>
@@ -1168,7 +1127,7 @@ namespace RCMembrane.Examples
 	        var parModel = constitutiveModel == ConstitutiveModel.MCFT ? ParameterModel.MCFT : ParameterModel.DSFM;
 
 	        // Initiate concrete
-	        var concrete = new Concrete(41.1, 9.5, parModel, constitutiveModel);
+	        var parameters = new Parameters(41.1, 9.5, parModel);
 
 	        // Initiate steel for each direction
 	        var steel = new Steel(489, 200000);
@@ -1177,7 +1136,7 @@ namespace RCMembrane.Examples
 	        var reinforcement = WebReinforcement.DirectionXOnly(6, 40, steel, 70);
 
             return
-                Membrane.Read(concrete, reinforcement, 70, considerCrackSlip);
+                Membrane.Read(parameters, reinforcement, 70, constitutiveModel, considerCrackSlip);
         }
 
         /// <summary>
@@ -1191,7 +1150,7 @@ namespace RCMembrane.Examples
 	        var parModel = constitutiveModel == ConstitutiveModel.MCFT ? ParameterModel.MCFT : ParameterModel.DSFM;
 
 	        // Initiate concrete
-	        var concrete = new Concrete(38.4, 9.5, parModel, constitutiveModel);
+	        var parameters = new Parameters(38.4, 9.5, parModel);
 
 	        // Initiate steel for each direction
 	        var steel = new Steel(485, 200000);
@@ -1200,7 +1159,7 @@ namespace RCMembrane.Examples
 	        var reinforcement = WebReinforcement.DirectionXOnly(6, 40, steel, 70);
 
             return
-                Membrane.Read(concrete, reinforcement, 70, considerCrackSlip);
+                Membrane.Read(parameters, reinforcement, 70, constitutiveModel, considerCrackSlip);
         }
 
         /// <summary>
@@ -1214,7 +1173,7 @@ namespace RCMembrane.Examples
 	        var parModel = constitutiveModel == ConstitutiveModel.MCFT ? ParameterModel.MCFT : ParameterModel.DSFM;
 
 	        // Initiate concrete
-	        var concrete = new Concrete(41.7, 9.5, parModel, constitutiveModel);
+	        var parameters = new Parameters(41.7, 9.5, parModel);
 
 	        // Initiate steel for each direction
 	        var steel = new Steel(502, 200000);
@@ -1223,7 +1182,7 @@ namespace RCMembrane.Examples
 	        var reinforcement = WebReinforcement.DirectionXOnly(6, 40, steel, 70);
 
             return
-                Membrane.Read(concrete, reinforcement, 70, considerCrackSlip);
+                Membrane.Read(parameters, reinforcement, 70, constitutiveModel, considerCrackSlip);
         }
 
         /// <summary>
@@ -1237,7 +1196,7 @@ namespace RCMembrane.Examples
 	        var parModel = constitutiveModel == ConstitutiveModel.MCFT ? ParameterModel.MCFT : ParameterModel.DSFM;
 
 	        // Initiate concrete
-	        var concrete = new Concrete(41.6, 9.5, parModel, constitutiveModel);
+	        var parameters = new Parameters(41.6, 9.5, parModel);
 
 	        // Initiate steel for each direction
 	        var steel = new Steel(502, 200000);
@@ -1246,7 +1205,7 @@ namespace RCMembrane.Examples
 	        var reinforcement = WebReinforcement.DirectionXOnly(6, 40, steel, 70);
 
             return
-                Membrane.Read(concrete, reinforcement, 70, considerCrackSlip);
+                Membrane.Read(parameters, reinforcement, 70, constitutiveModel, considerCrackSlip);
         }
 
         /// <summary>
@@ -1260,7 +1219,7 @@ namespace RCMembrane.Examples
 	        var parModel = constitutiveModel == ConstitutiveModel.MCFT ? ParameterModel.MCFT : ParameterModel.DSFM;
 
 	        // Initiate concrete
-	        var concrete = new Concrete(25.3, 9.5, parModel, constitutiveModel);
+	        var parameters = new Parameters(25.3, 9.5, parModel);
 
 	        // Initiate steel for each direction
 	        var steel = new Steel(402, 200000);
@@ -1269,7 +1228,7 @@ namespace RCMembrane.Examples
 	        var reinforcement = WebReinforcement.DirectionXOnly(6, 36.72, steel, 70);
 
             return
-                Membrane.Read(concrete, reinforcement, 70, considerCrackSlip);
+                Membrane.Read(parameters, reinforcement, 70, constitutiveModel, considerCrackSlip);
         }
 
         /// <summary>
@@ -1283,7 +1242,7 @@ namespace RCMembrane.Examples
 	        var parModel = constitutiveModel == ConstitutiveModel.MCFT ? ParameterModel.MCFT : ParameterModel.DSFM;
 
 	        // Initiate concrete
-	        var concrete = new Concrete(20, 9.5, parModel, constitutiveModel);
+	        var parameters = new Parameters(20, 9.5, parModel);
 
 	        // Initiate steel for each direction
 	        var steel = new Steel(411, 200000);
@@ -1292,7 +1251,7 @@ namespace RCMembrane.Examples
 	        var reinforcement = WebReinforcement.DirectionXOnly(6, 36.72, steel, 70);
 
             return
-                Membrane.Read(concrete, reinforcement, 70, considerCrackSlip);
+                Membrane.Read(parameters, reinforcement, 70, constitutiveModel, considerCrackSlip);
         }
 
         /// <summary>
@@ -1306,7 +1265,7 @@ namespace RCMembrane.Examples
 	        var parModel = constitutiveModel == ConstitutiveModel.MCFT ? ParameterModel.MCFT : ParameterModel.DSFM;
 
 	        // Initiate concrete
-	        var concrete = new Concrete(21.7, 9.5, parModel, constitutiveModel);
+	        var parameters = new Parameters(21.7, 9.5, parModel);
 
 	        // Initiate steel for each direction
 	        var steel = new Steel(424, 200000);
@@ -1315,7 +1274,7 @@ namespace RCMembrane.Examples
 	        var reinforcement = WebReinforcement.DirectionXOnly(6, 36.72, steel, 70);
 
             return
-                Membrane.Read(concrete, reinforcement, 70, considerCrackSlip);
+                Membrane.Read(parameters, reinforcement, 70, constitutiveModel, considerCrackSlip);
         }
 
         /// <summary>
@@ -1329,7 +1288,7 @@ namespace RCMembrane.Examples
 	        var parModel = constitutiveModel == ConstitutiveModel.MCFT ? ParameterModel.MCFT : ParameterModel.DSFM;
 
 	        // Initiate concrete
-	        var concrete = new Concrete(21.8, 9.5, parModel, constitutiveModel);
+	        var parameters = new Parameters(21.8, 9.5, parModel);
 
 	        // Initiate steel for each direction
 	        var steel = new Steel(402, 200000);
@@ -1338,7 +1297,7 @@ namespace RCMembrane.Examples
 	        var reinforcement = WebReinforcement.DirectionXOnly(6, 36.72, steel, 70);
 
             return
-                Membrane.Read(concrete, reinforcement, 70, considerCrackSlip);
+                Membrane.Read(parameters, reinforcement, 70, constitutiveModel, considerCrackSlip);
         }
 
         /// <summary>
@@ -1352,7 +1311,7 @@ namespace RCMembrane.Examples
 	        var parModel = constitutiveModel == ConstitutiveModel.MCFT ? ParameterModel.MCFT : ParameterModel.DSFM;
 
 	        // Initiate concrete
-	        var concrete = new Concrete(17.6, 9.5, parModel, constitutiveModel);
+	        var parameters = new Parameters(17.6, 9.5, parModel);
 
 	        // Initiate steel for each direction
 	        var steel = new Steel(433, 200000);
@@ -1361,7 +1320,7 @@ namespace RCMembrane.Examples
 	        var reinforcement = WebReinforcement.DirectionXOnly(6, 36.72, steel, 70);
 
             return
-                Membrane.Read(concrete, reinforcement, 70, considerCrackSlip);
+                Membrane.Read(parameters, reinforcement, 70, constitutiveModel, considerCrackSlip);
         }
 
         /// <summary>
@@ -1375,7 +1334,7 @@ namespace RCMembrane.Examples
 	        var parModel = constitutiveModel == ConstitutiveModel.MCFT ? ParameterModel.MCFT : ParameterModel.DSFM;
 
 	        // Initiate concrete
-	        var concrete = new Concrete(22.7, 9.5, parModel, constitutiveModel);
+	        var parameters = new Parameters(22.7, 9.5, parModel);
 
 	        // Initiate steel for each direction
 	        var steel = new Steel(426, 200000);
@@ -1384,7 +1343,7 @@ namespace RCMembrane.Examples
 	        var reinforcement = WebReinforcement.DirectionXOnly(6, 36.72, steel, 70);
 
             return
-                Membrane.Read(concrete, reinforcement, 70, considerCrackSlip);
+                Membrane.Read(parameters, reinforcement, 70, constitutiveModel, considerCrackSlip);
         }
 
         /// <summary>
@@ -1398,7 +1357,7 @@ namespace RCMembrane.Examples
 	        var parModel = constitutiveModel == ConstitutiveModel.MCFT ? ParameterModel.MCFT : ParameterModel.DSFM;
 
 	        // Initiate concrete
-	        var concrete = new Concrete(41.6, 9.5, parModel, constitutiveModel);
+	        var parameters = new Parameters(41.6, 9.5, parModel);
 
 	        // Initiate steel for each direction
 	        var steel = new Steel(496, 200000);
@@ -1407,7 +1366,7 @@ namespace RCMembrane.Examples
 	        var reinforcement = WebReinforcement.DirectionXOnly(6, 40, steel, 70);
 
             return
-                Membrane.Read(concrete, reinforcement, 70, considerCrackSlip);
+                Membrane.Read(parameters, reinforcement, 70, constitutiveModel, considerCrackSlip);
         }
 
         /// <summary>
@@ -1421,7 +1380,7 @@ namespace RCMembrane.Examples
 	        var parModel = constitutiveModel == ConstitutiveModel.MCFT ? ParameterModel.MCFT : ParameterModel.DSFM;
 
 	        // Initiate concrete
-	        var concrete = new Concrete(40.4, 9.5, parModel, constitutiveModel);
+	        var parameters = new Parameters(40.4, 9.5, parModel);
 
 	        // Initiate steel for each direction
 	        var steel = new Steel(496, 200000);
@@ -1430,7 +1389,7 @@ namespace RCMembrane.Examples
 	        var reinforcement = WebReinforcement.DirectionXOnly(6, 40, steel, 70);
 
             return
-                Membrane.Read(concrete, reinforcement, 70, considerCrackSlip);
+                Membrane.Read(parameters, reinforcement, 70, constitutiveModel, considerCrackSlip);
         }
 
         #endregion
@@ -1449,7 +1408,7 @@ namespace RCMembrane.Examples
 	        var parModel = constitutiveModel == ConstitutiveModel.MCFT ? ParameterModel.MCFT : ParameterModel.DSFM;
 
 	        // Initiate concrete
-	        var concrete = new Concrete(38.5, 10, parModel, constitutiveModel);
+	        var parameters = new Parameters(38.5, 10, parModel);
 
 	        // Initiate steel for each direction
 	        var steelX = new Steel(604, 200000);
@@ -1459,7 +1418,7 @@ namespace RCMembrane.Examples
 	        var reinforcement = new WebReinforcement(8.1, 92.7, steelX, 3.85, 178.8, steelY, 73);
 
 	        return
-		        Membrane.Read(concrete, reinforcement, 73, considerCrackSlip);
+		        Membrane.Read(parameters, reinforcement, 73, constitutiveModel, considerCrackSlip);
         }
 
         /// <summary>
@@ -1473,7 +1432,7 @@ namespace RCMembrane.Examples
 	        var parModel = constitutiveModel == ConstitutiveModel.MCFT ? ParameterModel.MCFT : ParameterModel.DSFM;
 
 	        // Initiate concrete
-	        var concrete = new Concrete(38.2, 10, parModel, constitutiveModel);
+	        var parameters = new Parameters(38.2, 10, parModel);
 
 	        // Initiate steel for each direction
 	        var steelX = new Steel(604, 200000);
@@ -1483,7 +1442,7 @@ namespace RCMembrane.Examples
 	        var reinforcement = new WebReinforcement(8.1, 92.7, steelX, 3.85, 178.8, steelY, 73);
 
 	        return
-		        Membrane.Read(concrete, reinforcement, 73, considerCrackSlip);
+		        Membrane.Read(parameters, reinforcement, 73, constitutiveModel, considerCrackSlip);
         }
 
         /// <summary>
@@ -1497,7 +1456,7 @@ namespace RCMembrane.Examples
 	        var parModel = constitutiveModel == ConstitutiveModel.MCFT ? ParameterModel.MCFT : ParameterModel.DSFM;
 
 	        // Initiate concrete
-	        var concrete = new Concrete(42, 10, parModel, constitutiveModel);
+	        var parameters = new Parameters(42, 10, parModel);
 
 	        // Initiate steel for each direction
 	        var steelX = new Steel(604, 200000);
@@ -1507,7 +1466,7 @@ namespace RCMembrane.Examples
 	        var reinforcement = new WebReinforcement(8.1, 92.7, steelX, 3.85, 178.8, steelY, 73);
 
 	        return
-		        Membrane.Read(concrete, reinforcement, 73, considerCrackSlip);
+		        Membrane.Read(parameters, reinforcement, 73, constitutiveModel, considerCrackSlip);
         }
 
         /// <summary>
@@ -1521,7 +1480,7 @@ namespace RCMembrane.Examples
 	        var parModel = constitutiveModel == ConstitutiveModel.MCFT ? ParameterModel.MCFT : ParameterModel.DSFM;
 
 	        // Initiate concrete
-	        var concrete = new Concrete(43.1, 10, parModel, constitutiveModel);
+	        var parameters = new Parameters(43.1, 10, parModel);
 
 	        // Initiate steel for each direction
 	        var steelX = new Steel(604, 200000);
@@ -1531,7 +1490,7 @@ namespace RCMembrane.Examples
 	        var reinforcement = new WebReinforcement(8.1, 92.7, steelX, 3.85, 178.8, steelY, 73);
 
 	        return
-		        Membrane.Read(concrete, reinforcement, 73, considerCrackSlip);
+		        Membrane.Read(parameters, reinforcement, 73, constitutiveModel, considerCrackSlip);
         }
 
         /// <summary>
@@ -1545,7 +1504,7 @@ namespace RCMembrane.Examples
 	        var parModel = constitutiveModel == ConstitutiveModel.MCFT ? ParameterModel.MCFT : ParameterModel.DSFM;
 
 	        // Initiate concrete
-	        var concrete = new Concrete(38.1, 10, parModel, constitutiveModel);
+	        var parameters = new Parameters(38.1, 10, parModel);
 
 	        // Initiate steel for each direction
 	        var steelX = new Steel(604, 200000);
@@ -1555,7 +1514,7 @@ namespace RCMembrane.Examples
 	        var reinforcement = new WebReinforcement(8.1, 92.7, steelX, 3.85, 178.8, steelY, 73);
 
 	        return
-		        Membrane.Read(concrete, reinforcement, 73, considerCrackSlip);
+		        Membrane.Read(parameters, reinforcement, 73, constitutiveModel, considerCrackSlip);
         }
 
         /// <summary>
@@ -1569,7 +1528,7 @@ namespace RCMembrane.Examples
 	        var parModel = constitutiveModel == ConstitutiveModel.MCFT ? ParameterModel.MCFT : ParameterModel.DSFM;
 
 	        // Initiate concrete
-	        var concrete = new Concrete(43.5, 10, parModel, constitutiveModel);
+	        var parameters = new Parameters(43.5, 10, parModel);
 
 	        // Initiate steel for each direction
 	        var steelX = new Steel(604, 200000);
@@ -1579,7 +1538,7 @@ namespace RCMembrane.Examples
 	        var reinforcement = new WebReinforcement(8.1, 92.7, steelX, 3.85, 178.8, steelY, 73);
 
 	        return
-		        Membrane.Read(concrete, reinforcement, 73, considerCrackSlip);
+		        Membrane.Read(parameters, reinforcement, 73, constitutiveModel, considerCrackSlip);
         }
 
         #endregion
@@ -1599,7 +1558,7 @@ namespace RCMembrane.Examples
 	        var parModel = constitutiveModel == ConstitutiveModel.MCFT ? ParameterModel.MCFT : ParameterModel.DSFM;
 
 	        // Initiate concrete
-	        var concrete = new Concrete(42.2, 19, parModel, constitutiveModel);
+	        var parameters = new Parameters(42.2, 19, parModel);
 
 	        // Initiate steel for each direction
 	        var steel = new Steel(444);
@@ -1608,7 +1567,7 @@ namespace RCMembrane.Examples
 	        var reinforcement = new WebReinforcement(10, 148.06, steel, 178);
 
 	        return
-		        Membrane.Read(concrete, reinforcement, 178, considerCrackSlip);
+		        Membrane.Read(parameters, reinforcement, 178, constitutiveModel, considerCrackSlip);
         }
 
         /// <summary>
@@ -1622,7 +1581,7 @@ namespace RCMembrane.Examples
 	        var parModel = constitutiveModel == ConstitutiveModel.MCFT ? ParameterModel.MCFT : ParameterModel.DSFM;
 
 	        // Initiate concrete
-	        var concrete = new Concrete(41.2, 19, parModel, constitutiveModel);
+	        var parameters = new Parameters(41.2, 19, parModel);
 
 	        // Initiate steel for each direction
 	        var steel = new Steel(462);
@@ -1631,7 +1590,7 @@ namespace RCMembrane.Examples
 	        var reinforcement = new WebReinforcement(15, 166.43, steel, 178);
 
 	        return
-		        Membrane.Read(concrete, reinforcement, 178, considerCrackSlip);
+		        Membrane.Read(parameters, reinforcement, 178, constitutiveModel, considerCrackSlip);
         }
 
         /// <summary>
@@ -1645,7 +1604,7 @@ namespace RCMembrane.Examples
 	        var parModel = constitutiveModel == ConstitutiveModel.MCFT ? ParameterModel.MCFT : ParameterModel.DSFM;
 
 	        // Initiate concrete
-	        var concrete = new Concrete(41.6, 19, parModel, constitutiveModel);
+	        var parameters = new Parameters(41.6, 19, parModel);
 
 	        // Initiate steel for each direction
 	        var steel = new Steel(446);
@@ -1654,7 +1613,7 @@ namespace RCMembrane.Examples
 	        var reinforcement = new WebReinforcement(20, 197.31, steel, 178);
 
 	        return
-		        Membrane.Read(concrete, reinforcement, 178, considerCrackSlip);
+		        Membrane.Read(parameters, reinforcement, 178, constitutiveModel, considerCrackSlip);
         }
 
         /// <summary>
@@ -1668,7 +1627,7 @@ namespace RCMembrane.Examples
 	        var parModel = constitutiveModel == ConstitutiveModel.MCFT ? ParameterModel.MCFT : ParameterModel.DSFM;
 
 	        // Initiate concrete
-	        var concrete = new Concrete(42.4, 19, parModel, constitutiveModel);
+	        var parameters = new Parameters(42.4, 19, parModel);
 
 	        // Initiate steel for each direction
 	        var steel = new Steel(469);
@@ -1677,7 +1636,7 @@ namespace RCMembrane.Examples
 	        var reinforcement = new WebReinforcement(25, 184.96, steel, 178);
 
 	        return
-		        Membrane.Read(concrete, reinforcement, 178, considerCrackSlip);
+		        Membrane.Read(parameters, reinforcement, 178, constitutiveModel, considerCrackSlip);
         }
 
         /// <summary>
@@ -1691,7 +1650,7 @@ namespace RCMembrane.Examples
 	        var parModel = constitutiveModel == ConstitutiveModel.MCFT ? ParameterModel.MCFT : ParameterModel.DSFM;
 
 	        // Initiate concrete
-	        var concrete = new Concrete(45.2, 19, parModel, constitutiveModel);
+	        var parameters = new Parameters(45.2, 19, parModel);
 
 	        // Initiate steel for each direction
 	        var steelX = new Steel(469);
@@ -1701,7 +1660,7 @@ namespace RCMembrane.Examples
 	        var reinforcement = new WebReinforcement(15, 166.43, steelX, 10, 148.06, steelY, 178);
 
 	        return
-		        Membrane.Read(concrete, reinforcement, 178, considerCrackSlip);
+		        Membrane.Read(parameters, reinforcement, 178, constitutiveModel, considerCrackSlip);
         }
 
         /// <summary>
@@ -1715,7 +1674,7 @@ namespace RCMembrane.Examples
 	        var parModel = constitutiveModel == ConstitutiveModel.MCFT ? ParameterModel.MCFT : ParameterModel.DSFM;
 
 	        // Initiate concrete
-	        var concrete = new Concrete(44, 19, parModel, constitutiveModel);
+	        var parameters = new Parameters(44, 19, parModel);
 
 	        // Initiate steel for each direction
 	        var steelX = new Steel(446);
@@ -1725,7 +1684,7 @@ namespace RCMembrane.Examples
 	        var reinforcement = new WebReinforcement(20, 197.31, steelX, 15, 166.43, steelY, 178);
 
 	        return
-		        Membrane.Read(concrete, reinforcement, 178, considerCrackSlip);
+		        Membrane.Read(parameters, reinforcement, 178, constitutiveModel, considerCrackSlip);
         }
 
         /// <summary>
@@ -1739,7 +1698,7 @@ namespace RCMembrane.Examples
 	        var parModel = constitutiveModel == ConstitutiveModel.MCFT ? ParameterModel.MCFT : ParameterModel.DSFM;
 
 	        // Initiate concrete
-	        var concrete = new Concrete(44.7, 19, parModel, constitutiveModel);
+	        var parameters = new Parameters(44.7, 19, parModel);
 
 	        // Initiate steel for each direction
 	        var steelX = new Steel(446);
@@ -1749,7 +1708,7 @@ namespace RCMembrane.Examples
 	        var reinforcement = new WebReinforcement(20, 197.31, steelX, 10, 148.06, steelY, 178);
 
 	        return
-		        Membrane.Read(concrete, reinforcement, 178, considerCrackSlip);
+		        Membrane.Read(parameters, reinforcement, 178, constitutiveModel, considerCrackSlip);
         }
 
         /// <summary>
@@ -1763,7 +1722,7 @@ namespace RCMembrane.Examples
 	        var parModel = constitutiveModel == ConstitutiveModel.MCFT ? ParameterModel.MCFT : ParameterModel.DSFM;
 
 	        // Initiate concrete
-	        var concrete = new Concrete(44.9, 19, parModel, constitutiveModel);
+	        var parameters = new Parameters(44.9, 19, parModel);
 
 	        // Initiate steel for each direction
 	        var steelX = new Steel(469);
@@ -1773,7 +1732,7 @@ namespace RCMembrane.Examples
 	        var reinforcement = new WebReinforcement(25, 184.96, steelX, 10, 148.06, steelY, 178);
 
 	        return
-		        Membrane.Read(concrete, reinforcement, 178, considerCrackSlip);
+		        Membrane.Read(parameters, reinforcement, 178, constitutiveModel, considerCrackSlip);
         }
 
         /// <summary>
@@ -1787,7 +1746,7 @@ namespace RCMembrane.Examples
 	        var parModel = constitutiveModel == ConstitutiveModel.MCFT ? ParameterModel.MCFT : ParameterModel.DSFM;
 
 	        // Initiate concrete
-	        var concrete = new Concrete(42.8, 19, parModel, constitutiveModel);
+	        var parameters = new Parameters(42.8, 19, parModel);
 
 	        // Initiate steel for each direction
 	        var steelX = new Steel(469);
@@ -1797,7 +1756,7 @@ namespace RCMembrane.Examples
 	        var reinforcement = new WebReinforcement(25, 184.96, steelX, 15, 166.43, steelY, 178);
 
 	        return
-		        Membrane.Read(concrete, reinforcement, 178, considerCrackSlip);
+		        Membrane.Read(parameters, reinforcement, 178, constitutiveModel, considerCrackSlip);
         }
 
         /// <summary>
@@ -1811,7 +1770,7 @@ namespace RCMembrane.Examples
 	        var parModel = constitutiveModel == ConstitutiveModel.MCFT ? ParameterModel.MCFT : ParameterModel.DSFM;
 
 	        // Initiate concrete
-	        var concrete = new Concrete(42.9, 19, parModel, constitutiveModel);
+	        var parameters = new Parameters(42.9, 19, parModel);
 
 	        // Initiate steel for each direction
 	        var steelX = new Steel(469);
@@ -1821,7 +1780,7 @@ namespace RCMembrane.Examples
 	        var reinforcement = new WebReinforcement(25, 184.96, steelX, 20, 197.31, steelY, 178);
 
 	        return
-		        Membrane.Read(concrete, reinforcement, 178, considerCrackSlip);
+		        Membrane.Read(parameters, reinforcement, 178, constitutiveModel, considerCrackSlip);
         }
 
 
@@ -1842,7 +1801,7 @@ namespace RCMembrane.Examples
 	        var parModel = constitutiveModel == ConstitutiveModel.MCFT ? ParameterModel.MCFT : ParameterModel.DSFM;
 
 	        // Initiate concrete
-	        var concrete = new Concrete(98.8, 19, parModel, constitutiveModel);
+	        var parameters = new Parameters(98.8, 19, parModel);
 
 	        // Initiate steel for each direction
 	        var steel = new Steel(445, 200000);
@@ -1851,7 +1810,7 @@ namespace RCMembrane.Examples
 	        var reinforcement = new WebReinforcement(11.3, 188, steel, 178);
 
 	        return
-		        Membrane.Read(concrete, reinforcement, 178, considerCrackSlip);
+		        Membrane.Read(parameters, reinforcement, 178, constitutiveModel, considerCrackSlip);
         }
 
         /// <summary>
@@ -1865,7 +1824,7 @@ namespace RCMembrane.Examples
 	        var parModel = constitutiveModel == ConstitutiveModel.MCFT ? ParameterModel.MCFT : ParameterModel.DSFM;
 
 	        // Initiate concrete
-	        var concrete = new Concrete(95.1, 19, parModel, constitutiveModel);
+	        var parameters = new Parameters(95.1, 19, parModel);
 
 	        // Initiate steel for each direction
 	        var steel = new Steel(445, 200000);
@@ -1874,7 +1833,7 @@ namespace RCMembrane.Examples
 	        var reinforcement = new WebReinforcement(11.3, 94, steel, 178);
 
 	        return
-		        Membrane.Read(concrete, reinforcement, 178, considerCrackSlip);
+		        Membrane.Read(parameters, reinforcement, 178, constitutiveModel, considerCrackSlip);
         }
 
         /// <summary>
@@ -1888,7 +1847,7 @@ namespace RCMembrane.Examples
 	        var parModel = constitutiveModel == ConstitutiveModel.MCFT ? ParameterModel.MCFT : ParameterModel.DSFM;
 
 	        // Initiate concrete
-	        var concrete = new Concrete(98.2, 19, parModel, constitutiveModel);
+	        var parameters = new Parameters(98.2, 19, parModel);
 
 	        // Initiate steel for each direction
 	        var steel = new Steel(409, 200000);
@@ -1897,7 +1856,7 @@ namespace RCMembrane.Examples
 	        var reinforcement = new WebReinforcement(16, 94, steel, 178);
 
 	        return
-		        Membrane.Read(concrete, reinforcement, 178, considerCrackSlip);
+		        Membrane.Read(parameters, reinforcement, 178, constitutiveModel, considerCrackSlip);
         }
 
         /// <summary>
@@ -1911,7 +1870,7 @@ namespace RCMembrane.Examples
 	        var parModel = constitutiveModel == ConstitutiveModel.MCFT ? ParameterModel.MCFT : ParameterModel.DSFM;
 
 	        // Initiate concrete
-	        var concrete = new Concrete(94.6, 19, parModel, constitutiveModel);
+	        var parameters = new Parameters(94.6, 19, parModel);
 
 	        // Initiate steel for each direction
 	        var steel = new Steel(455, 200000);
@@ -1920,7 +1879,7 @@ namespace RCMembrane.Examples
 	        var reinforcement = new WebReinforcement(19.5, 94, steel, 178);
 
 	        return
-		        Membrane.Read(concrete, reinforcement, 178, considerCrackSlip);
+		        Membrane.Read(parameters, reinforcement, 178, constitutiveModel, considerCrackSlip);
         }
 
         /// <summary>
@@ -1934,7 +1893,7 @@ namespace RCMembrane.Examples
 	        var parModel = constitutiveModel == ConstitutiveModel.MCFT ? ParameterModel.MCFT : ParameterModel.DSFM;
 
 	        // Initiate concrete
-	        var concrete = new Concrete(103.1, 19, parModel, constitutiveModel);
+	        var parameters = new Parameters(103.1, 19, parModel);
 
 	        // Initiate steel for each direction
 	        var steel = new Steel(470, 200000);
@@ -1943,7 +1902,7 @@ namespace RCMembrane.Examples
 	        var reinforcement = new WebReinforcement(25.2, 94, steel, 203);
 
 	        return
-		        Membrane.Read(concrete, reinforcement, 203, considerCrackSlip);
+		        Membrane.Read(parameters, reinforcement, 203, constitutiveModel, considerCrackSlip);
         }
 
         /// <summary>
@@ -1957,7 +1916,7 @@ namespace RCMembrane.Examples
 	        var parModel = constitutiveModel == ConstitutiveModel.MCFT ? ParameterModel.MCFT : ParameterModel.DSFM;
 
 	        // Initiate concrete
-	        var concrete = new Concrete(98.2, 19, parModel, constitutiveModel);
+	        var parameters = new Parameters(98.2, 19, parModel);
 
 	        // Initiate steel for each direction
 	        var steelX = new Steel(409, 200000);
@@ -1967,7 +1926,7 @@ namespace RCMembrane.Examples
 	        var reinforcement = new WebReinforcement(16, 94, steelX, 11.3, 94, steelY, 178);
 
 	        return
-		        Membrane.Read(concrete, reinforcement, 178, considerCrackSlip);
+		        Membrane.Read(parameters, reinforcement, 178, constitutiveModel, considerCrackSlip);
         }
 
         /// <summary>
@@ -1981,7 +1940,7 @@ namespace RCMembrane.Examples
 	        var parModel = constitutiveModel == ConstitutiveModel.MCFT ? ParameterModel.MCFT : ParameterModel.DSFM;
 
 	        // Initiate concrete
-	        var concrete = new Concrete(97.6, 19, parModel, constitutiveModel);
+	        var parameters = new Parameters(97.6, 19, parModel);
 
 	        // Initiate steel for each direction
 	        var steelX = new Steel(455, 200000);
@@ -1991,7 +1950,7 @@ namespace RCMembrane.Examples
 	        var reinforcement = new WebReinforcement(19.5, 94, steelX, 11.3, 94, steelY, 178);
 
 	        return
-		        Membrane.Read(concrete, reinforcement, 178, considerCrackSlip);
+		        Membrane.Read(parameters, reinforcement, 178, constitutiveModel, considerCrackSlip);
         }
 
         /// <summary>
@@ -2005,7 +1964,7 @@ namespace RCMembrane.Examples
 	        var parModel = constitutiveModel == ConstitutiveModel.MCFT ? ParameterModel.MCFT : ParameterModel.DSFM;
 
 	        // Initiate concrete
-	        var concrete = new Concrete(102.3, 19, parModel, constitutiveModel);
+	        var parameters = new Parameters(102.3, 19, parModel);
 
 	        // Initiate steel for each direction
 	        var steelX = new Steel(470, 200000);
@@ -2015,7 +1974,7 @@ namespace RCMembrane.Examples
 	        var reinforcement = new WebReinforcement(25.2, 94, steelX, 11.3, 94, steelY, 178);
 
 	        return
-		        Membrane.Read(concrete, reinforcement, 178, considerCrackSlip);
+		        Membrane.Read(parameters, reinforcement, 178, constitutiveModel, considerCrackSlip);
         }
 
         /// <summary>
@@ -2029,7 +1988,7 @@ namespace RCMembrane.Examples
 	        var parModel = constitutiveModel == ConstitutiveModel.MCFT ? ParameterModel.MCFT : ParameterModel.DSFM;
 
 	        // Initiate concrete
-	        var concrete = new Concrete(96.9, 19, parModel, constitutiveModel);
+	        var parameters = new Parameters(96.9, 19, parModel);
 
 	        // Initiate steel for each direction
 	        var steelX = new Steel(455, 200000);
@@ -2039,7 +1998,7 @@ namespace RCMembrane.Examples
 	        var reinforcement = new WebReinforcement(19.5, 188, steelX, 11.3, 188, steelY, 178);
 
 	        return
-		        Membrane.Read(concrete, reinforcement, 178, considerCrackSlip);
+		        Membrane.Read(parameters, reinforcement, 178, constitutiveModel, considerCrackSlip);
         }
 
         #endregion
@@ -2059,7 +2018,7 @@ namespace RCMembrane.Examples
 	        var parModel = constitutiveModel == ConstitutiveModel.MCFT ? ParameterModel.MCFT : ParameterModel.DSFM;
 
 	        // Initiate concrete
-	        var concrete = new Concrete(27, 13, parModel, constitutiveModel);
+	        var parameters = new Parameters(27, 13, parModel);
 
 	        // Initiate steel for each direction
 	        var steelX = new Steel(479);
@@ -2069,7 +2028,7 @@ namespace RCMembrane.Examples
 	        var reinforcement = new WebReinforcement(11.3, 108, steelX, 19.5, 108, steelY, 287);
 
 	        return
-		        Membrane.Read(concrete, reinforcement, 287, considerCrackSlip);
+		        Membrane.Read(parameters, reinforcement, 287, constitutiveModel, considerCrackSlip);
         }
 
         /// <summary>
@@ -2083,7 +2042,7 @@ namespace RCMembrane.Examples
 	        var parModel = constitutiveModel == ConstitutiveModel.MCFT ? ParameterModel.MCFT : ParameterModel.DSFM;
 
 	        // Initiate concrete
-	        var concrete = new Concrete(28.1, 13, parModel, constitutiveModel);
+	        var parameters = new Parameters(28.1, 13, parModel);
 
 	        // Initiate steel for each direction
 	        var steelX = new Steel(486);
@@ -2093,7 +2052,7 @@ namespace RCMembrane.Examples
 	        var reinforcement = new WebReinforcement(11.3, 108, steelX, 16, 108, steelY, 287);
 
 	        return
-		        Membrane.Read(concrete, reinforcement, 287, considerCrackSlip);
+		        Membrane.Read(parameters, reinforcement, 287, constitutiveModel, considerCrackSlip);
         }
 
         /// <summary>
@@ -2107,7 +2066,7 @@ namespace RCMembrane.Examples
 	        var parModel = constitutiveModel == ConstitutiveModel.MCFT ? ParameterModel.MCFT : ParameterModel.DSFM;
 
 	        // Initiate concrete
-	        var concrete = new Concrete(27.7, 13, parModel, constitutiveModel);
+	        var parameters = new Parameters(27.7, 13, parModel);
 
 	        // Initiate steel for each direction
 	        var steelX = new Steel(480);
@@ -2117,7 +2076,7 @@ namespace RCMembrane.Examples
 	        var reinforcement = new WebReinforcement(11.3, 108, steelX, 11.3, 108, steelY, 287);
 
 	        return
-		        Membrane.Read(concrete, reinforcement, 287, considerCrackSlip);
+		        Membrane.Read(parameters, reinforcement, 287, constitutiveModel, considerCrackSlip);
         }
 
 
@@ -2138,17 +2097,17 @@ namespace RCMembrane.Examples
 	        var parModel = constitutiveModel == ConstitutiveModel.MCFT ? ParameterModel.MCFT : ParameterModel.DSFM;
 
 	        // Initiate concrete
-	        var concrete = new Concrete(25.1, 10, parModel, constitutiveModel);
+	        var parameters = new Parameters(25.1, 10, parModel);
 
 	        // Initiate steel for each direction
 	        var steelX = new Steel(500, 196800);
-	        var steelY = steelX.Copy();
+	        var steelY = steelX.Clone();
 
 	        // Get reinforcement
 	        var reinforcement = new WebReinforcement(5.72, 44.5, steelX, 5.72, 89, steelY, 70);
 
 	        return
-		        Membrane.Read(concrete, reinforcement, 70, considerCrackSlip);
+		        Membrane.Read(parameters, reinforcement, 70, constitutiveModel, considerCrackSlip);
         }
 
         /// <summary>
@@ -2162,17 +2121,17 @@ namespace RCMembrane.Examples
 	        var parModel = constitutiveModel == ConstitutiveModel.MCFT ? ParameterModel.MCFT : ParameterModel.DSFM;
 
 	        // Initiate concrete
-	        var concrete = new Concrete(27.9, 10, parModel, constitutiveModel);
+	        var parameters = new Parameters(27.9, 10, parModel);
 
 	        // Initiate steel for each direction
 	        var steelX = new Steel(500, 196800);
-	        var steelY = steelX.Copy();
+	        var steelY = steelX.Clone();
 
 	        // Get reinforcement
 	        var reinforcement = new WebReinforcement(5.72, 44.5, steelX, 5.72, 89, steelY, 70);
 
 	        return
-		        Membrane.Read(concrete, reinforcement, 70, considerCrackSlip);
+		        Membrane.Read(parameters, reinforcement, 70, constitutiveModel, considerCrackSlip);
         }
 
         /// <summary>
@@ -2186,17 +2145,17 @@ namespace RCMembrane.Examples
 	        var parModel = constitutiveModel == ConstitutiveModel.MCFT ? ParameterModel.MCFT : ParameterModel.DSFM;
 
 	        // Initiate concrete
-	        var concrete = new Concrete(24.9, 10, parModel, constitutiveModel);
+	        var parameters = new Parameters(24.9, 10, parModel);
 
 	        // Initiate steel for each direction
 	        var steelX = new Steel(260, 202700);
-	        var steelY = steelX.Copy();
+	        var steelY = steelX.Clone();
 
 	        // Get reinforcement
 	        var reinforcement = new WebReinforcement(5.72, 44.5, steelX, 5.72, 89, steelY, 70);
 
 	        return
-		        Membrane.Read(concrete, reinforcement, 70, considerCrackSlip);
+		        Membrane.Read(parameters, reinforcement, 70, constitutiveModel, considerCrackSlip);
         }
 
         /// <summary>
@@ -2210,17 +2169,17 @@ namespace RCMembrane.Examples
 	        var parModel = constitutiveModel == ConstitutiveModel.MCFT ? ParameterModel.MCFT : ParameterModel.DSFM;
 
 	        // Initiate concrete
-	        var concrete = new Concrete(28.7, 10, parModel, constitutiveModel);
+	        var parameters = new Parameters(28.7, 10, parModel);
 
 	        // Initiate steel for each direction
 	        var steelX = new Steel(390, 195000);
-	        var steelY = steelX.Copy();
+	        var steelY = steelX.Clone();
 
 	        // Get reinforcement
 	        var reinforcement = new WebReinforcement(5.72, 44.5, steelX, 5.72, 89, steelY, 70);
 
 	        return
-		        Membrane.Read(concrete, reinforcement, 70, considerCrackSlip);
+		        Membrane.Read(parameters, reinforcement, 70, constitutiveModel, considerCrackSlip);
         }
 
         #endregion

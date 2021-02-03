@@ -34,7 +34,7 @@ namespace RCMembrane
 		public StrainState AverageStrains { get; protected set; }
 
 		/// <summary>
-		///     Get average <see cref="StressState" />, in MPa.
+		///     Get average <see cref="StressState" />.
 		/// </summary>
 		public StressState AverageStresses  => Reinforcement is null ? Concrete.Stresses : Concrete.Stresses + Reinforcement.Stresses;
 
@@ -51,6 +51,7 @@ namespace RCMembrane
 		/// <summary>
 		///     Get initial <see cref="Membrane" /> stiffness <see cref="Matrix" />.
 		/// </summary>
+		/// <inheritdoc cref="BiaxialConcrete.InitialStiffness"/>
 		public Matrix<double> InitialStiffness => Reinforcement is null ? Concrete.InitialStiffness : Concrete.InitialStiffness + Reinforcement.InitialStiffness;
 
 		/// <summary>
@@ -110,21 +111,21 @@ namespace RCMembrane
 		/// <summary>
 		///     Read membrane element based on concrete constitutive model.
 		/// </summary>
-		/// <param name="concreteParameters">Concrete <see cref="Parameters" /> object.</param>
+		/// <param name="concreteParameters">Concrete <see cref="IParameters" /> object.</param>
 		/// <param name="reinforcement"><see cref="WebReinforcement" /> object .</param>
 		/// <param name="width">The width of cross-section, in mm.</param>
 		/// <param name="considerCrackSlip">Consider crack slip? Only for <see cref="DSFMMembrane" /> (default: true)</param>
-		public static Membrane Read(Parameters concreteParameters, WebReinforcement? reinforcement, double width, ConstitutiveModel model = ConstitutiveModel.MCFT, bool considerCrackSlip = true) =>
+		public static Membrane Read(IParameters concreteParameters, WebReinforcement? reinforcement, double width, ConstitutiveModel model = ConstitutiveModel.MCFT, bool considerCrackSlip = true) =>
 			Read(concreteParameters, reinforcement, Length.FromMillimeters(width), model, considerCrackSlip);
 
 		/// <summary>
 		///     Read membrane element based on concrete constitutive model.
 		/// </summary>
-		/// <param name="concreteParameters">Concrete <see cref="Parameters" /> object.</param>
+		/// <param name="concreteParameters">Concrete <see cref="IParameters" /> object.</param>
 		/// <param name="reinforcement"><see cref="WebReinforcement" /> object .</param>
 		/// <param name="width">The width of cross-section.</param>
 		/// <param name="considerCrackSlip">Consider crack slip? Only for <see cref="DSFMMembrane" /> (default: true)</param>
-		public static Membrane Read(Parameters concreteParameters, WebReinforcement? reinforcement, Length width, ConstitutiveModel model = ConstitutiveModel.MCFT, bool considerCrackSlip = true)
+		public static Membrane Read(IParameters concreteParameters, WebReinforcement? reinforcement, Length width, ConstitutiveModel model = ConstitutiveModel.MCFT, bool considerCrackSlip = true)
 		{
 			if (model is ConstitutiveModel.MCFT)
 				return new MCFTMembrane(concreteParameters, reinforcement, width);
