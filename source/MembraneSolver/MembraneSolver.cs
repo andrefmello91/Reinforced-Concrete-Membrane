@@ -166,11 +166,11 @@ namespace RCMembrane.Solver
 		public static void SolverExample()
 		{
 			// Initiate the membrane
-			var membraneMCFT = PV10();
-			var membraneDSFM = PV10(ConstitutiveModel.DSFM);
+			var membraneMCFT = PHS10();
+			var membraneDSFM = PHS10(ConstitutiveModel.DSFM);
 
 			// Initiate stresses
-			var sigma = new StressState(0, 0, 5);
+			var sigma = new StressState(2.5, 2.5, 10);
 
 			// Initiate solvers
 			var mcftSolver = new MembraneSolver(membraneMCFT);
@@ -185,8 +185,8 @@ namespace RCMembrane.Solver
 			dsfmSolver.OutputResults(out var dsfmFile);
 
 			Console.WriteLine("Done! Press any key to exit.");
-			Process.Start(mcftFile);
-			Process.Start(dsfmFile);
+			//Process.Start(mcftFile);
+			//Process.Start(dsfmFile);
 			Console.ReadKey();
 		}
 
