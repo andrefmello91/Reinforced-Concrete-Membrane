@@ -137,24 +137,37 @@ namespace RCMembrane
 		///     Calculate the average crack opening.
 		/// </summary>
 		/// <param name="membrane">The <see cref="Membrane" /> object.</param>
-		public static Length CrackOpening(Membrane membrane) =>
-			membrane.Concrete.PrincipalStrains.Epsilon1 <= 0 || membrane.Concrete.PrincipalStrains.Epsilon1.ApproxZero(1E-9)
+		public static Length CrackOpening(Membrane membrane) => CrackOpening(membrane.Reinforcement, membrane.Concrete.PrincipalStrains);
+
+		/// <summary>
+		///     Calculate the average crack opening.
+		/// </summary>
+		/// <param name="reinforcement">The <see cref="WebReinforcement" /> object.</param>
+		/// <param name="concreteStrains">The <see cref="PrincipalStrainState"/> in concrete.</param>
+		public static Length CrackOpening(WebReinforcement? reinforcement, PrincipalStrainState concreteStrains) =>
+			concreteStrains.Epsilon1 <= 0 || concreteStrains.Epsilon1.ApproxZero(1E-9)
 				? Length.Zero
-				: membrane.Concrete.PrincipalStrains.Epsilon1 * CrackSpacing(membrane);
+				: concreteStrains.Epsilon1 * CrackSpacing(reinforcement, concreteStrains);
 
 		/// <summary>
 		///     Calculate the crack spacing in principal strain direction.
 		/// </summary>
-		/// <inheritdoc cref="CrackOpening" />
-		public static Length CrackSpacing(Membrane membrane)
+		/// <inheritdoc cref="CrackOpening(Membrane)" />
+		public static Length CrackSpacing(Membrane membrane) => CrackSpacing(membrane.Reinforcement, membrane.Concrete.PrincipalStrains);
+
+		/// <summary>
+		///     Calculate the crack spacing in principal strain direction.
+		/// </summary>
+		/// <inheritdoc cref="CrackOpening(WebReinforcement, PrincipalStrainState)" />
+		public static Length CrackSpacing(WebReinforcement? reinforcement, PrincipalStrainState concreteStrains)
 		{
 			// Get the angles
-			var (cosThetaC, sinThetaC) = membrane.Concrete.PrincipalStrains.Theta1.DirectionCosines(true);
+			var (cosThetaC, sinThetaC) = concreteStrains.Theta1.DirectionCosines(true);
 
 			// Calculate crack spacings in X and Y
 			double
-				smx = membrane.Reinforcement?.DirectionX?.CrackSpacing().Millimeters ?? 21,
-				smy = membrane.Reinforcement?.DirectionY?.CrackSpacing().Millimeters ?? 21,
+				smx = reinforcement?.DirectionX?.CrackSpacing().Millimeters ?? 21,
+				smy = reinforcement?.DirectionY?.CrackSpacing().Millimeters ?? 21,
 				sm = 1.00 / (sinThetaC / smx + cosThetaC / smy);
 
 			// Calculate crack spacing
