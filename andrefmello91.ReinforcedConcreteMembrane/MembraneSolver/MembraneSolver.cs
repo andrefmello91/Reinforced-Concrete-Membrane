@@ -1,14 +1,15 @@
 ﻿using System;
-using System.Diagnostics;
+using andrefmello91.Material.Concrete;
+using andrefmello91.OnPlaneComponents.Strain;
+using andrefmello91.OnPlaneComponents.Stress;
+using andrefmello91.ReinforcedConcreteMembrane.Examples;
 using Extensions;
-using Material.Concrete;
 using MathNet.Numerics.Data.Text;
 using MathNet.Numerics.LinearAlgebra;
 using MathNet.Numerics.LinearAlgebra.Double;
-using OnPlaneComponents;
-using static RCMembrane.Examples.PanelExamples;
+using static andrefmello91.ReinforcedConcreteMembrane.Examples.PanelExamples;
 
-namespace RCMembrane.Solver
+namespace andrefmello91.ReinforcedConcreteMembrane.Solver
 {
 	/// <summary>
 	///     Simple solver class.

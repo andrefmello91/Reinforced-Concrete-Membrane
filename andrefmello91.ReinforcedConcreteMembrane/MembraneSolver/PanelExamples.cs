@@ -1,8 +1,7 @@
-﻿using Material.Concrete;
-using Material.Reinforcement;
-using Material.Reinforcement.Biaxial;
+﻿using andrefmello91.Material.Concrete;
+using andrefmello91.Material.Reinforcement;
 
-namespace RCMembrane.Examples
+namespace andrefmello91.ReinforcedConcreteMembrane.Examples
 {
     /// <summary>
     /// Class with some panel examples.

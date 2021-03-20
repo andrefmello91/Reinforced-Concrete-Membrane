@@ -1,20 +1,20 @@
 ﻿using System;
 using System.Linq;
+using andrefmello91.Material.Concrete;
+using andrefmello91.Material.Reinforcement;
+using andrefmello91.OnPlaneComponents.Strain;
+using andrefmello91.OnPlaneComponents.Stress;
 using Extensions;
-using Material.Concrete;
-using Material.Concrete.Biaxial;
-using Material.Reinforcement.Biaxial;
 using MathNet.Numerics;
 using MathNet.Numerics.LinearAlgebra;
 using MathNet.Numerics.LinearAlgebra.Double;
-using OnPlaneComponents;
 using UnitsNet;
 using UnitsNet.Units;
 using static Extensions.UnitExtensions;
 
 #nullable enable
 
-namespace RCMembrane
+namespace andrefmello91.ReinforcedConcreteMembrane
 {
 	/// <summary>
 	///     Membrane element base class.

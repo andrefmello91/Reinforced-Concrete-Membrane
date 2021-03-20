@@ -1,12 +1,13 @@
-﻿using Material.Concrete;
-using Material.Reinforcement.Biaxial;
-using OnPlaneComponents;
+﻿using andrefmello91.Material.Concrete;
+using andrefmello91.Material.Reinforcement;
+using andrefmello91.OnPlaneComponents.Strain;
+using andrefmello91.OnPlaneComponents.Stress;
 using UnitsNet;
 using UnitsNet.Units;
 
 #nullable enable
 
-namespace RCMembrane
+namespace andrefmello91.ReinforcedConcreteMembrane
 {
 	/// <summary>
 	///     MCFT class, based on formulation by Vecchio and Collins (1986).

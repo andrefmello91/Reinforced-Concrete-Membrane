@@ -1,16 +1,17 @@
 ﻿using System;
+using andrefmello91.Material.Concrete;
+using andrefmello91.Material.Reinforcement;
+using andrefmello91.OnPlaneComponents.Strain;
+using andrefmello91.OnPlaneComponents.Stress;
 using Extensions;
-using Material.Concrete;
-using Material.Reinforcement.Biaxial;
 using MathNet.Numerics;
 using MathNet.Numerics.RootFinding;
-using OnPlaneComponents;
 using UnitsNet;
 using UnitsNet.Units;
 
 #nullable enable
 
-namespace RCMembrane
+namespace andrefmello91.ReinforcedConcreteMembrane
 {
 	/// <summary>
 	///     DSFM class, based on formulation by Vecchio (2000).
