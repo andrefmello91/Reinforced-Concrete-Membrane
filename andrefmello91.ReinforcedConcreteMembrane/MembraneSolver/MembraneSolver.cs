@@ -1,15 +1,14 @@
 ﻿using System;
 using andrefmello91.Material.Concrete;
+using andrefmello91.Material.Reinforcement;
 using andrefmello91.OnPlaneComponents.Strain;
 using andrefmello91.OnPlaneComponents.Stress;
-using andrefmello91.ReinforcedConcreteMembrane.Examples;
 using Extensions;
 using MathNet.Numerics.Data.Text;
 using MathNet.Numerics.LinearAlgebra;
 using MathNet.Numerics.LinearAlgebra.Double;
-using static andrefmello91.ReinforcedConcreteMembrane.Examples.PanelExamples;
 
-namespace andrefmello91.ReinforcedConcreteMembrane.Solver
+namespace andrefmello91.ReinforcedConcreteMembrane
 {
 	/// <summary>
 	///     Simple solver class.
@@ -166,9 +165,16 @@ namespace andrefmello91.ReinforcedConcreteMembrane.Solver
 		/// </summary>
 		public static void SolverExample()
 		{
+
+			// Initiate steel for each direction
+			var steelXY = new Steel(276, 200000);
+
+			// Get reinforcement
+			var reinforcement = new WebReinforcement(6.35, 50.55, steelXY, 4.7, 49.57, steelXY.Clone(), 70);
+
 			// Initiate the membrane
-			var membraneMCFT = PHS10();
-			var membraneDSFM = PHS10(ConstitutiveModel.DSFM);
+			var membraneMCFT = new MCFTMembrane(new Parameters(14.5, 6, ParameterModel.MCFT), reinforcement, 70);
+			var membraneDSFM = new MCFTMembrane(new Parameters(14.5, 6, ParameterModel.DSFM), reinforcement.Clone(), 70);
 
 			// Initiate stresses
 			var sigma = new StressState(2.5, 2.5, 10);
