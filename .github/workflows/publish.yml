@@ -28,3 +28,9 @@ jobs:
       with:   
        PROJECT_FILE_PATH: andrefmello91.ReinforcedConcreteMembrane/andrefmello91.ReinforcedConcreteMembrane.csproj  
        NUGET_KEY: ${{secrets.NUGET_API_KEY}} 
+    - name: PublishGitHub  
+      uses: Rebel028/publish-nuget@2.6.1  
+      with:   
+       PROJECT_FILE_PATH: andrefmello91.ReinforcedConcreteMembrane/andrefmello91.ReinforcedConcreteMembrane.csproj
+       NUGET_SOURCE: https://nuget.pkg.github.com/andrefmello91
+       NUGET_KEY: ${{secrets.NUGET_GITHUB_KEY}}
