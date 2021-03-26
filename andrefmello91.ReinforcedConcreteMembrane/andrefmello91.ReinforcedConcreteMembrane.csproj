@@ -5,17 +5,17 @@
         <LangVersion>9.0</LangVersion>
         <Nullable>enable</Nullable>
         <PackageId>andrefmello91.ReinforcedConcreteMembrane</PackageId>
-        <Version>1.0.1</Version>
+        <Version>1.0.2</Version>
         <Authors>andrefmello91</Authors>
         <PackageDescription>Library for nonlinear analysis of reinforced concrete membrane elements by Modified Compression Field Theory (VECCHIO; COLLINS, 1986) and Disturbed Stress Field Model (VECCHIO, 2000)..</PackageDescription>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile>
-        <PackageVersion>1.0.1</PackageVersion>
+        <PackageVersion>1.0.2</PackageVersion>
         <Description>Library for nonlinear analysis of reinforced concrete membrane elements by Modified Compression Field Theory (VECCHIO; COLLINS, 1986) and Disturbed Stress Field Model (VECCHIO, 2000).</Description>
         <RepositoryUrl>https://github.com/andrefmello91/Reinforced-Concrete-Membrane</RepositoryUrl>
         <PackageProjectUrl>https://github.com/andrefmello91/Reinforced-Concrete-Membrane</PackageProjectUrl>
-        <PackageReleaseNotes>Added documentation to package.</PackageReleaseNotes>
+        <PackageReleaseNotes>Updated material package.</PackageReleaseNotes>
         <AssemblyName>andrefmello91.ReinforcedConcreteMembrane</AssemblyName>
         <RootNamespace>andrefmello91.ReinforcedConcreteMembrane</RootNamespace>
     </PropertyGroup>
@@ -26,7 +26,7 @@
         <PackageReference Include="UnitsNet" Version="4.87.0" />
         <PackageReference Include="andrefmello91.Extensions" Version="1.0.2" />
         <PackageReference Include="andrefmello91.OnPlaneComponents" Version="1.0.1" />
-        <PackageReference Include="andrefmello91.Material" Version="1.0.1" />
+        <PackageReference Include="andrefmello91.Material" Version="1.0.2" />
     </ItemGroup>
 
 </Project>
