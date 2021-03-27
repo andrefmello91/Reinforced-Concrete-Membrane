@@ -1,9 +1,8 @@
 ﻿using System;
 using andrefmello91.Material.Concrete;
 using andrefmello91.Material.Reinforcement;
-using andrefmello91.OnPlaneComponents.Strain;
-using andrefmello91.OnPlaneComponents.Stress;
-using Extensions;
+using andrefmello91.OnPlaneComponents;
+using andrefmello91.Extensions;
 using MathNet.Numerics;
 using MathNet.Numerics.RootFinding;
 using UnitsNet;
@@ -106,6 +105,7 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 				CrackCheck();
 		}
 
+		/// <inheritdoc />
 		public override Membrane Clone() => new DSFMMembrane(Concrete.Parameters, Reinforcement?.Clone(), Width, ConsiderCrackSlip);
 
 		/// <summary>
@@ -339,15 +339,10 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 				(yxy * cos2ThetaS + (ey - ex) * sin2ThetaS).Abs();
 		}
 
-		/// <summary>
-		///     Compare two <see cref="DSFMMembrane" /> objects.
-		///     <para>Returns true if <see cref="Membrane.Concrete" /> and <see cref="Membrane.Concrete" /> are equal.</para>
-		/// </summary>
-		/// <param name="other">The other <see cref="DSFMMembrane" /> object.</param>
-		public virtual bool Equals(DSFMMembrane? other) => !(other is null) && base.Equals(other);
-
+		/// <inheritdoc />
 		public override bool Equals(object? obj) => obj is DSFMMembrane other && base.Equals(other);
 
+		/// <inheritdoc />
 		public override int GetHashCode() => base.GetHashCode();
 
 		#endregion

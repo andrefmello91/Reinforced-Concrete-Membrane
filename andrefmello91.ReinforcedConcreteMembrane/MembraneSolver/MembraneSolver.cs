@@ -1,9 +1,8 @@
 ﻿using System;
 using andrefmello91.Material.Concrete;
 using andrefmello91.Material.Reinforcement;
-using andrefmello91.OnPlaneComponents.Strain;
-using andrefmello91.OnPlaneComponents.Stress;
-using Extensions;
+using andrefmello91.OnPlaneComponents;
+using andrefmello91.Extensions;
 using MathNet.Numerics.Data.Text;
 using MathNet.Numerics.LinearAlgebra;
 using MathNet.Numerics.LinearAlgebra.Double;

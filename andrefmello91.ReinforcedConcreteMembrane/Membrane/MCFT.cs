@@ -1,7 +1,6 @@
 ﻿using andrefmello91.Material.Concrete;
 using andrefmello91.Material.Reinforcement;
-using andrefmello91.OnPlaneComponents.Strain;
-using andrefmello91.OnPlaneComponents.Stress;
+using andrefmello91.OnPlaneComponents;
 using UnitsNet;
 using UnitsNet.Units;
 
@@ -63,17 +62,13 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 			CrackCheck();
 		}
 
+		/// <inheritdoc />
 		public override Membrane Clone() => new MCFTMembrane(Concrete.Parameters, Reinforcement?.Clone(), Width);
 
-		/// <summary>
-		///     Compare two <see cref="MCFTMembrane" /> objects.
-		///     <para>Returns true if <see cref="Membrane.Concrete" /> and <see cref="Membrane.Reinforcement" /> are equal.</para>
-		/// </summary>
-		/// <param name="other">The other <see cref="MCFTMembrane" /> object.</param>
-		public virtual bool Equals(MCFTMembrane other) => !(other is null) && base.Equals(other);
+		/// <inheritdoc />
+		public override bool Equals(object? obj) => obj is MCFTMembrane other && base.Equals(other);
 
-		public override bool Equals(object obj) => obj is MCFTMembrane other && base.Equals(other);
-
+		/// <inheritdoc />
 		public override int GetHashCode() => base.GetHashCode();
 
 		#endregion

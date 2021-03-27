@@ -2,15 +2,14 @@
 using System.Linq;
 using andrefmello91.Material.Concrete;
 using andrefmello91.Material.Reinforcement;
-using andrefmello91.OnPlaneComponents.Strain;
-using andrefmello91.OnPlaneComponents.Stress;
-using Extensions;
+using andrefmello91.OnPlaneComponents;
+using andrefmello91.Extensions;
 using MathNet.Numerics;
 using MathNet.Numerics.LinearAlgebra;
 using MathNet.Numerics.LinearAlgebra.Double;
 using UnitsNet;
 using UnitsNet.Units;
-using static Extensions.UnitExtensions;
+using static andrefmello91.Extensions.UnitExtensions;
 
 #nullable enable
 
@@ -36,7 +35,9 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 		/// <summary>
 		///     Get average <see cref="StressState" />.
 		/// </summary>
-		public StressState AverageStresses  => Reinforcement is null ? Concrete.Stresses : Concrete.Stresses + Reinforcement.Stresses;
+		public StressState AverageStresses  => Reinforcement is null 
+			? Concrete.Stresses 
+			: Concrete.Stresses + Reinforcement.Stresses;
 
 		/// <summary>
 		///     Get <see cref="BiaxialConcrete" /> of the membrane element.
@@ -52,7 +53,9 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 		///     Get initial <see cref="Membrane" /> stiffness <see cref="Matrix" />.
 		/// </summary>
 		/// <inheritdoc cref="BiaxialConcrete.InitialStiffness"/>
-		public Matrix<double> InitialStiffness => Reinforcement is null ? Concrete.InitialStiffness : Concrete.InitialStiffness + Reinforcement.InitialStiffness;
+		public Matrix<double> InitialStiffness => Reinforcement is null 
+			? Concrete.InitialStiffness 
+			: Concrete.InitialStiffness + Reinforcement.InitialStiffness;
 
 		/// <summary>
 		///     Get reference length.
@@ -249,6 +252,7 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 			return Pressure.FromMegapascals(vcimax);
 		}
 
+		/// <inheritdoc />
 		public abstract Membrane Clone();
 
 		/// <inheritdoc cref="CrackSpacing" />
@@ -262,16 +266,19 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 		///     <para>Returns true if <see cref="Concrete" /> and <see cref="Reinforcement" /> are equal.</para>
 		/// </summary>
 		/// <param name="other">The other <see cref="Membrane" /> object.</param>
-		public virtual bool Equals(Membrane? other) => !(other is null) && Concrete == other.Concrete && Reinforcement == other.Reinforcement;
+		public bool Equals(Membrane? other) => !(other is null) && Concrete == other.Concrete && Reinforcement == other.Reinforcement;
 
+		/// <inheritdoc />
 		public override string ToString() =>
 			"Membrane\n" +
 			$"Width = {Width}\n" +
 			$"{Concrete}\n" +
 			$"{Reinforcement}\n";
 
+		/// <inheritdoc />
 		public override bool Equals(object? obj) => obj is Membrane other && Equals(other);
 
+		/// <inheritdoc />
 		public override int GetHashCode() => Concrete.GetHashCode() + Reinforcement.GetHashCode();
 
 		#endregion
@@ -281,12 +288,12 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 		/// <summary>
 		///     Returns true if parameters and constitutive model are equal.
 		/// </summary>
-		public static bool operator == (Membrane left, Membrane right) => !(left is null) && left.Equals(right);
+		public static bool operator ==(Membrane? left, Membrane? right) => left.IsEqualTo(right);
 
 		/// <summary>
 		///     Returns true if parameters and constitutive model are different.
 		/// </summary>
-		public static bool operator != (Membrane left, Membrane right) => !(left is null) && !left.Equals(right);
+		public static bool operator != (Membrane? left, Membrane? right) => left.IsNotEqualTo(right);
 
 		#endregion
 	}
