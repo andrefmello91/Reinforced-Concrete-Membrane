@@ -63,7 +63,7 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 
 		/// <summary>
 		///     Current iteration.
-		/// </summary
+		/// </summary>
 		private int _iteration;
 
 		/// <summary>
@@ -88,7 +88,7 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 
 		/// <summary>
 		///     Maximum number of iterations.
-		/// </summary
+		/// </summary>
 		private int _maxIterations;
 
 		/// <summary>
@@ -123,7 +123,7 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 
 		/// <summary>
 		///     Convergence tolerance.
-		/// </summary
+		/// </summary>
 		private double _tolerance;
 
 		#endregion
@@ -176,7 +176,7 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 			var membraneDSFM = new MCFTMembrane(new Parameters(14.5, 6, ParameterModel.DSFM), reinforcement.Clone(), 70);
 
 			// Initiate stresses
-			var sigma = new StressState(2.5, 2.5, 10);
+			var sigma = new StressState(0, 0, 5);
 
 			// Initiate solvers
 			var mcftSolver = new MembraneSolver(membraneMCFT);
