@@ -173,7 +173,7 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 
 			// Initiate the membrane
 			var membraneMCFT = new MCFTMembrane(new Parameters(14.5, 6, ParameterModel.MCFT), reinforcement, 70);
-			var membraneDSFM = new MCFTMembrane(new Parameters(14.5, 6, ParameterModel.DSFM), reinforcement.Clone(), 70);
+			var membraneDSFM = new DSFMMembrane(new Parameters(14.5, 6, ParameterModel.DSFM), reinforcement.Clone(), 70);
 
 			// Initiate stresses
 			var sigma = new StressState(0, 0, 5);
