@@ -17,20 +17,14 @@ jobs:
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: 5.0.x
-    - name: Restore dependencies
-      run: dotnet restore
-    - name: Build
-      run: dotnet build --no-restore
-    - name: Test
-      run: dotnet test --no-build --verbosity normal
-    - name: Publish  
-      uses: brandedoutcast/publish-nuget@v2.5.2  
-      with:   
-       PROJECT_FILE_PATH: andrefmello91.ReinforcedConcreteMembrane/andrefmello91.ReinforcedConcreteMembrane.csproj  
-       NUGET_KEY: ${{secrets.NUGET_API_KEY}} 
     - name: PublishGitHub  
       uses: Rebel028/publish-nuget@2.6.1  
       with:   
        PROJECT_FILE_PATH: andrefmello91.ReinforcedConcreteMembrane/andrefmello91.ReinforcedConcreteMembrane.csproj
        NUGET_SOURCE: https://nuget.pkg.github.com/andrefmello91
        NUGET_KEY: ${{secrets.NUGET_GITHUB_KEY}}
+    - name: Publish  
+      uses: brandedoutcast/publish-nuget@v2.5.5  
+      with:   
+       PROJECT_FILE_PATH: andrefmello91.ReinforcedConcreteMembrane/andrefmello91.ReinforcedConcreteMembrane.csproj 
+       NUGET_KEY: ${{secrets.NUGET_API_KEY}}
