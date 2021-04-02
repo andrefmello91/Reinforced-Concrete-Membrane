@@ -9,7 +9,7 @@ using MathNet.Numerics.LinearAlgebra;
 using MathNet.Numerics.LinearAlgebra.Double;
 using UnitsNet;
 using UnitsNet.Units;
-using static andrefmello91.Extensions.UnitExtensions;
+using static UnitsNet.UnitMath;
 
 #nullable enable
 
