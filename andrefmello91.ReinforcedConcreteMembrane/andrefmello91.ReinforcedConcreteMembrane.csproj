@@ -5,17 +5,17 @@
         <LangVersion>9.0</LangVersion>
         <Nullable>enable</Nullable>
         <PackageId>andrefmello91.ReinforcedConcreteMembrane</PackageId>
-        <Version>1.0.7</Version>
+        <Version>1.0.8-beta1</Version>
         <Authors>andrefmello91</Authors>
         <PackageDescription>Library for nonlinear analysis of reinforced concrete membrane elements by Modified Compression Field Theory (VECCHIO; COLLINS, 1986) and Disturbed Stress Field Model (VECCHIO, 2000)..</PackageDescription>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile>
-        <PackageVersion>1.0.7</PackageVersion>
+        <PackageVersion>1.0.8-beta1</PackageVersion>
         <Description>Library for nonlinear analysis of reinforced concrete membrane elements by Modified Compression Field Theory (VECCHIO; COLLINS, 1986) and Disturbed Stress Field Model (VECCHIO, 2000).</Description>
         <RepositoryUrl>https://github.com/andrefmello91/Reinforced-Concrete-Membrane</RepositoryUrl>
         <PackageProjectUrl>https://github.com/andrefmello91/Reinforced-Concrete-Membrane</PackageProjectUrl>
-        <PackageReleaseNotes>Updated solver example.</PackageReleaseNotes>
+        <PackageReleaseNotes>Updated extensions and onplanecomponents packages.</PackageReleaseNotes>
         <AssemblyName>andrefmello91.ReinforcedConcreteMembrane</AssemblyName>
         <RootNamespace>andrefmello91.ReinforcedConcreteMembrane</RootNamespace>
     </PropertyGroup>
@@ -26,7 +26,7 @@
         <PackageReference Include="MathNet.Numerics.Data.Text" Version="4.1.0" />
         <PackageReference Include="UnitsNet" Version="4.87.0" />
         <PackageReference Include="andrefmello91.Extensions" Version="1.0.3" />
-        <PackageReference Include="andrefmello91.OnPlaneComponents" Version="1.0.5" />
+        <PackageReference Include="andrefmello91.OnPlaneComponents" Version="1.0.6" />
     </ItemGroup>
 
 </Project>
