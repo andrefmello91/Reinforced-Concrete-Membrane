@@ -4,29 +4,41 @@
         <TargetFrameworks>net5.0;netcoreapp3.1;netstandard2.0</TargetFrameworks>
         <LangVersion>9.0</LangVersion>
         <Nullable>enable</Nullable>
-        <PackageId>andrefmello91.ReinforcedConcreteMembrane</PackageId>
-        <Version>1.0.8-beta2</Version>
+        <Version>1.0.8</Version>
         <Authors>andrefmello91</Authors>
-        <PackageDescription>Library for nonlinear analysis of reinforced concrete membrane elements by Modified Compression Field Theory (VECCHIO; COLLINS, 1986) and Disturbed Stress Field Model (VECCHIO, 2000)..</PackageDescription>
-        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile>
-        <PackageVersion>1.0.8-beta2</PackageVersion>
         <Description>Library for nonlinear analysis of reinforced concrete membrane elements by Modified Compression Field Theory (VECCHIO; COLLINS, 1986) and Disturbed Stress Field Model (VECCHIO, 2000).</Description>
         <RepositoryUrl>https://github.com/andrefmello91/Reinforced-Concrete-Membrane</RepositoryUrl>
-        <PackageProjectUrl>https://github.com/andrefmello91/Reinforced-Concrete-Membrane</PackageProjectUrl>
-        <PackageReleaseNotes>Updated extensions and onplanecomponents packages.</PackageReleaseNotes>
         <AssemblyName>andrefmello91.ReinforcedConcreteMembrane</AssemblyName>
         <RootNamespace>andrefmello91.ReinforcedConcreteMembrane</RootNamespace>
     </PropertyGroup>
+    
+    <PropertyGroup Condition="'$(Configuration)'=='Release'">
+        <PackageId>andrefmello91.ReinforcedConcreteMembrane</PackageId>
+        <PackageDescription>Library for nonlinear analysis of reinforced concrete membrane elements by Modified Compression Field Theory (VECCHIO; COLLINS, 1986) and Disturbed Stress Field Model (VECCHIO, 2000)..</PackageDescription>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <PackageVersion>1.0.8</PackageVersion>
+        <PackageReleaseNotes>Updated extensions and onplanecomponents packages.</PackageReleaseNotes>
+    </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="andrefmello91.Material" Version="1.0.7-beta1" />
         <PackageReference Include="MathNet.Numerics" Version="4.15.0" />
         <PackageReference Include="MathNet.Numerics.Data.Text" Version="4.1.0" />
         <PackageReference Include="UnitsNet" Version="4.87.0" />
-        <PackageReference Include="andrefmello91.Extensions" Version="1.0.4-beta1" />
-        <PackageReference Include="andrefmello91.OnPlaneComponents" Version="1.0.7-beta1" />
     </ItemGroup>
+
+    <ItemGroup Condition="'$(Configuration)'=='Release'">
+        <PackageReference Include="andrefmello91.Extensions" Version="1.0.4" />
+        <PackageReference Include="andrefmello91.OnPlaneComponents" Version="1.0.7" />
+        <PackageReference Include="andrefmello91.Material" Version="1.0.7" />
+    </ItemGroup>
+
+    <ItemGroup Condition="'$(Configuration)'=='Debug'">
+        <ProjectReference Include="..\..\Extensions\andrefmello91.Extensions\andrefmello91.Extensions.csproj" />
+        <ProjectReference Include="..\..\OnPlaneComponents\andrefmello91.OnPlaneComponents\andrefmello91.OnPlaneComponents.csproj" />
+        <ProjectReference Include="..\..\Material\andrefmello91.Material\andrefmello91.Material.csproj" />
+    </ItemGroup>
+
 
 </Project>
