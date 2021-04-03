@@ -30,7 +30,7 @@
 
     <ItemGroup Condition="'$(Configuration)'=='Release'">
         <PackageReference Include="andrefmello91.Extensions" Version="1.0.4" />
-        <PackageReference Include="andrefmello91.OnPlaneComponents" Version="1.0.7" />
+        <PackageReference Include="andrefmello91.OnPlaneComponents" Version="1.0.8" />
         <PackageReference Include="andrefmello91.Material" Version="1.0.7" />
     </ItemGroup>
 
