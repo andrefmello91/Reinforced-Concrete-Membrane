@@ -266,7 +266,7 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 		///     <para>Returns true if <see cref="Concrete" /> and <see cref="Reinforcement" /> are equal.</para>
 		/// </summary>
 		/// <param name="other">The other <see cref="Membrane" /> object.</param>
-		public bool Equals(Membrane? other) => !(other is null) && Concrete == other.Concrete && Reinforcement == other.Reinforcement;
+		public bool Equals(Membrane? other) => other is not null && Concrete == other.Concrete && Reinforcement == other.Reinforcement;
 
 		/// <inheritdoc />
 		public override string ToString() =>
