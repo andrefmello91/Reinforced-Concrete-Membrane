@@ -35,8 +35,8 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 
 		/// <summary>
 		///     Get/set crack slip consideration.
-		///     <para>See: <seealso cref="Constitutive.ConsiderCrackSlip" />.</para>
 		/// </summary>
+		/// <seealso cref="BiaxialConcrete.ConsiderCrackSlip" />
 		public bool ConsiderCrackSlip
 		{
 			get => Concrete.ConsiderCrackSlip;

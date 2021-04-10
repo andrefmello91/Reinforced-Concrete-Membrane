@@ -84,7 +84,7 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 		/// <inheritdoc cref="Membrane(IParameters, WebReinforcement?, Length, ConstitutiveModel)" />
 		/// <param name="unit">The <see cref="LengthUnit" /> of <paramref name="width" /></param>
 		protected Membrane(IParameters concreteParameters, WebReinforcement? reinforcement, double width, ConstitutiveModel model, LengthUnit unit = LengthUnit.Millimeter)
-			: this (concreteParameters, reinforcement, Length.From(width, unit), model)
+			: this (concreteParameters, reinforcement, (Length) width.As(unit), model)
 		{
 		}
 
@@ -112,35 +112,26 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 		#region  Methods
 
 		/// <summary>
-		///     Read membrane element based on concrete constitutive model.
+		///     Create a membrane element based on concrete constitutive model.
 		/// </summary>
-		/// <param name="concreteParameters">Concrete <see cref="IParameters" /> object.</param>
-		/// <param name="reinforcement"><see cref="WebReinforcement" /> object .</param>
-		/// <param name="width">The width of cross-section, in mm.</param>
 		/// <param name="considerCrackSlip">Consider crack slip? Only for <see cref="DSFMMembrane" /> (default: true)</param>
-		public static Membrane Read(IParameters concreteParameters, WebReinforcement? reinforcement, double width, ConstitutiveModel model = ConstitutiveModel.MCFT, bool considerCrackSlip = true) =>
-			Read(concreteParameters, reinforcement, Length.FromMillimeters(width), model, considerCrackSlip);
-
-		/// <summary>
-		///     Read membrane element based on concrete constitutive model.
-		/// </summary>
-		/// <param name="concreteParameters">Concrete <see cref="IParameters" /> object.</param>
-		/// <param name="reinforcement"><see cref="WebReinforcement" /> object .</param>
-		/// <param name="width">The width of cross-section.</param>
-		/// <param name="considerCrackSlip">Consider crack slip? Only for <see cref="DSFMMembrane" /> (default: true)</param>
-		public static Membrane Read(IParameters concreteParameters, WebReinforcement? reinforcement, Length width, ConstitutiveModel model = ConstitutiveModel.MCFT, bool considerCrackSlip = true)
-		{
-			if (model is ConstitutiveModel.MCFT)
-				return new MCFTMembrane(concreteParameters, reinforcement, width);
-
-			return new DSFMMembrane(concreteParameters, reinforcement, width, considerCrackSlip);
-		}
+		/// <inheritdoc cref="Membrane(IParameters, WebReinforcement, double, ConstitutiveModel, LengthUnit)"/>
+		public static Membrane From(IParameters concreteParameters, WebReinforcement? reinforcement, double width, ConstitutiveModel model = ConstitutiveModel.MCFT, LengthUnit unit = LengthUnit.Millimeter, bool considerCrackSlip = true) =>
+			From(concreteParameters, reinforcement, (Length) width.As(unit), model, considerCrackSlip);
+		
+		/// <inheritdoc cref="From(IParameters, WebReinforcement?, double, ConstitutiveModel, LengthUnit, bool)"/>
+		public static Membrane From(IParameters concreteParameters, WebReinforcement? reinforcement, Length width, ConstitutiveModel model = ConstitutiveModel.MCFT, bool considerCrackSlip = true) =>
+			model switch
+			{
+				ConstitutiveModel.MCFT => new MCFTMembrane(concreteParameters, reinforcement, width),
+				_                      => new DSFMMembrane(concreteParameters, reinforcement, width, considerCrackSlip)
+			};
 
 		/// <summary>
 		///     Calculate the average crack opening.
 		/// </summary>
 		/// <param name="membrane">The <see cref="Membrane" /> object.</param>
-		public static Length CrackOpening(Membrane membrane) => CrackOpening(membrane.Reinforcement, membrane.Concrete.PrincipalStrains);
+		protected Length CrackOpening() => CrackOpening(Reinforcement, Concrete.PrincipalStrains);
 
 		/// <summary>
 		///     Calculate the average crack opening.
@@ -156,7 +147,7 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 		///     Calculate the crack spacing in principal strain direction.
 		/// </summary>
 		/// <inheritdoc cref="CrackOpening(Membrane)" />
-		public static Length CrackSpacing(Membrane membrane) => CrackSpacing(membrane.Reinforcement, membrane.Concrete.PrincipalStrains);
+		protected Length CrackSpacing() => CrackSpacing(Reinforcement, Concrete.PrincipalStrains);
 
 		/// <summary>
 		///     Calculate the crack spacing in principal strain direction.
@@ -175,7 +166,7 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 
 			// Calculate crack spacing
 			return
-				Length.FromMillimeters(sm);
+				(Length) sm.As(LengthUnit.Millimeter);
 		}
 
 		/// <summary>
@@ -238,13 +229,13 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 		/// <summary>
 		///     Calculate maximum shear stress on crack, in MPa.
 		/// </summary>
-		public Pressure MaximumShearOnCrack() => MaximumShearOnCrack(CrackOpening());
+		protected Pressure MaximumShearOnCrack() => MaximumShearOnCrack(CrackOpening());
 
 		/// <summary>
 		///     Calculate maximum shear stress on crack, in MPa.
 		/// </summary>
 		/// <param name="crackOpening">Average crack opening, in mm.</param>
-		public Pressure MaximumShearOnCrack(Length crackOpening)
+		protected Pressure MaximumShearOnCrack(Length crackOpening)
 		{
 			var vcimax = 0.18 * Concrete.Parameters.Strength.Megapascals.Sqrt()
 			             / (0.31 + 24 * crackOpening.Millimeters / (Concrete.Parameters.AggregateDiameter.Millimeters + 16));
@@ -254,12 +245,6 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 
 		/// <inheritdoc />
 		public abstract Membrane Clone();
-
-		/// <inheritdoc cref="CrackSpacing" />
-		protected Length CrackSpacing() => CrackSpacing(this);
-
-		/// <inheritdoc cref="CrackOpening" />
-		protected Length CrackOpening() => CrackOpening(this);
 
 		/// <summary>
 		///     Compare two <see cref="Membrane" /> objects.

@@ -1,4 +1,5 @@
-﻿using andrefmello91.Material.Concrete;
+﻿using andrefmello91.Extensions;
+using andrefmello91.Material.Concrete;
 using andrefmello91.Material.Reinforcement;
 using andrefmello91.OnPlaneComponents;
 using UnitsNet;
@@ -28,7 +29,7 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 		/// <inheritdoc cref="MCFTMembrane(IParameters, WebReinforcement, Length)" />
 		/// <param name="unit">The <see cref="LengthUnit" /> of <paramref name="width" /></param>
 		public MCFTMembrane(IParameters concreteParameters, WebReinforcement? reinforcement, double width, LengthUnit unit = LengthUnit.Millimeter)
-			: this(concreteParameters, reinforcement, Length.From(width, unit))
+			: this(concreteParameters, reinforcement, (Length) width.As(unit))
 		{
 		}
 
