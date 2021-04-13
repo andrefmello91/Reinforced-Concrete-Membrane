@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using andrefmello91.Material.Concrete;
 using andrefmello91.Material.Reinforcement;
 using andrefmello91.OnPlaneComponents;
@@ -29,7 +30,7 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 		/// <summary>
 		///     <see cref="Array" /> of average <see cref="PrincipalStrainState" /> results for each load step.
 		/// </summary>
-		private PrincipalStrainState[] _averagePrincipalStrainOutput = null!;
+		private List<PrincipalStrainState> _averagePrincipalStrainOutput = new();
 
 		/// <summary>
 		///     Number of successfully calculated load steps.
@@ -39,7 +40,7 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 		/// <summary>
 		///     <see cref="Array" /> of concrete <see cref="PrincipalStrainState" /> results for each load step.
 		/// </summary>
-		private PrincipalStrainState[] _concretePrincipalStrainOutput = null!;
+		private List<PrincipalStrainState> _concretePrincipalStrainOutput = new();
 
 		/// <summary>
 		///     The step of concrete cracking.
@@ -99,7 +100,7 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 		/// <summary>
 		///     <see cref="Array" /> of <see cref="PrincipalStressState" /> results for each load step.
 		/// </summary>
-		private PrincipalStressState[] _principalStressOutput = null!;
+		private List<PrincipalStressState> _principalStressOutput = new ();
 
 		/// <summary>
 		///     The applied <see cref="StressState" /> at the current load step.
@@ -114,18 +115,28 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 		/// <summary>
 		///     <see cref="Array" /> of <see cref="StrainState" /> results for each load step.
 		/// </summary>
-		private StrainState[] _strainOutput = null!;
+		private List<StrainState> _strainOutput = new ();
 
 		/// <summary>
 		///     <see cref="Array" /> of <see cref="StressState" /> results for each load step.
 		/// </summary>
-		private StressState[] _stressOutput = null!;
+		private List<StressState> _stressOutput = new ();
 
 		/// <summary>
 		///     Convergence tolerance.
 		/// </summary>
 		private double _tolerance;
 
+		/// <summary>
+		///		Get the cracking <see cref="StressState"/>.
+		/// </summary>
+		public StressState CrackingStresses { get; private set; }
+		
+		/// <summary>
+		///		Get the ultimate <see cref="StressState"/>.
+		/// </summary>
+		public StressState UltimateStresses { get; private set; }
+		
 		#endregion
 
 		#region Properties
@@ -200,16 +211,17 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 		///     Solve this element.
 		/// </summary>
 		/// <param name="appliedStresses">Applied <see cref="StressState" />, in MPa.</param>
-		/// <param name="numLoadSteps">The number of load steps (default: 100).</param>
+		/// <param name="numLoadSteps">The number of load steps for <paramref name="appliedStresses"/> (default: 100).</param>
 		/// <param name="maxIterations">Maximum number of iterations (default: 10000).</param>
 		/// <param name="tolerance">Stress convergence tolerance (default: 4E-4).</param>
-		public void Solve(StressState appliedStresses, int numLoadSteps = 100, int maxIterations = 10000, double tolerance = 4E-4)
+		/// <param name="simulate">Simulate until convergence is not reached (failure).</param>
+		public void Solve(StressState appliedStresses, int numLoadSteps = 100, int maxIterations = 10000, double tolerance = 4E-4, bool simulate = false)
 		{
 			// Initialize fields and write a starting message
 			Initiate(appliedStresses, numLoadSteps, maxIterations, tolerance);
 
 			// Analyze by steps
-			StepAnalysis();
+			StepAnalysis(simulate);
 			AnalysisDone();
 		}
 
@@ -275,24 +287,17 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 			// Initiate solution values
 			_lastStiffness   = _currentStiffness.Clone();
 
-			// Initiate output matrices
-			_strainOutput          = new StrainState[_numLoadSteps];
-			_stressOutput          = new StressState[_numLoadSteps];
-			_principalStressOutput = new PrincipalStressState[_numLoadSteps];
-
-			_concretePrincipalStrainOutput = new PrincipalStrainState[_numLoadSteps];
-			_averagePrincipalStrainOutput  = new PrincipalStrainState[_numLoadSteps];
-
 			Console.WriteLine("\nStarting {0} analysis...\n", Element is MCFTMembrane ? "MCFT" : "DSFM");
 		}
 
 		/// <summary>
 		///     Do analysis by load steps.
 		/// </summary>
-		private void StepAnalysis()
+		private void StepAnalysis(bool simulate = false)
 		{
 			// Initiate load steps
-			for (_loadStep = 1; _loadStep <= _numLoadSteps; _loadStep++)
+			_loadStep = 1;
+			while (simulate || _loadStep <= _numLoadSteps)
 			{
 				// Calculate stresses
 				_stepStresses = LoadFactor * _appliedStresses;
@@ -302,7 +307,10 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 
 				// Solution reached:
 				if (!_stop)
+				{
+					_loadStep++;
 					continue;
+				}
 
 				// Solution not reached
 				// Decrement ls to correct output file
@@ -310,7 +318,9 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 				break;
 			}
 
+			// Set last stresses
 			_calculatedLoadSteps = _loadStep;
+			UltimateStresses     = _stepStresses;
 		}
 
 		/// <summary>
@@ -318,7 +328,9 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 		/// </summary>
 		private void Iterate()
 		{
-			for (_iteration = 1; _iteration <= _maxIterations; _iteration++)
+			_iteration = 1;
+			
+			while (_iteration <= _maxIterations)
 			{
 				// Do analysis
 				Element.Calculate(_currentStrains);
@@ -352,6 +364,8 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 				// Update stiffness and strains
 				SecantStiffnessUpdate();
 				StrainUpdate();
+				
+				_iteration++;
 			}
 		}
 
@@ -446,15 +460,12 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 		/// </summary>
 		private void SaveResults()
 		{
-			// Get row
-			var i = _loadStep - 1;
+			_strainOutput.Add(Element.AverageStrains);
+			_stressOutput.Add(_stepStresses);
+			_principalStressOutput.Add(Element.Concrete.PrincipalStresses);
 
-			_strainOutput[i]          = Element.AverageStrains;
-			_stressOutput[i]          = _stepStresses;
-			_principalStressOutput[i] = Element.Concrete.PrincipalStresses;
-
-			_concretePrincipalStrainOutput[i] = Element.Concrete.PrincipalStrains;
-			_averagePrincipalStrainOutput[i]  = Element.AveragePrincipalStrains;
+			_concretePrincipalStrainOutput.Add(Element.Concrete.PrincipalStrains);
+			_averagePrincipalStrainOutput.Add(Element.AveragePrincipalStrains);
 		}
 
 		/// <summary>
@@ -473,6 +484,9 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 			// Set and write message
 			_crackStep = _loadStep;
 
+			// Set cracking stresses
+			CrackingStresses = _stepStresses.Clone();
+			
 			Console.WriteLine("Concrete cracked at step {0}", _crackStep.Value);
 		}
 
