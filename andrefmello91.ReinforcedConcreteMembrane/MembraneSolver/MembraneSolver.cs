@@ -128,6 +128,11 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 		private double _tolerance;
 
 		/// <summary>
+		///		Write analysis results in console?
+		/// </summary>
+		private bool _writeInConsole = true;
+		
+		/// <summary>
 		///		Get the cracking <see cref="StressState"/>.
 		/// </summary>
 		public StressState CrackingStresses { get; private set; }
@@ -213,12 +218,13 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 		/// <param name="appliedStresses">Applied <see cref="StressState" />, in MPa.</param>
 		/// <param name="numLoadSteps">The number of load steps for <paramref name="appliedStresses"/> (default: 100).</param>
 		/// <param name="maxIterations">Maximum number of iterations (default: 10000).</param>
-		/// <param name="tolerance">Stress convergence tolerance (default: 4E-4).</param>
+		/// <param name="tolerance">Stress convergence tolerance (default: 2E-3).</param>
 		/// <param name="simulate">Simulate until convergence is not reached (failure).</param>
-		public void Solve(StressState appliedStresses, int numLoadSteps = 100, int maxIterations = 10000, double tolerance = 4E-4, bool simulate = false)
+		/// <param name="writeInConsole">Write analysis results in console?</param>
+		public void Solve(StressState appliedStresses, int numLoadSteps = 100, int maxIterations = 10000, double tolerance = 2E-3, bool simulate = false, bool writeInConsole = true)
 		{
 			// Initialize fields and write a starting message
-			Initiate(appliedStresses, numLoadSteps, maxIterations, tolerance);
+			Initiate(appliedStresses, numLoadSteps, maxIterations, tolerance, writeInConsole);
 
 			// Analyze by steps
 			StepAnalysis(simulate);
@@ -267,13 +273,15 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 		/// <param name="numLoadSteps">The number of load steps.</param>
 		/// <param name="maxIterations">Maximum number of iterations (default: 10000).</param>
 		/// <param name="tolerance">Stress convergence tolerance (default: 4E-4).</param>
-		private void Initiate(StressState appliedStresses, int numLoadSteps, int maxIterations, double tolerance)
+		/// <param name="writeInConsole">Write analysis results in console?</param>
+		private void Initiate(StressState appliedStresses, int numLoadSteps, int maxIterations, double tolerance, bool writeInConsole)
 		{
 			// Set values
 			_appliedStresses = appliedStresses;
 			_numLoadSteps    = numLoadSteps;
 			_maxIterations   = maxIterations;
 			_tolerance       = tolerance;
+			_writeInConsole  = writeInConsole;
 
 			// Get initial stresses
 			_stepStresses = LoadFactor * _appliedStresses;
@@ -286,8 +294,13 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 
 			// Initiate solution values
 			_lastStiffness   = _currentStiffness.Clone();
-
-			Console.WriteLine("\nStarting {0} analysis...\n", Element is MCFTMembrane ? "MCFT" : "DSFM");
+			
+			// Set Cs
+			if (Element is DSFMMembrane membrane)
+				membrane.SetCs(appliedStresses);
+			
+			if (_writeInConsole)
+				Console.WriteLine("\nStarting {0} analysis...\n", Element is MCFTMembrane ? "MCFT" : "DSFM");
 		}
 
 		/// <summary>
@@ -336,7 +349,7 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 				Element.Calculate(_currentStrains);
 
 				// Verify if concrete cracks in this load step and write a message
-				ConcreteCrackedMessage();
+				ConcreteCrackedCheck();
 
 				// Calculate and update residual
 				ResidualUpdate();
@@ -357,7 +370,7 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 				if (_iteration == _maxIterations)
 				{
 					// Write message
-					NoConvergenceMessage();
+					StopAnalysis();
 					break;
 				}
 
@@ -471,12 +484,18 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 		/// <summary>
 		///     Write a ending message in <see cref="Console" />.
 		/// </summary>
-		private void AnalysisDone() => Console.WriteLine($"\n{AnalysisType} analysis done.\n");
+		private void AnalysisDone()
+		{
+			if (!_writeInConsole)
+				return;
+			
+			Console.WriteLine($"\n{AnalysisType} analysis done.\n");
+		}
 
 		/// <summary>
 		///     Write a message in the load step that concrete cracks.
 		/// </summary>
-		private void ConcreteCrackedMessage()
+		private void ConcreteCrackedCheck()
 		{
 			if (_crackStep.HasValue || !Element.Concrete.Cracked)
 				return;
@@ -487,7 +506,8 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 			// Set cracking stresses
 			CrackingStresses = _stepStresses.Clone();
 			
-			Console.WriteLine("Concrete cracked at step {0}", _crackStep.Value);
+			if (_writeInConsole)
+				Console.WriteLine("Concrete cracked at step {0}", _crackStep.Value);
 		}
 
 		/// <summary>
@@ -495,6 +515,9 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 		/// </summary>
 		private void ConvergenceMessage()
 		{
+			if (!_writeInConsole)
+				return;
+
 			switch (Element)
 			{
 				case DSFMMembrane dsfm when Element.Concrete.Cracked:
@@ -510,11 +533,13 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 		/// <summary>
 		///     Write a message if convergence is not reached.
 		/// </summary>
-		private void NoConvergenceMessage()
+		private void StopAnalysis()
 		{
 			// Set stop
 			_stop = true;
-			Console.WriteLine("LS = {0}, {1}", _loadStep, "CONVERGENCE NOT REACHED");
+			
+			if (_writeInConsole)
+				Console.WriteLine("LS = {0}, {1}", _loadStep, "CONVERGENCE NOT REACHED");
 		}
 
 		/// <summary>

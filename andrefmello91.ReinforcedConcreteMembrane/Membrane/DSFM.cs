@@ -82,6 +82,22 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 		#region  Methods
 
 		/// <summary>
+		///		Calculate Cs coefficient for concrete softening basing on the applied <see cref="StressState"/>.
+		/// </summary>
+		/// <param name="stressState">The applied <see cref="StressState"/>.</param>
+		/// <seealso cref="BiaxialConcrete.Cs"/>
+		public static double CalculateCs(StressState stressState) =>
+			UnitMath.Max(stressState.SigmaX, stressState.SigmaY) > Pressure.Zero
+				? 0.2
+				: 0.55;
+
+		/// <summary>
+		///		Set Cs coefficient for concrete basing on the applied <see cref="StressState"/>.
+		/// </summary>
+		/// <inheritdoc cref="CalculateCs"/>.
+		public void SetCs(StressState stressState) => Concrete.Cs = CalculateCs(stressState);
+		
+		/// <summary>
 		///     Calculate <see cref="StressState" /> and <see cref="Membrane.Stiffness" /> by DSFM, given a known
 		///     <see cref="StrainState" />.
 		/// </summary>
