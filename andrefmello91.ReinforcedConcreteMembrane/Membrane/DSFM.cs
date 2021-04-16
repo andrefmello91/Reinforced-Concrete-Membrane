@@ -1,13 +1,12 @@
 ﻿using System;
+using andrefmello91.Extensions;
 using andrefmello91.Material.Concrete;
 using andrefmello91.Material.Reinforcement;
 using andrefmello91.OnPlaneComponents;
-using andrefmello91.Extensions;
 using MathNet.Numerics;
 using MathNet.Numerics.RootFinding;
 using UnitsNet;
 using UnitsNet.Units;
-
 #nullable enable
 
 namespace andrefmello91.ReinforcedConcreteMembrane
@@ -17,6 +16,7 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 	/// </summary>
 	public class DSFMMembrane : Membrane
 	{
+
 		#region Fields
 
 		/// <summary>
@@ -79,24 +79,18 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 
 		#endregion
 
-		#region  Methods
+		#region Methods
 
 		/// <summary>
-		///		Calculate Cs coefficient for concrete softening basing on the applied <see cref="StressState"/>.
+		///     Calculate Cs coefficient for concrete softening basing on the applied <see cref="StressState" />.
 		/// </summary>
-		/// <param name="stressState">The applied <see cref="StressState"/>.</param>
-		/// <seealso cref="BiaxialConcrete.Cs"/>
-		public static double CalculateCs(StressState stressState) =>
+		/// <param name="stressState">The applied <see cref="StressState" />.</param>
+		/// <seealso cref="BiaxialConcrete.Cs" />
+		private static double CalculateCs(StressState stressState) =>
 			UnitMath.Max(stressState.SigmaX, stressState.SigmaY) > Pressure.Zero
 				? 0.2
 				: 0.55;
 
-		/// <summary>
-		///		Set Cs coefficient for concrete basing on the applied <see cref="StressState"/>.
-		/// </summary>
-		/// <inheritdoc cref="CalculateCs"/>.
-		public void SetCs(StressState stressState) => Concrete.Cs = CalculateCs(stressState);
-		
 		/// <summary>
 		///     Calculate <see cref="StressState" /> and <see cref="Membrane.Stiffness" /> by DSFM, given a known
 		///     <see cref="StrainState" />.
@@ -112,7 +106,7 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 			Reinforcement?.CalculateStresses(AverageStrains);
 
 			// Calculate apparent principal strains
-			AveragePrincipalStrains  = PrincipalStrainState.FromStrain(AverageStrains);
+			AveragePrincipalStrains = PrincipalStrainState.FromStrain(AverageStrains);
 
 			// Check stresses on crack
 			if (ConsiderCrackSlip)
@@ -124,10 +118,20 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 		/// <inheritdoc />
 		public override Membrane Clone() => new DSFMMembrane(Concrete.Parameters, Reinforcement?.Clone(), Width, ConsiderCrackSlip);
 
+		/// <inheritdoc />
+		public override bool Equals(object? obj) => obj is DSFMMembrane other && base.Equals(other);
+
+		/// <summary>
+		///     Set Cs coefficient for concrete basing on the applied <see cref="StressState" />.
+		/// </summary>
+		/// <inheritdoc cref="CalculateCs" />
+		/// .
+		public void SetCs(StressState stressState) => Concrete.Cs = CalculateCs(stressState);
+
 		/// <summary>
 		///     Calculate and set <see cref="CrackSlipStrains" />.
 		/// </summary>
-		private	void CalculateCrackSlip()
+		private void CalculateCrackSlip()
 		{
 			// Verify if concrete is cracked
 			if (!Concrete.Cracked)
@@ -144,12 +148,91 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 		}
 
 		/// <summary>
+		///     Calculate crack slip <see cref="StrainState" />.
+		/// </summary>
+		/// <param name="vci">Shear stress on crack surface.</param>
+		private StrainState CrackSlip(Pressure vci)
+		{
+			//Console.WriteLine(vci);
+			// Get shear slip strains
+			double
+				ysa = StressCrackSlip(vci),
+				ysb = RotationLagCrackSlip(),
+				ys  = Math.Max(ysa, ysb);
+
+			SlipApproach = ys == ysa ? "Stress" : "Rotation lag";
+
+			// Get concrete principal angle
+			var thetaC1 = Concrete.PrincipalStrains.Theta1;
+
+			// Calculate direction cosines
+			var (cos2ThetaC, sin2ThetaC) = (2 * thetaC1).DirectionCosines();
+
+			// Calculate the shear slip strains
+			double
+				eslx  = -0.5 * ys * sin2ThetaC,
+				esly  = 0.5 * ys * sin2ThetaC,
+				eslxy = ys * cos2ThetaC;
+
+			// Correct strains if gamma is negative
+			if (AverageStrains.GammaXY < 0)
+			{
+				eslx  = -eslx;
+				esly  = -esly;
+				eslxy = -eslxy;
+			}
+
+			return new StrainState(eslx, esly, eslxy);
+		}
+
+		/// <summary>
 		///     Set the angle of initial cracking (<see cref="_thetaIc" />).
 		/// </summary>
 		private void InitialCrackAngle()
 		{
 			if (!_thetaIc.HasValue && Concrete.Cracked)
 				_thetaIc = Concrete.PrincipalStrains.Theta1;
+		}
+
+		/// <summary>
+		///     Calculate shear slip strain by rotation lag approach.
+		/// </summary>
+		private double RotationLagCrackSlip()
+		{
+			// Get the strains
+			double
+				ex  = AverageStrains.EpsilonX,
+				ey  = AverageStrains.EpsilonY,
+				yxy = AverageStrains.GammaXY;
+
+			// Calculate shear slip strain by rotation lag approach
+			double
+				thetaIc = _thetaIc ?? Constants.PiOver4,
+				dThetaE = AveragePrincipalStrains.Theta1 - thetaIc;
+
+			// Get theta L
+			var thetaL = Reinforcement is null || !Reinforcement.XYReinforced
+				? 10.ToRadian()
+				: Reinforcement.XYReinforced
+					? 5.ToRadian()
+					: 7.5.ToRadian();
+
+			// Correct thetaL if dThetaE < 0
+			if (dThetaE < 0)
+				thetaL = -thetaL;
+
+			// Get dTheta s
+			var dThetaS = dThetaE.Abs() > thetaL.Abs()
+				? dThetaE - thetaL
+				: dThetaE;
+
+			var
+				thetaS = thetaIc + dThetaS;
+
+			var (cos2ThetaS, sin2ThetaS) = (2 * thetaS).DirectionCosines();
+
+			return
+				(yxy * cos2ThetaS + (ey - ex) * sin2ThetaS).Abs();
 		}
 
 		/// <summary>
@@ -220,44 +303,6 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 		}
 
 		/// <summary>
-		///     Calculate crack slip <see cref="StrainState" />.
-		/// </summary>
-		/// <param name="vci">Shear stress on crack surface.</param>
-		private StrainState CrackSlip(Pressure vci)
-		{
-			//Console.WriteLine(vci);
-			// Get shear slip strains
-			double
-				ysa = StressCrackSlip(vci),
-				ysb = RotationLagCrackSlip(),
-				ys  = Math.Max(ysa, ysb);
-
-			SlipApproach = ys == ysa ? "Stress" : "Rotation lag";
-
-			// Get concrete principal angle
-			var thetaC1 = Concrete.PrincipalStrains.Theta1;
-
-			// Calculate direction cosines
-			var (cos2ThetaC, sin2ThetaC) = (2 * thetaC1).DirectionCosines();
-
-			// Calculate the shear slip strains
-			double
-				eslx  = -0.5 * ys * sin2ThetaC,
-				esly  =  0.5 * ys * sin2ThetaC,
-				eslxy = ys * cos2ThetaC;
-
-			// Correct strains if gamma is negative
-			if (AverageStrains.GammaXY < 0)
-			{
-				eslx  = -eslx;
-				esly  = -esly;
-				eslxy = -eslxy;
-			}
-
-			return new StrainState(eslx, esly, eslxy);
-		}
-
-		/// <summary>
 		///     Calculate crack slip strains by stress-based approach (Walraven, 1980).
 		/// </summary>
 		/// <param name="vci">Shear stress on crack surface, in MPa.</param>
@@ -290,13 +335,10 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 		///     Calculate crack slip strains by stress-based approach (Okamura and Maekawa)
 		/// </summary>
 		/// <param name="vci">Shear stress on crack surface, in MPa.</param>
-		private double StressCrackSlip2(Pressure vci)
+		private double StressCrackSlipAlt(Pressure vci)
 		{
 			if (vci.ApproxZero(StressState.Tolerance))
 				return 0;
-
-			// Get concrete principal tensile strain and strength
-			var ec1 = Concrete.PrincipalStrains.Epsilon1;
 
 			// Calculate crack spacings and width
 			var s = CrackSpacing();
@@ -314,53 +356,10 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 				ds / s;
 		}
 
-		/// <summary>
-		///     Calculate shear slip strain by rotation lag approach.
-		/// </summary>
-		private double RotationLagCrackSlip()
-		{
-			// Get the strains
-			double
-				ex  = AverageStrains.EpsilonX,
-				ey  = AverageStrains.EpsilonY,
-				yxy = AverageStrains.GammaXY;
-
-			// Calculate shear slip strain by rotation lag approach
-			double
-				thetaIc = _thetaIc ?? Constants.PiOver4,
-				dThetaE = AveragePrincipalStrains.Theta1 - thetaIc;
-
-			// Get theta L
-			var thetaL = Reinforcement is null || !Reinforcement.XYReinforced
-				? 10.ToRadian()
-				: Reinforcement.XYReinforced
-					? 5.ToRadian()
-					: 7.5.ToRadian();
-
-			// Correct thetaL if dThetaE < 0
-			if (dThetaE < 0)
-				thetaL = -thetaL;
-
-			// Get dTheta s
-			var dThetaS = dThetaE.Abs() > thetaL.Abs()
-				? dThetaE - thetaL
-				: dThetaE;
-
-			var
-				thetaS = thetaIc + dThetaS;
-
-			var (cos2ThetaS, sin2ThetaS) = (2 * thetaS).DirectionCosines();
-
-			return
-				(yxy * cos2ThetaS + (ey - ex) * sin2ThetaS).Abs();
-		}
-
-		/// <inheritdoc />
-		public override bool Equals(object? obj) => obj is DSFMMembrane other && base.Equals(other);
-
 		/// <inheritdoc />
 		public override int GetHashCode() => base.GetHashCode();
 
 		#endregion
+
 	}
 }
