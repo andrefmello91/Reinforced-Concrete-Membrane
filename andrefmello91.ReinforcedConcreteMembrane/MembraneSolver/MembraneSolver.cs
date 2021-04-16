@@ -188,8 +188,8 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 			var reinforcement = new WebReinforcement(6.35, 50.55, steelXY, 4.7, 49.57, steelXY.Clone(), 70);
 
 			// Initiate the membrane
-			var membraneMCFT = new MCFTMembrane(new Parameters(14.5, 6, ParameterModel.MCFT), reinforcement, 70);
-			var membraneDSFM = new DSFMMembrane(new Parameters(14.5, 6, ParameterModel.DSFM), reinforcement.Clone(), 70);
+			var membraneMCFT = new MCFTMembrane(new Parameters(14.5, 6, ParameterModel.Default), reinforcement, 70);
+			var membraneDSFM = new DSFMMembrane(new Parameters(14.5, 6, ParameterModel.Default), reinforcement.Clone(), 70);
 
 			// Initiate stresses
 			var sigma = new StressState(0, 0, 5);
