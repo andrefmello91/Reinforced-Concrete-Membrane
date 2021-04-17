@@ -88,7 +88,7 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 		/// <seealso cref="BiaxialConcrete.Cs" />
 		private static double CalculateCs(StressState stressState) =>
 			UnitMath.Max(stressState.SigmaX, stressState.SigmaY) > Pressure.Zero
-				? 0.2
+				? 0.15
 				: 0.55;
 
 		/// <summary>
@@ -125,7 +125,6 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 		///     Set Cs coefficient for concrete basing on the applied <see cref="StressState" />.
 		/// </summary>
 		/// <inheritdoc cref="CalculateCs" />
-		/// .
 		public void SetCs(StressState stressState) => Concrete.Cs = CalculateCs(stressState);
 
 		/// <summary>
