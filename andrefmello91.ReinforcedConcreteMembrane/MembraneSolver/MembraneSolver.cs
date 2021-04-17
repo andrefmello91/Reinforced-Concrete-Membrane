@@ -180,7 +180,6 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 		/// </summary>
 		public static void SolverExample()
 		{
-
 			// Initiate steel for each direction
 			var steelXY = new Steel(276, 200000);
 
@@ -188,8 +187,8 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 			var reinforcement = new WebReinforcement(6.35, 50.55, steelXY, 4.7, 49.57, steelXY.Clone(), 70);
 
 			// Initiate the membrane
-			var membraneMCFT = new MCFTMembrane(new Parameters(14.5, 6, ParameterModel.Default), reinforcement, 70);
-			var membraneDSFM = new DSFMMembrane(new Parameters(14.5, 6, ParameterModel.Default), reinforcement.Clone(), 70);
+			var membraneMCFT = new MCFTMembrane(new Parameters(14.5, 6), reinforcement, 70);
+			var membraneDSFM = new DSFMMembrane(new Parameters(14.5, 6), reinforcement.Clone(), 70);
 
 			// Initiate stresses
 			var sigma = new StressState(0, 0, 5);
@@ -203,25 +202,23 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 			dsfmSolver.Solve(sigma);
 
 			// Output results
-			mcftSolver.OutputResults(out var mcftFile);
-			dsfmSolver.OutputResults(out var dsfmFile);
+			mcftSolver.OutputResults(out _);
+			dsfmSolver.OutputResults(out _);
 
 			Console.WriteLine("Done! Press any key to exit.");
-			//Process.Start(mcftFile);
-			//Process.Start(dsfmFile);
 			Console.ReadKey();
 		}
 
 		/// <summary>
 		///     Solve this element.
 		/// </summary>
-		/// <param name="appliedStresses">Applied <see cref="StressState" />, in MPa.</param>
+		/// <param name="appliedStresses">Applied <see cref="StressState" />.</param>
 		/// <param name="numLoadSteps">The number of load steps for <paramref name="appliedStresses"/> (default: 100).</param>
 		/// <param name="maxIterations">Maximum number of iterations (default: 10000).</param>
-		/// <param name="tolerance">Stress convergence tolerance (default: 2E-3).</param>
+		/// <param name="tolerance">Stress convergence tolerance (default: 1E-3).</param>
 		/// <param name="simulate">Simulate until convergence is not reached (failure).</param>
 		/// <param name="writeInConsole">Write analysis results in console?</param>
-		public void Solve(StressState appliedStresses, int numLoadSteps = 100, int maxIterations = 10000, double tolerance = 2E-3, bool simulate = false, bool writeInConsole = true)
+		public void Solve(StressState appliedStresses, int numLoadSteps = 100, int maxIterations = 10000, double tolerance = 1E-3, bool simulate = false, bool writeInConsole = true)
 		{
 			// Initialize fields and write a starting message
 			Initiate(appliedStresses, numLoadSteps, maxIterations, tolerance, writeInConsole);
@@ -269,10 +266,10 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 		/// <summary>
 		///     Initialize auxiliary fields and write a starting message in <see cref="Console" />.
 		/// </summary>
-		/// <param name="appliedStresses">Applied <see cref="StressState" />, in MPa.</param>
+		/// <param name="appliedStresses">Applied <see cref="StressState" />.</param>
 		/// <param name="numLoadSteps">The number of load steps.</param>
-		/// <param name="maxIterations">Maximum number of iterations (default: 10000).</param>
-		/// <param name="tolerance">Stress convergence tolerance (default: 4E-4).</param>
+		/// <param name="maxIterations">Maximum number of iterations.</param>
+		/// <param name="tolerance">Stress convergence tolerance.</param>
 		/// <param name="writeInConsole">Write analysis results in console?</param>
 		private void Initiate(StressState appliedStresses, int numLoadSteps, int maxIterations, double tolerance, bool writeInConsole)
 		{
