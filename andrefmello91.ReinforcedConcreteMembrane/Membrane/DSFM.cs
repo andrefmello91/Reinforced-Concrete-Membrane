@@ -60,7 +60,7 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 		/// <inheritdoc cref="DSFMMembrane(IParameters, WebReinforcement, Length, bool)" />
 		/// <param name="unit">The <see cref="LengthUnit" /> of <paramref name="width" /></param>
 		public DSFMMembrane(IParameters concreteParameters, WebReinforcement? reinforcement, double width, LengthUnit unit = LengthUnit.Millimeter, bool considerCrackSlip = true)
-			: this(concreteParameters, reinforcement, Length.FromMillimeters(width), considerCrackSlip)
+			: this(concreteParameters, reinforcement, (Length) width.As(unit), considerCrackSlip)
 		{
 		}
 
