@@ -292,10 +292,6 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 			// Initiate solution values
 			_lastStiffness   = _currentStiffness.Clone();
 			
-			// Set Cs
-			if (Element is DSFMMembrane membrane)
-				membrane.SetCs(appliedStresses);
-			
 			if (_writeInConsole)
 				Console.WriteLine("\nStarting {0} analysis...\n", Element is MCFTMembrane ? "MCFT" : "DSFM");
 		}

@@ -86,8 +86,11 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 		/// </summary>
 		/// <param name="stressState">The applied <see cref="StressState" />.</param>
 		/// <seealso cref="BiaxialConcrete.Cs" />
+		/// <returns>
+		///		0.55 if maximum of <see cref="StressState.SigmaX"/> and <see cref="StressState.SigmaY"/> is finite and smaller than 0.5, otherwise 0.15.
+		/// </returns>
 		private static double CalculateCs(StressState stressState) =>
-			UnitMath.Max(stressState.SigmaX, stressState.SigmaY) > Pressure.Zero
+			UnitMath.Max(stressState.SigmaX, stressState.SigmaY) / stressState.TauXY.Abs() >= 0.5
 				? 0.15
 				: 0.55;
 
@@ -100,6 +103,9 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 		{
 			// Set strains
 			AverageStrains = appliedStrains.Clone();
+			
+			// Reduce Cs
+			ReduceCs(AverageStresses);
 
 			// Calculate and set concrete and steel stresses
 			Concrete.CalculatePrincipalStresses(ConcreteStrains, Reinforcement, ReferenceLength);
@@ -125,7 +131,13 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 		///     Set Cs coefficient for concrete basing on the applied <see cref="StressState" />.
 		/// </summary>
 		/// <inheritdoc cref="CalculateCs" />
-		public void SetCs(StressState stressState) => Concrete.Cs = CalculateCs(stressState);
+		private void ReduceCs(StressState stressState)
+		{
+			if (Concrete.Cs.Approx(0.15, 1E-3)) // Already reduced
+				return;
+			
+			Concrete.Cs = CalculateCs(stressState);
+		}
 
 		/// <summary>
 		///     Calculate and set <see cref="CrackSlipStrains" />.
