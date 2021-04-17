@@ -133,7 +133,7 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 		/// </summary>
 		/// <param name="reinforcement">The <see cref="WebReinforcement" /> object.</param>
 		/// <param name="concreteStrains">The <see cref="PrincipalStrainState" /> in concrete.</param>
-		private static Length CrackOpening(WebReinforcement? reinforcement, PrincipalStrainState concreteStrains) =>
+		public static Length CrackOpening(WebReinforcement? reinforcement, PrincipalStrainState concreteStrains) =>
 			concreteStrains.Epsilon1 <= 0 || concreteStrains.Epsilon1.ApproxZero(1E-9)
 				? Length.Zero
 				: concreteStrains.Epsilon1 * CrackSpacing(reinforcement, concreteStrains);
