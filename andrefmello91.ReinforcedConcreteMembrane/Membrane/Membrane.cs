@@ -176,7 +176,7 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 		/// </summary>
 		/// <param name="appliedStrains">Current applied <see cref="StrainState" />.</param>
 		public abstract void Calculate(StrainState appliedStrains);
-
+		
 		/// <inheritdoc />
 		public override bool Equals(object? obj) => obj is Membrane other && Equals(other);
 

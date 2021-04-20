@@ -89,10 +89,15 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 		/// <returns>
 		///		0.55 if maximum of <see cref="StressState.SigmaX"/> and <see cref="StressState.SigmaY"/> is finite and smaller than 0.5, otherwise 0.15.
 		/// </returns>
-		private static double CalculateCs(StressState stressState) =>
-			UnitMath.Max(stressState.SigmaX, stressState.SigmaY) / stressState.TauXY.Abs() >= 0.5
+		private static double CalculateCs(StressState stressState)
+		{
+			var sigmaMax = UnitMath.Max(stressState.SigmaX, stressState.SigmaY);
+			var ratio    = sigmaMax / stressState.TauXY.Abs();
+			
+			return ratio >= 0.5 || !ratio.IsFinite() && sigmaMax > Pressure.Zero
 				? 0.15
 				: 0.55;
+		}
 
 		/// <summary>
 		///     Calculate <see cref="StressState" /> and <see cref="Membrane.Stiffness" /> by DSFM, given a known
