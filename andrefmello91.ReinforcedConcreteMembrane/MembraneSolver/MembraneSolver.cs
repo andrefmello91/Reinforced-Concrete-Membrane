@@ -607,8 +607,7 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 					// Increment elements of stiffness matrix
 					for (var i = 0; i < 3; i++)
 					for (var j = 0; j < 3; j++)
-					for (var k = 0; k < 3; k++)
-						kc[i, j] += dk[i, k] / de[j] * ei[k];
+						kc[i, j] += dk.Row(i) / de[j] * ei;
 
 					// Set new values
 					_lastStiffness    = _currentStiffness;
