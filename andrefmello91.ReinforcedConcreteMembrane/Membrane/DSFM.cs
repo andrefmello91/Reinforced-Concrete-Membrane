@@ -14,7 +14,7 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 	/// <summary>
 	///     DSFM class, based on formulation by Vecchio (2000).
 	/// </summary>
-	public class DSFMMembrane : Membrane
+	internal class DSFMMembrane : Membrane
 	{
 
 		#region Fields
@@ -59,7 +59,7 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 
 		/// <inheritdoc cref="DSFMMembrane(IParameters, WebReinforcement, Length, bool)" />
 		/// <param name="unit">The <see cref="LengthUnit" /> of <paramref name="width" /></param>
-		public DSFMMembrane(IParameters concreteParameters, WebReinforcement? reinforcement, double width, LengthUnit unit = LengthUnit.Millimeter, bool considerCrackSlip = true)
+		internal DSFMMembrane(IParameters concreteParameters, WebReinforcement? reinforcement, double width, LengthUnit unit = LengthUnit.Millimeter, bool considerCrackSlip = true)
 			: this(concreteParameters, reinforcement, (Length) width.As(unit), considerCrackSlip)
 		{
 		}
@@ -69,7 +69,7 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 		/// </summary>
 		/// <inheritdoc cref="Membrane(IParameters, WebReinforcement?, Length, ConstitutiveModel)" />
 		/// <param name="considerCrackSlip">Consider crack slip? (default: true)</param>
-		public DSFMMembrane(IParameters concreteParameters, WebReinforcement? reinforcement, Length width, bool considerCrackSlip = true)
+		internal DSFMMembrane(IParameters concreteParameters, WebReinforcement? reinforcement, Length width, bool considerCrackSlip = true)
 			: base(concreteParameters, reinforcement, width, ConstitutiveModel.DSFM)
 		{
 			// Initiate crack slip strains

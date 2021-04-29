@@ -12,7 +12,7 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 	/// <summary>
 	///     MCFT class, based on formulation by Vecchio and Collins (1986).
 	/// </summary>
-	public class MCFTMembrane : Membrane
+	internal class MCFTMembrane : Membrane
 	{
 		#region Properties
 
@@ -28,7 +28,7 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 
 		/// <inheritdoc cref="MCFTMembrane(IParameters, WebReinforcement, Length)" />
 		/// <param name="unit">The <see cref="LengthUnit" /> of <paramref name="width" /></param>
-		public MCFTMembrane(IParameters concreteParameters, WebReinforcement? reinforcement, double width, LengthUnit unit = LengthUnit.Millimeter)
+		internal MCFTMembrane(IParameters concreteParameters, WebReinforcement? reinforcement, double width, LengthUnit unit = LengthUnit.Millimeter)
 			: this(concreteParameters, reinforcement, (Length) width.As(unit))
 		{
 		}
@@ -37,7 +37,7 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 		///     Membrane element for MCFT analysis.
 		/// </summary>
 		/// <inheritdoc cref="Membrane(IParameters, WebReinforcement?, Length, ConstitutiveModel)" />
-		public MCFTMembrane(IParameters concreteParameters, WebReinforcement? reinforcement, Length width)
+		internal MCFTMembrane(IParameters concreteParameters, WebReinforcement? reinforcement, Length width)
 			: base(concreteParameters, reinforcement, width, ConstitutiveModel.MCFT)
 		{
 		}
