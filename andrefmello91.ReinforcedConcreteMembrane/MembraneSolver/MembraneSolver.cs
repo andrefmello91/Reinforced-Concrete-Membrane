@@ -40,11 +40,6 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 		private const string DefaultLocation = "D:/";
 
 		/// <summary>
-		///     The applied <see cref="StressState" />.
-		/// </summary>
-		private StressState _appliedStresses;
-
-		/// <summary>
 		///     <see cref="Array" /> of average <see cref="PrincipalStrainState" /> results for each load step.
 		/// </summary>
 		private readonly List<PrincipalStrainState> _averagePrincipalStrainOutput = new()
@@ -53,17 +48,46 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 		};
 
 		/// <summary>
-		///     Number of successfully calculated load steps.
-		/// </summary>
-		private int _calculatedLoadSteps;
-
-		/// <summary>
 		///     <see cref="Array" /> of concrete <see cref="PrincipalStrainState" /> results for each load step.
 		/// </summary>
 		private readonly List<PrincipalStrainState> _concretePrincipalStrainOutput = new()
 		{
 			PrincipalStrainState.Zero
 		};
+
+		/// <summary>
+		///     <see cref="Array" /> of <see cref="PrincipalStressState" /> results for each load step.
+		/// </summary>
+		private readonly List<PrincipalStressState> _principalStressOutput = new()
+		{
+			PrincipalStressState.Zero
+		};
+
+		/// <summary>
+		///     <see cref="Array" /> of <see cref="StrainState" /> results for each load step.
+		/// </summary>
+		private readonly List<StrainState> _strainOutput = new()
+		{
+			StrainState.Zero
+		};
+
+		/// <summary>
+		///     <see cref="Array" /> of <see cref="StressState" /> results for each load step.
+		/// </summary>
+		private readonly List<StressState> _stressOutput = new()
+		{
+			StressState.Zero
+		};
+
+		/// <summary>
+		///     The applied <see cref="StressState" />.
+		/// </summary>
+		private StressState _appliedStresses;
+
+		/// <summary>
+		///     Number of successfully calculated load steps.
+		/// </summary>
+		private int _calculatedLoadSteps;
 
 		/// <summary>
 		///     The step of concrete cracking.
@@ -131,14 +155,6 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 		private int _numLoadSteps;
 
 		/// <summary>
-		///     <see cref="Array" /> of <see cref="PrincipalStressState" /> results for each load step.
-		/// </summary>
-		private readonly List<PrincipalStressState> _principalStressOutput = new()
-		{
-			PrincipalStressState.Zero
-		};
-
-		/// <summary>
 		///     The applied <see cref="StressState" /> at the current load step.
 		/// </summary>
 		private StressState _stepStresses;
@@ -147,22 +163,6 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 		///     Stop parameter for analysis.
 		/// </summary>
 		private bool _stop;
-
-		/// <summary>
-		///     <see cref="Array" /> of <see cref="StrainState" /> results for each load step.
-		/// </summary>
-		private readonly List<StrainState> _strainOutput = new()
-		{
-			StrainState.Zero
-		};
-
-		/// <summary>
-		///     <see cref="Array" /> of <see cref="StressState" /> results for each load step.
-		/// </summary>
-		private readonly List<StressState> _stressOutput = new()
-		{
-			StressState.Zero
-		};
 
 		/// <summary>
 		///     Convergence tolerance.

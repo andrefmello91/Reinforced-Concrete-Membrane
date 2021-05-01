@@ -87,13 +87,14 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 		/// <param name="stressState">The applied <see cref="StressState" />.</param>
 		/// <seealso cref="BiaxialConcrete.Cs" />
 		/// <returns>
-		///		0.55 if maximum of <see cref="StressState.SigmaX"/> and <see cref="StressState.SigmaY"/> is finite and smaller than 0.5, otherwise 0.15.
+		///     0.55 if maximum of <see cref="StressState.SigmaX" /> and <see cref="StressState.SigmaY" /> is finite and smaller
+		///     than 0.5, otherwise 0.15.
 		/// </returns>
 		private static double CalculateCs(StressState stressState)
 		{
 			var sigmaMax = UnitMath.Max(stressState.SigmaX, stressState.SigmaY);
 			var ratio    = sigmaMax / stressState.TauXY.Abs();
-			
+
 			return ratio >= 0.5 || !ratio.IsFinite() && sigmaMax > Pressure.Zero
 				? 0.15
 				: 0.55;
@@ -108,7 +109,7 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 		{
 			// Set strains
 			AverageStrains = appliedStrains.Clone();
-			
+
 			// Reduce Cs
 			ReduceCs(AverageStresses);
 
@@ -128,21 +129,6 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 
 		/// <inheritdoc />
 		public override Membrane Clone() => new DSFMMembrane(Concrete.Parameters, Reinforcement?.Clone(), Width, ConsiderCrackSlip);
-
-		/// <inheritdoc />
-		public override bool Equals(object? obj) => obj is DSFMMembrane other && base.Equals(other);
-
-		/// <summary>
-		///     Set Cs coefficient for concrete basing on the applied <see cref="StressState" />.
-		/// </summary>
-		/// <inheritdoc cref="CalculateCs" />
-		private void ReduceCs(StressState stressState)
-		{
-			if (Concrete.Cs.Approx(0.15, 1E-3)) // Already reduced
-				return;
-			
-			Concrete.Cs = CalculateCs(stressState);
-		}
 
 		/// <summary>
 		///     Calculate and set <see cref="CrackSlipStrains" />.
@@ -208,6 +194,18 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 		{
 			if (!_thetaIc.HasValue && Concrete.Cracked)
 				_thetaIc = Concrete.PrincipalStrains.Theta1;
+		}
+
+		/// <summary>
+		///     Set Cs coefficient for concrete basing on the applied <see cref="StressState" />.
+		/// </summary>
+		/// <inheritdoc cref="CalculateCs" />
+		private void ReduceCs(StressState stressState)
+		{
+			if (Concrete.Cs.Approx(0.15, 1E-3)) // Already reduced
+				return;
+
+			Concrete.Cs = CalculateCs(stressState);
 		}
 
 		/// <summary>
@@ -372,8 +370,15 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 				ds / s;
 		}
 
+		#region Object override
+
+		/// <inheritdoc />
+		public override bool Equals(object? obj) => obj is DSFMMembrane other && base.Equals(other);
+
 		/// <inheritdoc />
 		public override int GetHashCode() => base.GetHashCode();
+
+		#endregion
 
 		#endregion
 

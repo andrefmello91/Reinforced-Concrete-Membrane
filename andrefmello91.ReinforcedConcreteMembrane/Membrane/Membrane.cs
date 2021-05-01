@@ -113,6 +113,16 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 		#region Methods
 
 		/// <summary>
+		///     Calculate the average crack opening.
+		/// </summary>
+		/// <param name="reinforcement">The <see cref="WebReinforcement" /> object.</param>
+		/// <param name="concreteStrains">The <see cref="PrincipalStrainState" /> in concrete.</param>
+		public static Length CrackOpening(WebReinforcement? reinforcement, PrincipalStrainState concreteStrains) =>
+			concreteStrains.Epsilon1 <= 0 || concreteStrains.Epsilon1.ApproxZero(1E-9)
+				? Length.Zero
+				: concreteStrains.Epsilon1 * CrackSpacing(reinforcement, concreteStrains);
+
+		/// <summary>
 		///     Create a membrane element based on concrete constitutive model.
 		/// </summary>
 		/// <param name="considerCrackSlip">Consider crack slip? Only for <see cref="DSFMMembrane" /> (default: true)</param>
@@ -127,16 +137,6 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 				ConstitutiveModel.MCFT => new MCFTMembrane(concreteParameters, reinforcement, width),
 				_                      => new DSFMMembrane(concreteParameters, reinforcement, width, considerCrackSlip)
 			};
-
-		/// <summary>
-		///     Calculate the average crack opening.
-		/// </summary>
-		/// <param name="reinforcement">The <see cref="WebReinforcement" /> object.</param>
-		/// <param name="concreteStrains">The <see cref="PrincipalStrainState" /> in concrete.</param>
-		public static Length CrackOpening(WebReinforcement? reinforcement, PrincipalStrainState concreteStrains) =>
-			concreteStrains.Epsilon1 <= 0 || concreteStrains.Epsilon1.ApproxZero(1E-9)
-				? Length.Zero
-				: concreteStrains.Epsilon1 * CrackSpacing(reinforcement, concreteStrains);
 
 		/// <summary>
 		///     Calculate the crack spacing in principal strain direction.
@@ -176,19 +176,6 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 		/// </summary>
 		/// <param name="appliedStrains">Current applied <see cref="StrainState" />.</param>
 		public abstract void Calculate(StrainState appliedStrains);
-		
-		/// <inheritdoc />
-		public override bool Equals(object? obj) => obj is Membrane other && Equals(other);
-
-		/// <inheritdoc />
-		public abstract Membrane Clone();
-
-		/// <summary>
-		///     Compare two <see cref="Membrane" /> objects.
-		///     <para>Returns true if <see cref="Concrete" /> and <see cref="Reinforcement" /> are equal.</para>
-		/// </summary>
-		/// <param name="other">The other <see cref="Membrane" /> object.</param>
-		public bool Equals(Membrane? other) => other is not null && Concrete == other.Concrete && Reinforcement == other.Reinforcement;
 
 		/// <summary>
 		///     Limit tensile principal stress by crack check procedure, by Bentz (2000).
@@ -258,6 +245,25 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 		/// </summary>
 		protected Pressure MaximumShearOnCrack() => MaximumShearOnCrack(CrackOpening(), Concrete.Parameters);
 
+		#region Interface Implementations
+
+		/// <inheritdoc />
+		public abstract Membrane Clone();
+
+		/// <summary>
+		///     Compare two <see cref="Membrane" /> objects.
+		///     <para>Returns true if <see cref="Concrete" /> and <see cref="Reinforcement" /> are equal.</para>
+		/// </summary>
+		/// <param name="other">The other <see cref="Membrane" /> object.</param>
+		public bool Equals(Membrane? other) => other is not null && Concrete == other.Concrete && Reinforcement == other.Reinforcement;
+
+		#endregion
+
+		#region Object override
+
+		/// <inheritdoc />
+		public override bool Equals(object? obj) => obj is Membrane other && Equals(other);
+
 		/// <inheritdoc />
 		public override int GetHashCode() => Concrete.GetHashCode() + Reinforcement.GetHashCode();
 
@@ -267,6 +273,8 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 			$"Width = {Width}\n" +
 			$"{Concrete}\n" +
 			$"{Reinforcement}\n";
+
+		#endregion
 
 		#endregion
 

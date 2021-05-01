@@ -4,7 +4,6 @@ using andrefmello91.Material.Reinforcement;
 using andrefmello91.OnPlaneComponents;
 using UnitsNet;
 using UnitsNet.Units;
-
 #nullable enable
 
 namespace andrefmello91.ReinforcedConcreteMembrane
@@ -14,6 +13,7 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 	/// </summary>
 	internal class MCFTMembrane : Membrane
 	{
+
 		#region Properties
 
 		/// <inheritdoc />
@@ -44,7 +44,7 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 
 		#endregion
 
-		#region  Methods
+		#region Methods
 
 		/// <summary>
 		///     Calculate <see cref="StressState" /> and <see cref="Membrane.Stiffness" /> by MCFT, given a known
@@ -66,6 +66,8 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 		/// <inheritdoc />
 		public override Membrane Clone() => new MCFTMembrane(Concrete.Parameters, Reinforcement?.Clone(), Width);
 
+		#region Object override
+
 		/// <inheritdoc />
 		public override bool Equals(object? obj) => obj is MCFTMembrane other && base.Equals(other);
 
@@ -73,5 +75,8 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 		public override int GetHashCode() => base.GetHashCode();
 
 		#endregion
+
+		#endregion
+
 	}
 }
