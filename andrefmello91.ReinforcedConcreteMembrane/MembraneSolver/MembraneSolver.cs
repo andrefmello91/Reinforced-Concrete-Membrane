@@ -590,6 +590,8 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 		/// </summary>
 		private void UpdateStiffness()
 		{
+			Matrix<double> dK;
+			
 			// Clone current stiffness
 			var kc = _currentStiffness.Clone();
 
@@ -597,22 +599,14 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 			{
 				// Newton-Raphson update
 				case Solver.NewtonRaphson:
-					// Get differentiations
+					// Get variations
 					var de = (_currentStrains - _lastStrains).AsVector();
-					var dk = _currentStiffness - _lastStiffness;
+					var ds = (_currentStresses - _lastStresses).AsVector();
 
-					// Get strains from last load step
-					var ei = _currentStrains.AsVector();
-
-					// Increment elements of stiffness matrix
-					for (var i = 0; i < 3; i++)
-					for (var j = 0; j < 3; j++)
-						kc[i, j] += dk.Row(i) / de[j] * ei;
-
-					// Set new values
-					_lastStiffness    = _currentStiffness;
-					_currentStiffness = kc;
-					return;
+					// Calculate increment
+					dK = ds.ToColumnMatrix() * de.ToRowMatrix();
+					
+					break;
 
 				// Secant update
 				case Solver.Secant:
@@ -621,17 +615,19 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 						dStrain = (_currentStrains - _lastStrains).AsVector(),
 						dRes    = (_currentResidual - _lastResidual).AsVector();
 
-					// Increment current stiffness
-					var dK = ((dRes - _lastStiffness * dStrain) / dStrain.Norm(2)).ToColumnMatrix() * dStrain.ToRowMatrix();
+					// Calculate increment
+					dK = ((dRes - _lastStiffness * dStrain) / dStrain.Norm(2)).ToColumnMatrix() * dStrain.ToRowMatrix();
 
-					// Set new values
-					_currentStiffness = _lastStiffness + dK;
-					_lastStiffness    = kc;
-					return;
+					break;
 
 				default:
 					return;
 			}
+			
+			// Set new values
+			_lastStiffness    =  _currentStiffness;
+			_currentStiffness += dK;
+
 		}
 
 		/// <summary>
