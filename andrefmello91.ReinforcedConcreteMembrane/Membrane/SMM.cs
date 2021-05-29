@@ -44,7 +44,7 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 		public override void Calculate(StrainState appliedStrains)
 		{
 			AverageStrains          = appliedStrains.Clone();
-			AveragePrincipalStrains = (PrincipalStrainState) appliedStrains.ToPrincipal();
+			AveragePrincipalStrains = appliedStrains.ToPrincipal();
 			
 			// Calculate and set concrete and steel stresses
 			Concrete.CalculatePrincipalStresses(AverageStrains, Reinforcement);
