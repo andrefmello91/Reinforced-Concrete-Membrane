@@ -30,9 +30,6 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 
 		#region Properties
 
-		/// <inheritdoc />
-		public override StrainState ConcreteStrains => AverageStrains - CrackSlipStrains;
-
 		/// <summary>
 		///     Get/set crack slip consideration.
 		/// </summary>
@@ -113,8 +110,11 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 			// Reduce Cs
 			ReduceCs(AverageStresses);
 
+			// Calculate concrete strains
+			var cStrains = AverageStrains - CrackSlipStrains;
+			
 			// Calculate and set concrete and steel stresses
-			Concrete.CalculatePrincipalStresses(ConcreteStrains, Reinforcement, ReferenceLength);
+			Concrete.CalculatePrincipalStresses(cStrains, Reinforcement, ReferenceLength);
 			Reinforcement?.CalculateStresses(AverageStrains);
 
 			// Calculate apparent principal strains
