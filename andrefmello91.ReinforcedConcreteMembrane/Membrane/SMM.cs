@@ -13,7 +13,7 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 	/// </summary>
 	internal class SMMMembrane : Membrane
 	{
-
+		
 		#region Constructors
 
 		/// <inheritdoc cref="MCFTMembrane(IParameters, WebReinforcement, Length)" />
@@ -49,9 +49,6 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 			// Calculate and set concrete and steel stresses
 			Concrete.CalculatePrincipalStresses(AverageStrains, Reinforcement);
 			Reinforcement?.CalculateStresses(AverageStrains);
-
-			// Verify if concrete is cracked and check crack stresses to limit fc1
-			CrackCheck();
 		}
 
 		/// <inheritdoc />

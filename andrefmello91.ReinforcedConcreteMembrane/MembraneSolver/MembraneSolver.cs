@@ -445,7 +445,7 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 			_lastStiffness = _currentStiffness.Clone();
 
 			if (_writeInConsole)
-				Console.WriteLine("\nStarting {0} analysis...\n", Element is MCFTMembrane ? "MCFT" : "DSFM");
+				Console.WriteLine("\nStarting {0} analysis...\n", $"{Element.Concrete.Model}");
 		}
 
 		/// <summary>
@@ -501,17 +501,8 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 		///     Returns the output file name and save location.
 		/// </summary>
 		/// <param name="location">The location to save output file.</param>
-		private string ResultFileName(string location)
-		{
-			// Set filename
-			var fileName = $"{location}membrane_result_";
-
-			fileName += Element is MCFTMembrane ? "MCFT" : "DSFM";
-
-			// Set file extension
-			return
-				$"{fileName}.csv";
-		}
+		private string ResultFileName(string location) =>
+			$"{location}membrane_result_{Element.Concrete.Model}.csv";
 
 		/// <summary>
 		///     Save results in output matrices.
