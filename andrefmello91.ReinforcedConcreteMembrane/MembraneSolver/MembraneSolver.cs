@@ -201,7 +201,7 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 		/// <summary>
 		///     Get the analysis type.
 		/// </summary>
-		private string AnalysisType => Element is MCFTMembrane ? "MCFT" : "DSFM";
+		private string AnalysisType => $"{Element.Concrete.Model}";
 
 		/// <summary>
 		///     Get current load factor.
@@ -445,7 +445,7 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 			_lastStiffness = _currentStiffness.Clone();
 
 			if (_writeInConsole)
-				Console.WriteLine("\nStarting {0} analysis...\n", $"{Element.Concrete.Model}");
+				Console.WriteLine("\nStarting {0} analysis...\n", AnalysisType);
 		}
 
 		/// <summary>
@@ -502,7 +502,7 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 		/// </summary>
 		/// <param name="location">The location to save output file.</param>
 		private string ResultFileName(string location) =>
-			$"{location}membrane_result_{Element.Concrete.Model}.csv";
+			$"{location}membrane_result_{AnalysisType}.csv";
 
 		/// <summary>
 		///     Save results in output matrices.
