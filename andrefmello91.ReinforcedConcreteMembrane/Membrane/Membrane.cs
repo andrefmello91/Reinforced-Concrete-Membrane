@@ -46,11 +46,6 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 		public BiaxialConcrete Concrete { get; protected set; }
 
 		/// <summary>
-		///     Get the <see cref="StrainState" /> in concrete.
-		/// </summary>
-		public abstract StrainState ConcreteStrains { get; }
-
-		/// <summary>
 		///     Get initial <see cref="Membrane" /> stiffness <see cref="Matrix" />.
 		/// </summary>
 		/// <inheritdoc cref="BiaxialConcrete.InitialStiffness" />
@@ -99,7 +94,7 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 		protected Membrane(IParameters concreteParameters, WebReinforcement? reinforcement, Length width, ConstitutiveModel model)
 		{
 			// Initiate new materials
-			Concrete      = new BiaxialConcrete(concreteParameters, model);
+			Concrete      = BiaxialConcrete.From(concreteParameters, model);
 			Reinforcement = reinforcement;
 
 			Width = width;
@@ -135,7 +130,8 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 			model switch
 			{
 				ConstitutiveModel.MCFT => new MCFTMembrane(concreteParameters, reinforcement, width),
-				_                      => new DSFMMembrane(concreteParameters, reinforcement, width, considerCrackSlip)
+				ConstitutiveModel.DSFM => new DSFMMembrane(concreteParameters, reinforcement, width, considerCrackSlip),
+				_                      => new SMMMembrane(concreteParameters, reinforcement, width)
 			};
 
 		/// <summary>

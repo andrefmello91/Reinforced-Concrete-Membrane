@@ -9,33 +9,26 @@ using UnitsNet.Units;
 namespace andrefmello91.ReinforcedConcreteMembrane
 {
 	/// <summary>
-	///     MCFT class, based on formulation by Vecchio and Collins (1986).
+	///     SMM class, based on formulation by Hsu and Zhu (2002).
 	/// </summary>
-	internal class MCFTMembrane : Membrane
+	internal class SMMMembrane : Membrane
 	{
-
-		#region Properties
-
-		/// <inheritdoc />
-		public override PrincipalStrainState AveragePrincipalStrains => Concrete.PrincipalStrains;
-
-		#endregion
-
+		
 		#region Constructors
 
 		/// <inheritdoc cref="MCFTMembrane(IParameters, WebReinforcement, Length)" />
 		/// <param name="unit">The <see cref="LengthUnit" /> of <paramref name="width" /></param>
-		internal MCFTMembrane(IParameters concreteParameters, WebReinforcement? reinforcement, double width, LengthUnit unit = LengthUnit.Millimeter)
+		internal SMMMembrane(IParameters concreteParameters, WebReinforcement? reinforcement, double width, LengthUnit unit = LengthUnit.Millimeter)
 			: this(concreteParameters, reinforcement, (Length) width.As(unit))
 		{
 		}
 
 		/// <summary>
-		///     Membrane element for MCFT analysis.
+		///     Membrane element for SMM analysis.
 		/// </summary>
 		/// <inheritdoc cref="Membrane(IParameters, WebReinforcement?, Length, ConstitutiveModel)" />
-		internal MCFTMembrane(IParameters concreteParameters, WebReinforcement? reinforcement, Length width)
-			: base(concreteParameters, reinforcement, width, ConstitutiveModel.MCFT)
+		internal SMMMembrane(IParameters concreteParameters, WebReinforcement? reinforcement, Length width)
+			: base(concreteParameters, reinforcement, width, ConstitutiveModel.SMM)
 		{
 		}
 
@@ -50,23 +43,21 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 		/// <param name="appliedStrains">Current <see cref="StrainState" />.</param>
 		public override void Calculate(StrainState appliedStrains)
 		{
-			AverageStrains = appliedStrains.Clone();
-
+			AverageStrains          = appliedStrains.Clone();
+			AveragePrincipalStrains = appliedStrains.ToPrincipal();
+			
 			// Calculate and set concrete and steel stresses
 			Concrete.CalculatePrincipalStresses(AverageStrains, Reinforcement);
 			Reinforcement?.CalculateStresses(AverageStrains);
-
-			// Verify if concrete is cracked and check crack stresses to limit fc1
-			CrackCheck();
 		}
 
 		/// <inheritdoc />
-		public override Membrane Clone() => new MCFTMembrane(Concrete.Parameters, Reinforcement?.Clone(), Width);
+		public override Membrane Clone() => new SMMMembrane(Concrete.Parameters, Reinforcement?.Clone(), Width);
 
 		#region Object override
 
 		/// <inheritdoc />
-		public override bool Equals(object? obj) => obj is MCFTMembrane other && base.Equals(other);
+		public override bool Equals(object? obj) => obj is SMMMembrane other && base.Equals(other);
 
 		/// <inheritdoc />
 		public override int GetHashCode() => base.GetHashCode();
