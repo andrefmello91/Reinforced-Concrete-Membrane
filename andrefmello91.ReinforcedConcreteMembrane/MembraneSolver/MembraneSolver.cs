@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using andrefmello91.Extensions;
 using andrefmello91.Material.Concrete;
 using andrefmello91.Material.Reinforcement;
@@ -174,6 +175,16 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 		/// </summary>
 		private bool _writeInConsole = true;
 
+		/// <summary>
+		///		The initial strain increment of the current load step.
+		/// </summary>
+		private StrainState _initialIncrement;
+		
+		/// <summary>
+		///		The strain increment of the current load step.
+		/// </summary>
+		private StrainState _currentIncrement;
+		
 		#endregion
 
 		#region Properties
@@ -207,6 +218,16 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 		///     Get current load factor.
 		/// </summary>
 		private double LoadFactor => (double) _loadStep / _numLoadSteps;
+
+		/// <summary>
+		///     Calculate stress convergence.
+		/// </summary>
+		private double StressConvergence => CalculateConvergence(_currentResidual.AsVector(), _stepStresses.AsVector());
+
+		/// <summary>
+		///     Calculate strain convergence.
+		/// </summary>
+		private double StrainConvergence => CalculateConvergence(_currentIncrement.AsArray(), _initialIncrement.AsArray());
 
 		#endregion
 
@@ -260,6 +281,9 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 			Console.WriteLine("Done! Press any key to exit.");
 			Console.ReadKey();
 		}
+
+		private static double CalculateConvergence(IEnumerable<double> numerator, IEnumerable<double> denominator) =>
+			numerator.Sum(n => n * n) / (1 + denominator.Sum(d => d * d));
 
 		/// <summary>
 		///     Output results in a CSV file.
@@ -358,29 +382,6 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 		}
 
 		/// <summary>
-		///     Calculate stress convergence.
-		/// </summary>
-		private double Convergence()
-		{
-			Vector<double>
-				res = _currentResidual.AsVector(),
-				app = _stepStresses.AsVector();
-
-			double
-				num = 0,
-				den = 1;
-
-			for (var i = 0; i < res.Count; i++)
-			{
-				num += res[i] * res[i];
-				den += app[i] * app[i];
-			}
-
-			return
-				num / den;
-		}
-
-		/// <summary>
 		///     Write a message after achieving convergence.
 		/// </summary>
 		private void ConvergenceMessage()
@@ -403,15 +404,9 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 		/// <summary>
 		///     Verify if convergence is reached.
 		/// </summary>
-		/// <param name="minIterations">Minimum number of iterations (default: 2).</param>
-		private bool ConvergenceReached(int minIterations = 2) => ConvergenceReached(Convergence(), minIterations);
-
-		/// <summary>
-		///     Verify if convergence is reached.
-		/// </summary>
 		/// <param name="convergence">Calculated convergence.</param>
 		/// <param name="minIterations">Minimum number of iterations (default: 2).</param>
-		private bool ConvergenceReached(double convergence, int minIterations = 2) => convergence <= _tolerance && _iteration >= minIterations;
+		private bool ConvergenceReached(double convergence, double? tolerance = null,  int minIterations = 2) => convergence <= (tolerance ?? _tolerance) && _iteration >= minIterations;
 
 		/// <summary>
 		///     Initialize auxiliary fields and write a starting message in <see cref="Console" />.
@@ -431,9 +426,9 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 			_writeInConsole  = writeInConsole;
 
 			// Get initial stresses
-			_stepStresses    = LoadFactor * _appliedStresses;
-			_currentStresses = StressState.Zero;
-			_lastStresses    = StressState.Zero;
+			_stepStresses     = LoadFactor * _appliedStresses;
+			_currentStresses  = _lastStresses     = StressState.Zero;
+			_currentIncrement = _initialIncrement = StrainState.Zero;
 
 			// Calculate initial stiffness
 			_currentStiffness = Element.InitialStiffness;
@@ -466,16 +461,22 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 				// Calculate and update residual
 				UpdateResidual();
 
-				// If convergence is reached
-				if (ConvergenceReached())
+				// Check stress convergence
+				if (ConvergenceReached(StressConvergence))
 					goto ConvergenceReached;
 
 				// If reached max iterations
 				if (_iteration == _maxIterations)
 					goto Stop;
 
-				// Update stiffness and strains
+				// Update strains
 				UpdateStrains();
+				
+				// Check strain convergence
+				if (ConvergenceReached(StrainConvergence, 1E-6, 5))
+					goto ConvergenceReached;
+
+				// Update stiffness
 				UpdateStiffness();
 
 				_iteration++;
@@ -514,7 +515,7 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 		private void SaveResults()
 		{
 			_strainOutput.Add(Element.AverageStrains);
-			_stressOutput.Add(_stepStresses);
+			_stressOutput.Add(Element.AverageStresses);
 			_principalStressOutput.Add(Element.Concrete.PrincipalStresses);
 
 			_concretePrincipalStrainOutput.Add(Element.Concrete.PrincipalStrains);
@@ -582,9 +583,6 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 		private void UpdateStiffness()
 		{
 			Matrix<double> dK;
-			
-			// Clone current stiffness
-			var kc = _currentStiffness.Clone();
 
 			switch (Solver)
 			{
@@ -596,7 +594,7 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 
 					// Calculate increment
 					dK = ds.ToColumnMatrix() * de.ToRowMatrix();
-					
+
 					break;
 
 				// Secant update
@@ -614,11 +612,10 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 				default:
 					return;
 			}
-			
+
 			// Set new values
 			_lastStiffness    =  _currentStiffness;
 			_currentStiffness += dK;
-
 		}
 
 		/// <summary>
@@ -629,8 +626,14 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 			// Get current strains
 			var eCur = _currentStrains.Clone();
 
+			// Calculate increment and set initial increment
+			_currentIncrement = StrainState.FromStresses(-_currentResidual, _currentStiffness);
+
+			if (_iteration == 1)
+				_initialIncrement = _currentIncrement.Clone();
+			
 			// Increment strains
-			_currentStrains += StrainState.FromStresses(-_currentResidual, _currentStiffness);
+			_currentStrains += _currentIncrement;
 
 			// Set last strains
 			_lastStrains = eCur;

@@ -1,4 +1,5 @@
-﻿using andrefmello91.Extensions;
+﻿using System;
+using andrefmello91.Extensions;
 using andrefmello91.Material.Concrete;
 using andrefmello91.Material.Reinforcement;
 using andrefmello91.OnPlaneComponents;
@@ -13,7 +14,6 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 	/// </summary>
 	internal class SMMMembrane : Membrane
 	{
-		
 		#region Constructors
 
 		/// <inheritdoc cref="MCFTMembrane(IParameters, WebReinforcement, Length)" />
@@ -49,6 +49,83 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 			// Calculate and set concrete and steel stresses
 			Concrete.CalculatePrincipalStresses(AverageStrains, Reinforcement);
 			Reinforcement?.CalculateStresses(AverageStrains);
+		}
+
+		// private void Solve()
+		// {
+		// 	var strains = AveragePrincipalStrains.Transform(Concrete.DeviationAngle);
+		//
+		// 	double SolveGamma(double gamma)
+		// 	{
+		// 		double SolveEpsilon1(double epsilon1)
+		// 		{
+		// 			strains = new StrainState(strains.EpsilonX, epsilon1, gamma, strains.ThetaX);
+		// 			
+		// 			// Remove Poisson effect
+		// 			var noPoissonStrain = RemovePoissonEffect(strains, Reinforcement, Concrete.Cracked);
+		// 			
+		// 			// Calculate and set concrete and steel stresses
+		// 			Concrete.CalculatePrincipalStresses(noPoissonStrain, Reinforcement);
+		// 			Reinforcement?.CalculateStresses(noPoissonStrain.ToHorizontal());
+		//
+		// 		}
+		// 	}
+		// }
+		
+		/// <summary>
+		///		Calculate the strain state affected by Poisson ratios.
+		/// </summary>
+		/// <param name="smearedStrains">The smeared strain state.</param>
+		/// <inheritdoc cref="BiaxialConcrete.SMMConstitutive.PoissonCoefficients"/>
+		/// <returns>
+		///		The <see cref="StrainState"/> without Poisson effect.
+		/// </returns>
+		private static StrainState RemovePoissonEffect(StrainState smearedStrains, WebReinforcement? reinforcement, bool cracked)
+		{
+			// Get initial strains
+			var e1i = smearedStrains.EpsilonX;
+			var e2i = smearedStrains.EpsilonY;
+			
+			// Get coefficients
+			var (v12, v21) = PoissonCoefficients(reinforcement, cracked);
+			
+			// Calculate strains
+			var v1 = 1D / (1D - v12 * v21);
+			var v2 = v21 * v1;
+
+			var e1 = v1 * e1i + v2 * e2i;
+			var e2 = v2 * e1i + v1 * e2i;
+
+			return new StrainState(e1, e2, smearedStrains.GammaXY, smearedStrains.ThetaX);
+		}
+
+		/// <summary>
+		///		Calculate the Poisson coefficients for SMM.
+		/// </summary>
+		/// <param name="reinforcement">The reinforcement.</param>
+		/// <param name="cracked">The cracked state of concrete. True if cracked.</param>
+		private static (double v12, double v21) PoissonCoefficients(WebReinforcement? reinforcement, bool cracked)
+		{
+			var v21 = cracked
+				? 0
+				: 0.2;
+
+			if (reinforcement is null)
+				return (0.2, v21);
+
+			var strains = reinforcement.Strains;
+				
+			var esf = Math.Max(strains.EpsilonX, strains.EpsilonY);
+				
+			var ey = strains.EpsilonX >= strains.EpsilonY
+				? reinforcement.DirectionX?.Steel.YieldStrain
+				: reinforcement.DirectionY?.Steel.YieldStrain;
+
+			var v12 = esf <= 0 || !ey.HasValue
+				? 0.2
+				: 0.2 + 850 * esf;
+
+			return (v12, v21);
 		}
 
 		/// <inheritdoc />
