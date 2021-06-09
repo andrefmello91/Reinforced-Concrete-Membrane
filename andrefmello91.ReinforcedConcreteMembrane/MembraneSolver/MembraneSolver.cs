@@ -179,14 +179,20 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 		private int _step;
 
 		/// <summary>
-		///     Maximum number of iterations.
+		///     Maximum number of iterations to perform at each step.
 		/// </summary>
-		private int _maxIterations;
+		/// <remarks>
+		///		Default: 10000
+		/// </remarks>
+		public int MaximumIterations { get; set; } = 10000;
 
 		/// <summary>
-		///     Number of steps.
+		///     The number of steps to perform.
 		/// </summary>
-		private int _numberOfSteps;
+		/// <remarks>
+		///		Default: 100
+		/// </remarks>
+		public int NumberOfSteps { get; set; } = 100;
 
 		/// <summary>
 		///     The applied <see cref="StressState" /> at the current step.
@@ -199,9 +205,20 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 		private bool _stop;
 
 		/// <summary>
-		///     Convergence tolerance.
+		///     Convergence tolerance for stresses.
 		/// </summary>
-		private double _tolerance;
+		/// <remarks>
+		///		Default: 1E-3
+		/// </remarks>
+		public double StressTolerance { get; set; } = 1E-3;
+		
+		/// <summary>
+		///     Convergence tolerance for strains.
+		/// </summary>
+		/// <remarks>
+		///		Default: 1E-8
+		/// </remarks>
+		public double StrainTolerance { get; set; } = 1E-8;
 
 		/// <summary>
 		///     Write analysis results in console?
@@ -223,7 +240,7 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 		/// <summary>
 		///     The type of analysis control.
 		/// </summary>
-		public AnalysisControl Control { get; }
+		public AnalysisControl Control { get; set; }
 
 		/// <summary>
 		///     Get the cracking <see cref="StressState" />.
@@ -253,7 +270,7 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 		/// <summary>
 		///     Get current load factor.
 		/// </summary>
-		private double LoadFactor => (double) _step / _numberOfSteps;
+		private double LoadFactor => (double) _step / NumberOfSteps;
 
 		/// <summary>
 		///     Calculate strain convergence.
@@ -363,15 +380,12 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 		///     Solve this element to applied stresses.
 		/// </summary>
 		/// <param name="appliedStresses">Applied <see cref="StressState" />.</param>
-		/// <param name="numberOfSteps">The number of steps for <paramref name="appliedStresses" /> (default: 100).</param>
-		/// <param name="maxIterations">Maximum number of iterations (default: 10000).</param>
-		/// <param name="tolerance">Stress convergence tolerance (default: 1E-3).</param>
 		/// <param name="simulate">Simulate until convergence is not reached (failure).</param>
 		/// <param name="writeInConsole">Write analysis results in console?</param>
-		public void Solve(StressState appliedStresses, int numberOfSteps = 100, int maxIterations = 10000, double tolerance = 1E-3, bool simulate = false, bool writeInConsole = true)
+		public void Solve(StressState appliedStresses, bool simulate = false, bool writeInConsole = true)
 		{
 			// Initialize fields and write a starting message
-			Initiate(appliedStresses, numberOfSteps, maxIterations, tolerance, writeInConsole);
+			Initiate(appliedStresses, writeInConsole);
 
 			// Analyze by steps
 			StepAnalysis(simulate);
@@ -394,7 +408,7 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 		/// </summary>
 		private void CalculateStresses()
 		{
-			Element.Calculate(_currentStrains);
+			Element.Calculate(_currentStrains, _stepStresses);
 
 			// Update stresses
 			_lastStresses    = _currentStresses.Clone();
@@ -443,8 +457,10 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 		///     Verify if convergence is reached.
 		/// </summary>
 		/// <param name="convergence">Calculated convergence.</param>
+		/// <param name="tolerance">The convergence tolerance.</param>
 		/// <param name="minIterations">Minimum number of iterations (default: 2).</param>
-		private bool ConvergenceReached(double convergence, double? tolerance = null, int minIterations = 2) => convergence <= (tolerance ?? _tolerance) && _iteration >= minIterations;
+		private bool ConvergenceReached(double convergence, double tolerance, int minIterations = 2) =>
+			_iteration >= minIterations && convergence <= tolerance;
 
 		/// <summary>
 		///     Initialize auxiliary fields and write a starting message in <see cref="Console" />.
@@ -454,17 +470,14 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 		/// <param name="maxIterations">Maximum number of iterations.</param>
 		/// <param name="tolerance">Stress convergence tolerance.</param>
 		/// <param name="writeInConsole">Write analysis results in console?</param>
-		private void Initiate(StressState appliedStresses, int numberOfSteps, int maxIterations, double tolerance, bool writeInConsole)
+		private void Initiate(StressState appliedStresses, bool writeInConsole)
 		{
 			// Set values
 			_appliedStresses = appliedStresses;
-			_numberOfSteps    = numberOfSteps;
-			_maxIterations   = maxIterations;
-			_tolerance       = tolerance;
 			_writeInConsole  = writeInConsole;
 
 			// Get initial stresses
-			_step         = 1;
+			_step             = 1;
 			_stepStresses     = LoadFactor * _appliedStresses;
 			_currentStresses  = _lastStresses     = StressState.Zero;
 			_currentIncrement = _initialIncrement = StrainState.Zero;
@@ -496,7 +509,7 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 		{
 			_iteration = 1;
 
-			while (_iteration <= _maxIterations)
+			while (_iteration <= MaximumIterations)
 			{
 				// Calculate stresses
 				CalculateStresses();
@@ -508,18 +521,18 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 				UpdateResidual();
 
 				// Check stress convergence
-				if (ConvergenceReached(StressConvergence))
+				if (ConvergenceReached(StressConvergence, StressTolerance))
 					goto ConvergenceReached;
 
 				// If reached max iterations
-				if (_iteration == _maxIterations)
+				if (_iteration == MaximumIterations)
 					goto Stop;
 
 				// Update strains
 				UpdateStrains();
 
 				// Check strain convergence
-				if (ConvergenceReached(StrainConvergence, 1E-7))
+				if (ConvergenceReached(StrainConvergence, StrainTolerance))
 					goto ConvergenceReached;
 
 				// Update stiffness
@@ -626,7 +639,7 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 		{
 			// Initiate steps
 			_step = 1;
-			while (simulate || _step <= _numberOfSteps)
+			while (simulate || _step <= NumberOfSteps)
 			{
 				// Calculate stresses
 				_stepStresses = GetStepStresses();
@@ -652,6 +665,11 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 						// Set provisional stresses
 						UltimateStresses = _currentStresses;
 
+						if (_step > 927)
+						{
+							
+						}
+						
 						_step++;
 						continue;
 				}

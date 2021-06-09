@@ -171,7 +171,8 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 		///     Calculate <see cref="AverageStresses" /> and <see cref="Stiffness" />, given a known <see cref="StrainState" />.
 		/// </summary>
 		/// <param name="appliedStrains">Current applied <see cref="StrainState" />.</param>
-		public abstract void Calculate(StrainState appliedStrains);
+		/// <param name="appliedStresses">Current applied <see cref="StressState"/> (only for <see cref="ConstitutiveModel.SMM"/>)</param>
+		public abstract void Calculate(StrainState appliedStrains, StressState? appliedStresses = null);
 
 		/// <summary>
 		///     Limit tensile principal stress by crack check procedure, by Bentz (2000).
