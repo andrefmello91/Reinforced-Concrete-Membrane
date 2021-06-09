@@ -8,6 +8,7 @@ using andrefmello91.OnPlaneComponents;
 using MathNet.Numerics.Data.Text;
 using MathNet.Numerics.LinearAlgebra;
 using MathNet.Numerics.LinearAlgebra.Double;
+using UnitsNet;
 
 namespace andrefmello91.ReinforcedConcreteMembrane
 {
@@ -63,7 +64,7 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 		private const string DefaultLocation = "D:/";
 
 		/// <summary>
-		///     <see cref="Array" /> of average <see cref="PrincipalStrainState" /> results for each load step.
+		///     <see cref="Array" /> of average <see cref="PrincipalStrainState" /> results for each step.
 		/// </summary>
 		private readonly List<PrincipalStrainState> _averagePrincipalStrainOutput = new()
 		{
@@ -71,7 +72,7 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 		};
 
 		/// <summary>
-		///     <see cref="Array" /> of concrete <see cref="PrincipalStrainState" /> results for each load step.
+		///     <see cref="Array" /> of concrete <see cref="PrincipalStrainState" /> results for each step.
 		/// </summary>
 		private readonly List<PrincipalStrainState> _concretePrincipalStrainOutput = new()
 		{
@@ -79,7 +80,7 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 		};
 
 		/// <summary>
-		///     <see cref="Array" /> of <see cref="PrincipalStressState" /> results for each load step.
+		///     <see cref="Array" /> of <see cref="PrincipalStressState" /> results for each step.
 		/// </summary>
 		private readonly List<PrincipalStressState> _principalStressOutput = new()
 		{
@@ -87,7 +88,7 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 		};
 
 		/// <summary>
-		///     <see cref="Array" /> of <see cref="StrainState" /> results for each load step.
+		///     <see cref="Array" /> of <see cref="StrainState" /> results for each step.
 		/// </summary>
 		private readonly List<StrainState> _strainOutput = new()
 		{
@@ -95,7 +96,7 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 		};
 
 		/// <summary>
-		///     <see cref="Array" /> of <see cref="StressState" /> results for each load step.
+		///     <see cref="Array" /> of <see cref="StressState" /> results for each step.
 		/// </summary>
 		private readonly List<StressState> _stressOutput = new()
 		{
@@ -108,9 +109,9 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 		private StressState _appliedStresses;
 
 		/// <summary>
-		///     Number of successfully calculated load steps.
+		///     Number of successfully calculated steps.
 		/// </summary>
-		private int _calculatedLoadSteps;
+		private int _calculatedSteps;
 
 		/// <summary>
 		///     The step of concrete cracking.
@@ -118,7 +119,7 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 		private int? _crackStep;
 
 		/// <summary>
-		///     The strain increment of the current load step.
+		///     The strain increment of the current step.
 		/// </summary>
 		private StrainState _currentIncrement;
 
@@ -143,7 +144,7 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 		private StressState _currentStresses;
 
 		/// <summary>
-		///     The initial strain increment of the current load step.
+		///     The initial strain increment of the current step.
 		/// </summary>
 		private StrainState _initialIncrement;
 
@@ -173,9 +174,9 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 		private StressState _lastStresses;
 
 		/// <summary>
-		///     Current load step.
+		///     Current step.
 		/// </summary>
-		private int _loadStep;
+		private int _step;
 
 		/// <summary>
 		///     Maximum number of iterations.
@@ -183,12 +184,12 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 		private int _maxIterations;
 
 		/// <summary>
-		///     Number of load steps.
+		///     Number of steps.
 		/// </summary>
-		private int _numLoadSteps;
+		private int _numberOfSteps;
 
 		/// <summary>
-		///     The applied <see cref="StressState" /> at the current load step.
+		///     The applied <see cref="StressState" /> at the current step.
 		/// </summary>
 		private StressState _stepStresses;
 
@@ -208,12 +209,12 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 		private bool _writeInConsole = true;
 
 		/// <summary>
-		///		The shear strain increment for each load step.
+		///		The strain increment for each step.
 		/// </summary>
 		/// <remarks>
 		///		Used only in <see cref="AnalysisControl.Strain"/>.
 		/// </remarks>
-		private double _strainIncrement;
+		private StrainState _strainIncrement;
 		
 		#endregion
 
@@ -252,7 +253,7 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 		/// <summary>
 		///     Get current load factor.
 		/// </summary>
-		private double LoadFactor => (double) _loadStep / _numLoadSteps;
+		private double LoadFactor => (double) _step / _numberOfSteps;
 
 		/// <summary>
 		///     Calculate strain convergence.
@@ -337,9 +338,9 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 				outputReaders = { "ex", "ey", "exy", "", "fx", "fy", "fxy", "", "ec1", "ec2", "theta1e", "", "fc1", "fc2", "theta1f" };
 
 			// Result matrices
-			var result = Matrix<double>.Build.Dense(_calculatedLoadSteps, outputReaders.Length, double.NaN);
+			var result = Matrix<double>.Build.Dense(_calculatedSteps, outputReaders.Length, double.NaN);
 
-			for (var i = 0; i < _calculatedLoadSteps; i++)
+			for (var i = 0; i < _calculatedSteps; i++)
 			{
 				// Set stress and strain states
 				result.SetSubMatrix(i, 0, _strainOutput[i].AsVector().ToRowMatrix());
@@ -362,15 +363,15 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 		///     Solve this element to applied stresses.
 		/// </summary>
 		/// <param name="appliedStresses">Applied <see cref="StressState" />.</param>
-		/// <param name="numLoadSteps">The number of load steps for <paramref name="appliedStresses" /> (default: 100).</param>
+		/// <param name="numberOfSteps">The number of steps for <paramref name="appliedStresses" /> (default: 100).</param>
 		/// <param name="maxIterations">Maximum number of iterations (default: 10000).</param>
 		/// <param name="tolerance">Stress convergence tolerance (default: 1E-3).</param>
 		/// <param name="simulate">Simulate until convergence is not reached (failure).</param>
 		/// <param name="writeInConsole">Write analysis results in console?</param>
-		public void Solve(StressState appliedStresses, int numLoadSteps = 100, int maxIterations = 10000, double tolerance = 1E-3, bool simulate = false, bool writeInConsole = true)
+		public void Solve(StressState appliedStresses, int numberOfSteps = 100, int maxIterations = 10000, double tolerance = 1E-3, bool simulate = false, bool writeInConsole = true)
 		{
 			// Initialize fields and write a starting message
-			Initiate(appliedStresses, numLoadSteps, maxIterations, tolerance, writeInConsole);
+			Initiate(appliedStresses, numberOfSteps, maxIterations, tolerance, writeInConsole);
 
 			// Analyze by steps
 			StepAnalysis(simulate);
@@ -401,7 +402,7 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 		}
 
 		/// <summary>
-		///     Write a message in the load step that concrete cracks.
+		///     Write a message in the step that concrete cracks.
 		/// </summary>
 		private void ConcreteCrackedCheck()
 		{
@@ -409,7 +410,7 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 				return;
 
 			// Set and write message
-			_crackStep = _loadStep;
+			_crackStep = _step;
 
 			// Set cracking stresses
 			CrackingStresses = _currentStresses.Clone();
@@ -429,11 +430,11 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 			switch (Element)
 			{
 				case DSFMMembrane dsfm when Element.Concrete.Cracked:
-					Console.WriteLine("LS = {0}, Iterations = {1}, Slip Approach: {2}", _loadStep, _iteration, dsfm.SlipApproach);
+					Console.WriteLine("LS = {0}, Iterations = {1}, Slip Approach: {2}", _step, _iteration, dsfm.SlipApproach);
 					break;
 
 				default:
-					Console.WriteLine("LS = {0}, Iterations = {1}", _loadStep, _iteration);
+					Console.WriteLine("LS = {0}, Iterations = {1}", _step, _iteration);
 					break;
 			}
 		}
@@ -449,21 +450,21 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 		///     Initialize auxiliary fields and write a starting message in <see cref="Console" />.
 		/// </summary>
 		/// <param name="appliedStresses">Applied <see cref="StressState" />.</param>
-		/// <param name="numLoadSteps">The number of load steps.</param>
+		/// <param name="numberOfSteps">The number of steps.</param>
 		/// <param name="maxIterations">Maximum number of iterations.</param>
 		/// <param name="tolerance">Stress convergence tolerance.</param>
 		/// <param name="writeInConsole">Write analysis results in console?</param>
-		private void Initiate(StressState appliedStresses, int numLoadSteps, int maxIterations, double tolerance, bool writeInConsole)
+		private void Initiate(StressState appliedStresses, int numberOfSteps, int maxIterations, double tolerance, bool writeInConsole)
 		{
 			// Set values
 			_appliedStresses = appliedStresses;
-			_numLoadSteps    = numLoadSteps;
+			_numberOfSteps    = numberOfSteps;
 			_maxIterations   = maxIterations;
 			_tolerance       = tolerance;
 			_writeInConsole  = writeInConsole;
 
 			// Get initial stresses
-			_loadStep         = 1;
+			_step         = 1;
 			_stepStresses     = LoadFactor * _appliedStresses;
 			_currentStresses  = _lastStresses     = StressState.Zero;
 			_currentIncrement = _initialIncrement = StrainState.Zero;
@@ -475,7 +476,7 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 			_currentStrains = StrainState.FromStresses(_stepStresses, _currentStiffness);
 			
 			// Get the strain increment
-			_strainIncrement = _currentStrains.GammaXY;
+			_strainIncrement = _currentStrains.Clone();
 
 			// Simplify stiffness
 			// if (Control is AnalysisControl.Strain)
@@ -500,7 +501,7 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 				// Calculate stresses
 				CalculateStresses();
 
-				// Verify if concrete cracks in this load step and write a message
+				// Verify if concrete cracks in this step and write a message
 				ConcreteCrackedCheck();
 
 				// Calculate and update residual
@@ -518,7 +519,7 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 				UpdateStrains();
 
 				// Check strain convergence
-				if (Control is AnalysisControl.Strain && ConvergenceReached(StrainConvergence))
+				if (ConvergenceReached(StrainConvergence, 1E-7))
 					goto ConvergenceReached;
 
 				// Update stiffness
@@ -568,32 +569,64 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 		}
 
 		/// <summary>
-		///		Get the stiffness matrix simplified.
+		///		Get the 'free' stiffness matrix for strain control analysis.
 		/// </summary>
-		/// <remarks>
-		///		This must be done only for <see cref="AnalysisControl.Strain"/>.
-		/// </remarks>
-		/// <param name="stiffness">The element stiffness matrix.</param>
-		private static Matrix<double> Simplified(Matrix<double> stiffness)
+		private Matrix<double> FreeStiffness()
 		{
-			var k = stiffness.Clone();
+			var k = _currentStiffness.Clone();
+
+			// Get index of not zero strains
+			var strain = _strainIncrement.AsArray();
 			
-			// Clear elements
-			k.ClearRow(2);
-			k.ClearColumn(2);
-			k[2, 2] = 1;
+			for (var i = 0; i < strain.Length; i++)
+			{
+				// If strain is zero, it's free. Keep elements.
+				if (strain[i].ApproxZero())
+					continue;
+
+				// Clear elements
+				k.ClearRow(i);
+				k.ClearColumn(i);
+			}
 
 			return k;
 		}
 		
 		/// <summary>
-		///     Do analysis by load steps.
+		///		Get the 'constrained' stiffness matrix for strain control analysis.
+		/// </summary>
+		private Matrix<double> ConstrainedStiffness()
+		{
+			var k = _currentStiffness.Clone();
+
+			// Get index of not zero strains
+			var strain = _strainIncrement.AsArray();
+			
+			for (var i = 0; i < strain.Length; i++)
+			{
+				// If strain is not zero, it's constrained. Keep elements.
+				if (!strain[i].ApproxZero())
+					continue;
+
+				// Clear elements
+				k.ClearRow(i);
+				k.ClearColumn(i);
+			}
+
+			// foreach (var i in index)
+			// 	k[i, i] = 1;
+
+			return k;
+		}
+		
+		/// <summary>
+		///     Do analysis by steps.
 		/// </summary>
 		private void StepAnalysis(bool simulate)
 		{
-			// Initiate load steps
-			_loadStep = 1;
-			while (simulate || _loadStep <= _numLoadSteps)
+			// Initiate steps
+			_step = 1;
+			while (simulate || _step <= _numberOfSteps)
 			{
 				// Calculate stresses
 				_stepStresses = GetStepStresses();
@@ -607,10 +640,10 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 					case true:
 						
 						// Decrement ls to correct output file
-						_loadStep--;
+						_step--;
 						
-						// Set last load step
-						_calculatedLoadSteps = _loadStep;
+						// Set last step
+						_calculatedSteps = _step;
 						return;
 					
 					// Solution reached
@@ -619,10 +652,12 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 						// Set provisional stresses
 						UltimateStresses = _currentStresses;
 
-						_loadStep++;
+						_step++;
 						continue;
 				}
 			}
+
+			_step = 1;
 		}
 
 		/// <summary>
@@ -634,7 +669,7 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 			_stop = true;
 
 			if (_writeInConsole)
-				Console.WriteLine("LS = {0}, {1}", _loadStep, "CONVERGENCE NOT REACHED");
+				Console.WriteLine("LS = {0}, {1}", _step, "CONVERGENCE NOT REACHED");
 		}
 
 		/// <summary>
@@ -645,45 +680,24 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 			// Set new values
 			_lastResidual    = _currentResidual.Clone();
 			
-			// Get the simplified stresses
-			var curStresses = Control is AnalysisControl.Stress
-				? _currentStresses
-				: SimplifiedStresses(_currentStresses, _currentStiffness, _loadStep * _strainIncrement);
+			// // Get the simplified stresses
+			// var (stepStresses, curStresses) = Control is AnalysisControl.Stress
+			// 	? (_stepStresses, _currentStresses)
+			// 	: (SimplifiedStresses(_stepStresses, _currentStiffness, _loadStep * _strainIncrement), SimplifiedStresses(_currentStresses, _currentStiffness, _loadStep * _strainIncrement));
 			
 			// Set residual
-			_currentResidual = curStresses - _stepStresses;
+			_currentResidual = _currentStresses - _stepStresses;
 		}
 
 		/// <summary>
-		///		Get the stress state for the current load step, basing in the analysis control.
+		///		Get the stress state for the current step, basing in the analysis control.
 		/// </summary>
-		private StressState GetStepStresses()
-		{
-			var stresses = LoadFactor * _appliedStresses;
-
-			return Control is AnalysisControl.Stress
-				? stresses
-				: SimplifiedStresses(stresses, _currentStiffness, _loadStep * _strainIncrement);
-		}
-		
-		/// <summary>
-		///		Get the stress state for the current load step, basing in the analysis control.
-		/// </summary>
-		/// <param name="stepStresses">The current stress state.</param>
-		/// <param name="stiffness">The current stiffness matrix.</param>
-		/// <param name="shearStrain">The known shear strain value.</param>
-		/// <returns>
-		///		The simplified <see cref="StressState"/>
-		/// </returns>
-		private static StressState SimplifiedStresses(StressState stepStresses, Matrix<double> stiffness, double shearStrain)
-		{
-			// Get the stress state
-			var st = stepStresses.AsVector() - stiffness.Column(2) * shearStrain;
-			st[2]  = shearStrain;
-			
-			return 
-				StressState.FromVector(st);
-		}
+		private StressState GetStepStresses() =>
+			Control switch
+			{
+				AnalysisControl.Stress => LoadFactor * _appliedStresses,
+				_                      => StressState.FromStrains(_step * _strainIncrement, _currentStiffness)
+			};
 
 		/// <summary>
 		///     Calculate the secant stiffness <see cref="Matrix" /> of current iteration.
@@ -720,14 +734,15 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 				default:
 					return;
 			}
+			
+			// Simplify increment
+			// if (Control is AnalysisControl.Strain)
+			// 	dK = Simplified(dK);
 
 			// Set new values
-			_lastStiffness    =  _currentStiffness;
+			_lastStiffness    =  _currentStiffness.Clone();
 			_currentStiffness += dK;
 			
-			// // Simplify stiffness
-			// if (Control is AnalysisControl.Strain)
-			// 	Simplify(_currentStiffness);
 		}
 
 		/// <summary>
@@ -735,14 +750,10 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 		/// </summary>
 		private void UpdateStrains()
 		{
-			// Get simplified stiffness
-			var k = Control is AnalysisControl.Stress
-				? _currentStiffness
-				: Simplified(_currentStiffness);
-			
-			// Calculate increment and set initial increment
-			_currentIncrement = StrainState.FromStresses(-_currentResidual, k);
+			// Calculate increment
+			_currentIncrement = StrainState.FromStresses(-_currentResidual, _currentStiffness);
 
+			// Calculate increment and set initial increment
 			if (_iteration == 1)
 				_initialIncrement = _currentIncrement.Clone();
 
@@ -751,6 +762,53 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 			_currentStrains += _currentIncrement;
 		}
 
+		/// <summary>
+		///		Get the strain increment for the next step.
+		/// </summary>
+		private StrainState StrainIncrement()
+		{
+			switch (Control)
+			{
+				case AnalysisControl.Stress:
+					return
+						StrainState.FromStresses(-_currentResidual, _currentStiffness);
+
+				default:
+					// Get 'free' stiffness and stresses
+					var stresses      = FreeStresses();
+					var freeStiffness = FreeStiffness();
+
+					if (_iteration == 1)
+						stresses += StressState.FromStrains(_step * _strainIncrement, _currentStiffness);
+					
+					return
+						StrainState.FromStresses(-stresses, freeStiffness);
+			}
+		}
+
+		/// <summary>
+		///		Get the simplified 'free' stress state for strain control analysis.
+		/// </summary>
+		/// <returns>
+		///		The <see cref="StressState"/> where there is no strain applied.
+		/// </returns>
+		private StressState FreeStresses()
+		{
+			var stresses     = _currentStresses.AsArray();
+			var strain       = _strainIncrement.AsArray();
+			var simpStresses = new Pressure[3];
+
+			for (var i = 0; i < strain.Length; i++)
+			{
+				simpStresses[i] = strain[i].ApproxZero()
+					? stresses[i]
+					: Pressure.Zero;
+			}
+
+			return
+				new StressState(simpStresses[0], simpStresses[1], simpStresses[2]);
+		}
+		
 		#endregion
 
 	}
