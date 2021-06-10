@@ -48,7 +48,7 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 		///     <see cref="StrainState" />.
 		/// </summary>
 		/// <inheritdoc />
-		public override void Calculate(StrainState appliedStrains, StressState? appliedStresses = null)
+		public override void Calculate(StrainState appliedStrains)
 		{
 			AverageStrains = appliedStrains.Clone();
 
