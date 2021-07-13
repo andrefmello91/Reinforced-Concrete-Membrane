@@ -93,7 +93,7 @@ namespace andrefmello91.ReinforcedConcreteMembrane.Solver
 		/// <summary>
 		///     The secant stiffness <see cref="Matrix" /> of current iteration
 		/// </summary>
-		private Matrix<double> _currentStiffness = null!;
+		private MaterialMatrix _currentStiffness = null!;
 
 		/// <summary>
 		///     The <see cref="StrainState" /> of current iteration
@@ -123,7 +123,7 @@ namespace andrefmello91.ReinforcedConcreteMembrane.Solver
 		/// <summary>
 		///     The secant stiffness <see cref="Matrix" /> of last iteration
 		/// </summary>
-		private Matrix<double> _lastStiffness = null!;
+		private MaterialMatrix _lastStiffness = null!;
 
 		/// <summary>
 		///     The <see cref="StrainState" /> of last iteration
@@ -431,7 +431,7 @@ namespace andrefmello91.ReinforcedConcreteMembrane.Solver
 			Control switch
 			{
 				AnalysisControl.Stress => LoadFactor * _appliedStresses,
-				_                      => StressState.FromStrains(_currentStrains + _strainIncrement, _currentStiffness)
+				_                      => _currentStiffness * (_currentStrains + _strainIncrement)
 			};
 
 		/// <summary>
@@ -458,10 +458,10 @@ namespace andrefmello91.ReinforcedConcreteMembrane.Solver
 			_currentStrains = StrainState.Zero;
 
 			// Get the strain increment
-			_strainIncrement = StrainState.FromStresses(_stepStresses, _currentStiffness);
+			_strainIncrement = _stepStresses / _currentStiffness;
 
 			// Initiate solution values
-			_lastStiffness = _currentStiffness.Clone();
+			_lastStiffness = (MaterialMatrix) _currentStiffness.Clone();
 
 			if (_writeInConsole)
 				Console.WriteLine("\nStarting {0} analysis...\n", AnalysisType);
@@ -650,8 +650,8 @@ namespace andrefmello91.ReinforcedConcreteMembrane.Solver
 			}
 
 			// Set new values
-			_lastStiffness    =  _currentStiffness.Clone();
-			_currentStiffness += dK;
+			_lastStiffness    = (MaterialMatrix)  _currentStiffness.Clone();
+			_currentStiffness = (MaterialMatrix) (_currentStiffness + new MaterialMatrix(dK));
 		}
 
 		/// <summary>
@@ -660,7 +660,7 @@ namespace andrefmello91.ReinforcedConcreteMembrane.Solver
 		private void UpdateStrains()
 		{
 			// Calculate increment
-			_currentIncrement = -StrainState.FromStresses(_currentResidual, _currentStiffness);
+			_currentIncrement = -(_currentResidual / _currentStiffness);
 
 			// Calculate increment and set initial increment
 			if (_iteration == 1)

@@ -48,7 +48,9 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 		/// <summary>
 		///     Get current pseudo-stresses, in MPa.
 		/// </summary>
-		public StressState PseudoStresses => CrackSlipStrains.IsZero ? StressState.Zero : StressState.FromStrains(CrackSlipStrains, Concrete.Stiffness);
+		public StressState PseudoStresses => CrackSlipStrains.IsZero
+			? StressState.Zero
+			: Concrete.Stiffness.Solve(CrackSlipStrains);
 
 		#endregion
 
