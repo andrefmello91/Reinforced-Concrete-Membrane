@@ -47,7 +47,7 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 		///     Calculate <see cref="StressState" /> and <see cref="Membrane.Stiffness" /> by MCFT, given a known
 		///     <see cref="StrainState" />.
 		/// </summary>
-		/// <param name="appliedStrains">Current <see cref="StrainState" />.</param>
+		/// <inheritdoc />
 		public override void Calculate(StrainState appliedStrains)
 		{
 			AverageStrains = appliedStrains.Clone();

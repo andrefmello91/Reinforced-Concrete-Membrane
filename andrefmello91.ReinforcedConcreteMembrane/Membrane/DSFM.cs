@@ -48,7 +48,9 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 		/// <summary>
 		///     Get current pseudo-stresses, in MPa.
 		/// </summary>
-		public StressState PseudoStresses => CrackSlipStrains.IsZero ? StressState.Zero : StressState.FromStrains(CrackSlipStrains, Concrete.Stiffness);
+		public StressState PseudoStresses => CrackSlipStrains.IsZero
+			? StressState.Zero
+			: Concrete.Stiffness.Solve(CrackSlipStrains);
 
 		#endregion
 
@@ -101,7 +103,7 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 		///     Calculate <see cref="StressState" /> and <see cref="Membrane.Stiffness" /> by DSFM, given a known
 		///     <see cref="StrainState" />.
 		/// </summary>
-		/// <param name="appliedStrains">Current <see cref="StrainState" />.</param>
+		/// <inheritdoc />
 		public override void Calculate(StrainState appliedStrains)
 		{
 			// Set strains

@@ -49,9 +49,9 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 		///     Get initial <see cref="Membrane" /> stiffness <see cref="Matrix" />.
 		/// </summary>
 		/// <inheritdoc cref="BiaxialConcrete.InitialStiffness" />
-		public Matrix<double> InitialStiffness => Reinforcement is null
+		public MaterialMatrix InitialStiffness => Reinforcement is null
 			? Concrete.InitialStiffness
-			: Concrete.InitialStiffness + Reinforcement.InitialStiffness;
+			: (MaterialMatrix) (Concrete.InitialStiffness + Reinforcement.InitialStiffness);
 
 		/// <summary>
 		///     Get reference length.
@@ -66,7 +66,9 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 		/// <summary>
 		///     Get current <see cref="Membrane" /> stiffness <see cref="Matrix" />.
 		/// </summary>
-		public Matrix<double> Stiffness => Reinforcement is null ? Concrete.Stiffness : Concrete.Stiffness + Reinforcement.Stiffness;
+		public MaterialMatrix Stiffness => Reinforcement is null
+			? Concrete.Stiffness
+			: (MaterialMatrix) (Concrete.Stiffness + Reinforcement.Stiffness);
 
 		/// <summary>
 		///     Get the width of the membrane element.
