@@ -28,9 +28,9 @@
     </ItemGroup>
 
     <ItemGroup Condition="'$(Configuration)'=='Release'">
-        <PackageReference Include="andrefmello91.Extensions" Version="1.0.8" />
+        <PackageReference Include="andrefmello91.Extensions" Version="1.0.9" />
         <PackageReference Include="andrefmello91.Material" Version="1.1.1" />
-        <PackageReference Include="andrefmello91.OnPlaneComponents" Version="1.1.3" />
+        <PackageReference Include="andrefmello91.OnPlaneComponents" Version="1.1.4" />
     </ItemGroup>
 
     <ItemGroup Condition="'$(Configuration)'=='Debug'">
