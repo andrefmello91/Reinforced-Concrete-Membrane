@@ -103,8 +103,8 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 			var esf = Math.Max(strains.EpsilonX, strains.EpsilonY);
 				
 			var ey = strains.EpsilonX >= strains.EpsilonY
-				? reinforcement.DirectionX?.Steel.YieldStrain
-				: reinforcement.DirectionY?.Steel.YieldStrain;
+				? reinforcement.DirectionX?.Steel.Parameters.YieldStrain
+				: reinforcement.DirectionY?.Steel.Parameters.YieldStrain;
 
 			var v12 = esf <= 0 || !ey.HasValue
 				? 0.2
