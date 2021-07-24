@@ -54,7 +54,7 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 
 			// Calculate and set concrete and steel stresses
 			Concrete.CalculatePrincipalStresses(AverageStrains, Reinforcement);
-			Reinforcement?.CalculateStresses(AverageStrains);
+			Reinforcement?.Calculate(AverageStrains);
 
 			// Verify if concrete is cracked and check crack stresses to limit fc1
 			CrackCheck();

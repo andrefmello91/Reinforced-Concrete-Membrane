@@ -117,7 +117,7 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 			
 			// Calculate and set concrete and steel stresses
 			Concrete.CalculatePrincipalStresses(cStrains, Reinforcement, ReferenceLength);
-			Reinforcement?.CalculateStresses(AverageStrains);
+			Reinforcement?.Calculate(AverageStrains);
 
 			// Calculate apparent principal strains
 			AveragePrincipalStrains = PrincipalStrainState.FromStrain(AverageStrains);
@@ -258,6 +258,9 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 		{
 			var theta1 = Concrete.PrincipalStrains.Theta1;
 
+			var rx = Reinforcement?.DirectionX?.Clone();
+			var ry = Reinforcement?.DirectionY?.Clone();
+			
 			// Get the average strains
 			double
 				ex = AverageStrains.EpsilonX,
@@ -291,9 +294,13 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 				esCry = ey + de1Cr * cosNy2;
 
 			// Calculate reinforcement stresses
+			// Calculate reinforcement stresses
+			rx?.Calculate(esCrx);
+			ry?.Calculate(esCry);
+
 			Pressure
-				fscrx = Reinforcement?.DirectionX?.CalculateStress(esCrx) ?? Pressure.Zero,
-				fscry = Reinforcement?.DirectionY?.CalculateStress(esCry) ?? Pressure.Zero;
+				fscrx = rx?.Stress ?? Pressure.Zero,
+				fscry = ry?.Stress ?? Pressure.Zero;
 
 			// Calculate shear stress
 			return
@@ -308,9 +315,12 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 					esCryIt = ey + de1CrIt * cosNy2;
 
 				// Calculate reinforcement stresses
+				rx?.Calculate(esCrxIt);
+				ry?.Calculate(esCryIt);
+				
 				Pressure
-					fscrxIt = Reinforcement?.DirectionX?.CalculateStress(esCrxIt) ?? Pressure.Zero,
-					fscryIt = Reinforcement?.DirectionY?.CalculateStress(esCryIt) ?? Pressure.Zero;
+					fscrxIt = rx?.Stress ?? Pressure.Zero,
+					fscryIt = ry?.Stress ?? Pressure.Zero;
 
 				// Check equilibrium (must be zero)
 				return

@@ -53,7 +53,7 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 					
 			// Calculate and set concrete and steel stresses
 			Concrete.CalculatePrincipalStresses(noPoissonStrain, Reinforcement);
-			Reinforcement?.CalculateStresses(noPoissonStrain.ToHorizontal());
+			Reinforcement?.Calculate(noPoissonStrain.ToHorizontal());
 		}
 
 		// private void Solve(StressState appliedStresses)
