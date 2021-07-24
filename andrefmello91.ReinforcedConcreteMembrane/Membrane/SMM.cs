@@ -18,9 +18,9 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 	{
 		#region Constructors
 
-		/// <inheritdoc cref="MCFTMembrane(IParameters, WebReinforcement, Length)" />
+		/// <inheritdoc cref="MCFTMembrane(IConcreteParameters, WebReinforcement, Length)" />
 		/// <param name="unit">The <see cref="LengthUnit" /> of <paramref name="width" /></param>
-		internal SMMMembrane(IParameters concreteParameters, WebReinforcement? reinforcement, double width, LengthUnit unit = LengthUnit.Millimeter)
+		internal SMMMembrane(IConcreteParameters concreteParameters, WebReinforcement? reinforcement, double width, LengthUnit unit = LengthUnit.Millimeter)
 			: this(concreteParameters, reinforcement, (Length) width.As(unit))
 		{
 		}
@@ -28,8 +28,8 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 		/// <summary>
 		///     Membrane element for SMM analysis.
 		/// </summary>
-		/// <inheritdoc cref="Membrane(IParameters, WebReinforcement?, Length, ConstitutiveModel)" />
-		internal SMMMembrane(IParameters concreteParameters, WebReinforcement? reinforcement, Length width)
+		/// <inheritdoc cref="Membrane(IConcreteParameters, WebReinforcement?, Length, ConstitutiveModel)" />
+		internal SMMMembrane(IConcreteParameters concreteParameters, WebReinforcement? reinforcement, Length width)
 			: base(concreteParameters, reinforcement, width, ConstitutiveModel.SMM)
 		{
 		}

@@ -91,9 +91,9 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 
 		#region Constructors
 
-		/// <inheritdoc cref="Membrane(IParameters, WebReinforcement?, Length, ConstitutiveModel)" />
+		/// <inheritdoc cref="Membrane(IConcreteParameters, WebReinforcement?, Length, ConstitutiveModel)" />
 		/// <param name="unit">The <see cref="LengthUnit" /> of <paramref name="width" /></param>
-		protected Membrane(IParameters concreteParameters, WebReinforcement? reinforcement, double width, ConstitutiveModel model, LengthUnit unit = LengthUnit.Millimeter)
+		protected Membrane(IConcreteParameters concreteParameters, WebReinforcement? reinforcement, double width, ConstitutiveModel model, LengthUnit unit = LengthUnit.Millimeter)
 			: this(concreteParameters, reinforcement, (Length) width.As(unit), model)
 		{
 		}
@@ -105,7 +105,7 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 		/// <param name="reinforcement"><see cref="WebReinforcement" /> object .</param>
 		/// <param name="width">The width of cross-section.</param>
 		/// <param name="model">Concrete <see cref="ConstitutiveModel" />.</param>
-		protected Membrane(IParameters concreteParameters, WebReinforcement? reinforcement, Length width, ConstitutiveModel model)
+		protected Membrane(IConcreteParameters concreteParameters, WebReinforcement? reinforcement, Length width, ConstitutiveModel model)
 		{
 			// Initiate new materials
 			Concrete      = BiaxialConcrete.From(concreteParameters, model);
@@ -135,12 +135,12 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 		///     Create a membrane element based on concrete constitutive model.
 		/// </summary>
 		/// <param name="considerCrackSlip">Consider crack slip? Only for <see cref="DSFMMembrane" /> (default: true)</param>
-		/// <inheritdoc cref="Membrane(IParameters, WebReinforcement, double, ConstitutiveModel, LengthUnit)" />
-		public static Membrane From(IParameters concreteParameters, WebReinforcement? reinforcement, double width, ConstitutiveModel model = ConstitutiveModel.MCFT, LengthUnit unit = LengthUnit.Millimeter, bool considerCrackSlip = true) =>
+		/// <inheritdoc cref="Membrane(IConcreteParameters, WebReinforcement, double, ConstitutiveModel, LengthUnit)" />
+		public static Membrane From(IConcreteParameters concreteParameters, WebReinforcement? reinforcement, double width, ConstitutiveModel model = ConstitutiveModel.MCFT, LengthUnit unit = LengthUnit.Millimeter, bool considerCrackSlip = true) =>
 			From(concreteParameters, reinforcement, (Length) width.As(unit), model, considerCrackSlip);
 
-		/// <inheritdoc cref="From(IParameters, WebReinforcement?, double, ConstitutiveModel, LengthUnit, bool)" />
-		public static Membrane From(IParameters concreteParameters, WebReinforcement? reinforcement, Length width, ConstitutiveModel model = ConstitutiveModel.MCFT, bool considerCrackSlip = true) =>
+		/// <inheritdoc cref="From(IConcreteParameters, WebReinforcement?, double, ConstitutiveModel, LengthUnit, bool)" />
+		public static Membrane From(IConcreteParameters concreteParameters, WebReinforcement? reinforcement, Length width, ConstitutiveModel model = ConstitutiveModel.MCFT, bool considerCrackSlip = true) =>
 			model switch
 			{
 				ConstitutiveModel.MCFT => new MCFTMembrane(concreteParameters, reinforcement, width),
@@ -173,7 +173,7 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 		/// </summary>
 		/// <param name="crackOpening">Average crack opening, in mm.</param>
 		/// <param name="parameters">Concrete parameters.</param>
-		private static Pressure MaximumShearOnCrack(Length crackOpening, IParameters parameters)
+		private static Pressure MaximumShearOnCrack(Length crackOpening, IConcreteParameters parameters)
 		{
 			var vcimax = 0.18 * parameters.Strength.Megapascals.Sqrt()
 			             / (0.31 + 24 * crackOpening.Millimeters / (parameters.AggregateDiameter.Millimeters + 16));
