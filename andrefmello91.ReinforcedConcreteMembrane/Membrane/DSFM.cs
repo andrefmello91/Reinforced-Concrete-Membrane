@@ -116,7 +116,7 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 			var cStrains = AverageStrains - CrackSlipStrains;
 			
 			// Calculate and set concrete and steel stresses
-			Concrete.CalculatePrincipalStresses(cStrains, Reinforcement, ReferenceLength);
+			Concrete.Calculate(cStrains, Reinforcement, ReferenceLength);
 			Reinforcement?.Calculate(AverageStrains);
 
 			// Calculate apparent principal strains

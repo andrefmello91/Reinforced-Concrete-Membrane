@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using andrefmello91.Extensions;
+using andrefmello91.Material;
 using andrefmello91.Material.Concrete;
 using andrefmello91.Material.Reinforcement;
 using andrefmello91.OnPlaneComponents;
@@ -18,9 +19,8 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 	/// <summary>
 	///     Membrane element base class.
 	/// </summary>
-	public abstract class Membrane : IEquatable<Membrane>, ICloneable<Membrane>
+	public abstract class Membrane : IBiaxialMaterial, IEquatable<Membrane>, ICloneable<Membrane>
 	{
-
 		#region Properties
 
 		/// <summary>
@@ -62,6 +62,18 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 		///     Get/set <see cref="WebReinforcement" /> of the membrane element.
 		/// </summary>
 		public WebReinforcement? Reinforcement { get; }
+
+		/// <inheritdoc />
+		PrincipalStrainState IBiaxialMaterial.PrincipalStrains => AveragePrincipalStrains;
+
+		/// <inheritdoc />
+		PrincipalStressState IBiaxialMaterial.PrincipalStresses => AverageStresses.ToPrincipal();
+
+		/// <inheritdoc />
+		StrainState IBiaxialMaterial.Strains => AverageStrains;
+
+		/// <inheritdoc />
+		StressState IBiaxialMaterial.Stresses => AverageStresses;
 
 		/// <summary>
 		///     Get current <see cref="Membrane" /> stiffness <see cref="Matrix" />.

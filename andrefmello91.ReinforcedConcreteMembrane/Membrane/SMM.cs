@@ -52,78 +52,10 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 			var noPoissonStrain = RemovePoissonEffect(AveragePrincipalStrains.Transform(Concrete.DeviationAngle), Reinforcement, Concrete.Cracked);
 					
 			// Calculate and set concrete and steel stresses
-			Concrete.CalculatePrincipalStresses(noPoissonStrain, Reinforcement);
+			Concrete.Calculate(noPoissonStrain, Reinforcement);
 			Reinforcement?.Calculate(noPoissonStrain.ToHorizontal());
 		}
 
-		// private void Solve(StressState appliedStresses)
-		// {
-		// 	var strains = AveragePrincipalStrains.Transform(Concrete.DeviationAngle);
-		//
-		// 	if (!Concrete.Cracked)
-		// 	{
-		// 		// Remove Poisson effect
-		// 		var noPoissonStrain = RemovePoissonEffect(strains, Reinforcement, Concrete.Cracked);
-		// 			
-		// 		// Calculate and set concrete and steel stresses
-		// 		Concrete.CalculatePrincipalStresses(noPoissonStrain, Reinforcement);
-		// 		Reinforcement?.CalculateStresses(noPoissonStrain.ToHorizontal());
-		// 		
-		// 		return;
-		// 	}
-		// 	
-		// 	// Initiate strains
-		// 	var y12 = 0D;
-		// 	var e1  = 0D;
-		// 	
-		// 	// Solve the nonlinear equation by Brent Method
-		// 	if (Brent.TryFindRoot(SolveGamma, -0.1, 0.1, 0.1, 10000, out y12))
-		// 	{
-		// 		
-		// 	}
-		//
-		// 	double SolveGamma(double gamma)
-		// 	{
-		// 		// Solve the nonlinear equation by Brent Method
-		// 		if (!Brent.TryFindRoot(SolveEpsilon1, 0, 0.1, 0.1, 10000, out e1))
-		// 			return 1;
-		//
-		// 		double SolveEpsilon1(double epsilon1)
-		// 		{
-		// 			strains = new StrainState(strains.EpsilonX, epsilon1, gamma, strains.ThetaX);
-		// 			
-		// 			// Remove Poisson effect
-		// 			var noPoissonStrain = RemovePoissonEffect(strains, Reinforcement, Concrete.Cracked);
-		// 			
-		// 			// Calculate and set concrete and steel stresses
-		// 			Concrete.CalculatePrincipalStresses(noPoissonStrain, Reinforcement);
-		// 			Reinforcement?.CalculateStresses(noPoissonStrain.ToHorizontal());
-		// 			
-		// 			// Calculate summed reinforcement stresses
-		// 			// From constitutive model
-		// 			var eq11 = (Reinforcement?.Stresses.SigmaX + Reinforcement?.Stresses.SigmaY) ?? Pressure.Zero;
-		// 			
-		// 			// From equilibrium
-		// 			var eq12 = appliedStresses.SigmaX + appliedStresses.SigmaY - Concrete.Stresses.SigmaX - Concrete.Stresses.SigmaY;
-		// 			
-		// 			// Subtraction must be zero
-		// 			return
-		// 				(eq12 - eq11).Megapascals;
-		// 		}
-		// 		
-		// 		// Calculate subtracted reinforcement stresses
-		// 		// From constitutive model
-		// 		var eq21 = (Reinforcement?.Stresses.SigmaX - Reinforcement?.Stresses.SigmaY) ?? Pressure.Zero;
-		// 			
-		// 		// From equilibrium
-		// 		var (cos, sin) = (2 * Concrete.Stresses.ThetaX).DirectionCosines();
-		// 		var eq22       = appliedStresses.SigmaX - appliedStresses.SigmaY - (Concrete.Stresses.SigmaX - Concrete.Stresses.SigmaY) * cos + 2 * Concrete.Stresses.TauXY * sin;
-		//
-		// 		return
-		// 			(eq22 - eq21).Megapascals;
-		// 	}
-		// }
-		
 		/// <summary>
 		///		Calculate the strain state affected by Poisson ratios.
 		/// </summary>
