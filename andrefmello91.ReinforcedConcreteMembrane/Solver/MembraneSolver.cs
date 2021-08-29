@@ -9,6 +9,7 @@ using MathNet.Numerics.Data.Text;
 using MathNet.Numerics.LinearAlgebra;
 using MathNet.Numerics.LinearAlgebra.Double;
 using UnitsNet;
+using UnitsNet.Units;
 
 namespace andrefmello91.ReinforcedConcreteMembrane.Solver
 {
@@ -271,10 +272,12 @@ namespace andrefmello91.ReinforcedConcreteMembrane.Solver
 		public static void SolverExample()
 		{
 			// Initiate steel for each direction
-			var steelXY = new Steel(276, 200000);
+			var steelXY = new SteelParameters(276, 200000);
 
 			// Get reinforcement
-			var reinforcement = new WebReinforcement(6.35, 50.55, steelXY, 4.7, 49.57, steelXY.Clone(), 70);
+			var xRef          = WebReinforcementDirection.From(6.35, 50.55, steelXY, 70, 0);
+			var yRef          = WebReinforcementDirection.From(4.7, 49.57, steelXY.Clone(), 70, 0);
+			var reinforcement = new WebReinforcement(xRef, yRef, (Length) 70.As(LengthUnit.Millimeter));
 
 			// Initiate the membrane
 			var membraneMCFT = new MCFTMembrane(new Parameters(14.5, 6), reinforcement, 70);
