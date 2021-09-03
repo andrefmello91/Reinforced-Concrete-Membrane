@@ -35,7 +35,7 @@
 
     <ItemGroup Condition="'$(Configuration)'=='Debug'">
         <ProjectReference Include="..\..\Extensions\andrefmello91.Extensions\andrefmello91.Extensions.csproj" />
-        <ProjectReference Include="..\..\OnPlaneComponents\andrefmello91.OnPlaneComponents\andrefmello91.OnPlaneComponents.csproj" />
+        <ProjectReference Include="..\..\On-Plane-Components\andrefmello91.OnPlaneComponents\andrefmello91.OnPlaneComponents.csproj" />
         <ProjectReference Include="..\..\Material\andrefmello91.Material\andrefmello91.Material.csproj" />
     </ItemGroup>
 
