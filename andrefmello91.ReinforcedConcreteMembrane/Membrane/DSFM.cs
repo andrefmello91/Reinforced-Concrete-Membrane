@@ -132,6 +132,12 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 		/// <inheritdoc />
 		public override Membrane Clone() => new DSFMMembrane(Concrete.Parameters, Reinforcement?.Clone(), Width, ConsiderCrackSlip);
 
+		/// <inheritdoc />
+		public override bool Equals(object? obj) => obj is DSFMMembrane other && base.Equals(other);
+
+		/// <inheritdoc />
+		public override int GetHashCode() => base.GetHashCode();
+
 		/// <summary>
 		///     Calculate and set <see cref="CrackSlipStrains" />.
 		/// </summary>
@@ -381,16 +387,6 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 			return
 				ds / s;
 		}
-
-		#endregion
-
-		#region Object override
-
-		/// <inheritdoc />
-		public override bool Equals(object? obj) => obj is DSFMMembrane other && base.Equals(other);
-
-		/// <inheritdoc />
-		public override int GetHashCode() => base.GetHashCode();
 
 		#endregion
 

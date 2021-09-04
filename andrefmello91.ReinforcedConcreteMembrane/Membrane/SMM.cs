@@ -118,10 +118,6 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 		/// <inheritdoc />
 		public override Membrane Clone() => new SMMMembrane(Concrete.Parameters, Reinforcement?.Clone(), Width);
 
-		#endregion
-
-		#region Object override
-
 		/// <inheritdoc />
 		public override bool Equals(object? obj) => obj is SMMMembrane other && base.Equals(other);
 

@@ -63,10 +63,6 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 		/// <inheritdoc />
 		public override Membrane Clone() => new MCFTMembrane(Concrete.Parameters, Reinforcement?.Clone(), Width);
 
-		#endregion
-
-		#region Object override
-
 		/// <inheritdoc />
 		public override bool Equals(object? obj) => obj is MCFTMembrane other && base.Equals(other);
 

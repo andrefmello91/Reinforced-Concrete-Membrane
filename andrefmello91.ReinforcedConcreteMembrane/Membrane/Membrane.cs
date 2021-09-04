@@ -181,6 +181,19 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 			return Pressure.FromMegapascals(vcimax);
 		}
 
+		/// <inheritdoc />
+		public override bool Equals(object? obj) => obj is Membrane other && Equals(other);
+
+		/// <inheritdoc />
+		public override int GetHashCode() => Concrete.GetHashCode() + Reinforcement.GetHashCode();
+
+		/// <inheritdoc />
+		public override string ToString() =>
+			"Membrane\n" +
+			$"Width = {Width}\n" +
+			$"{Concrete}\n" +
+			$"{Reinforcement}\n";
+
 		/// <summary>
 		///     Limit tensile principal stress by crack check procedure, by Bentz (2000).
 		/// </summary>
@@ -255,6 +268,16 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 		/// <param name="appliedStrains">Current applied <see cref="StrainState" />.</param>
 		public abstract void Calculate(StrainState appliedStrains);
 
+		/// <inheritdoc />
+		public abstract Membrane Clone();
+
+		/// <summary>
+		///     Compare two <see cref="Membrane" /> objects.
+		///     <para>Returns true if <see cref="Concrete" /> and <see cref="Reinforcement" /> are equal.</para>
+		/// </summary>
+		/// <param name="other">The other <see cref="Membrane" /> object.</param>
+		public bool Equals(Membrane? other) => other is not null && Concrete == other.Concrete && Reinforcement == other.Reinforcement;
+
 		#endregion
 
 		#region Operators
@@ -268,37 +291,6 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 		///     Returns true if parameters and constitutive model are different.
 		/// </summary>
 		public static bool operator !=(Membrane? left, Membrane? right) => left.IsNotEqualTo(right);
-
-		#endregion
-
-		#region Interface Implementations
-
-		/// <inheritdoc />
-		public abstract Membrane Clone();
-
-		/// <summary>
-		///     Compare two <see cref="Membrane" /> objects.
-		///     <para>Returns true if <see cref="Concrete" /> and <see cref="Reinforcement" /> are equal.</para>
-		/// </summary>
-		/// <param name="other">The other <see cref="Membrane" /> object.</param>
-		public bool Equals(Membrane? other) => other is not null && Concrete == other.Concrete && Reinforcement == other.Reinforcement;
-
-		#endregion
-
-		#region Object override
-
-		/// <inheritdoc />
-		public override bool Equals(object? obj) => obj is Membrane other && Equals(other);
-
-		/// <inheritdoc />
-		public override int GetHashCode() => Concrete.GetHashCode() + Reinforcement.GetHashCode();
-
-		/// <inheritdoc />
-		public override string ToString() =>
-			"Membrane\n" +
-			$"Width = {Width}\n" +
-			$"{Concrete}\n" +
-			$"{Reinforcement}\n";
 
 		#endregion
 
