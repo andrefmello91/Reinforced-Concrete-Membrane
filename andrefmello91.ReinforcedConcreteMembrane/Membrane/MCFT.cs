@@ -63,6 +63,8 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 		/// <inheritdoc />
 		public override Membrane Clone() => new MCFTMembrane(Concrete.Parameters, Reinforcement?.Clone(), Width);
 
+		#endregion
+
 		#region Object override
 
 		/// <inheritdoc />
@@ -70,8 +72,6 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 
 		/// <inheritdoc />
 		public override int GetHashCode() => base.GetHashCode();
-
-		#endregion
 
 		#endregion
 

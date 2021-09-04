@@ -653,7 +653,7 @@ namespace andrefmello91.ReinforcedConcreteMembrane.Solver
 			}
 
 			// Set new values
-			_lastStiffness    = (MaterialMatrix)  _currentStiffness.Clone();
+			_lastStiffness    = (MaterialMatrix) _currentStiffness.Clone();
 			_currentStiffness = (MaterialMatrix) (_currentStiffness + new MaterialMatrix(dK));
 		}
 

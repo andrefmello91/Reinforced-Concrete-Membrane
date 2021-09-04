@@ -19,12 +19,12 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 
 		#region Fields
 
+		public string SlipApproach;
+
 		/// <summary>
 		///     Initial cracking angle.
 		/// </summary>
 		private double? _thetaIc;
-
-		public string SlipApproach;
 
 		#endregion
 
@@ -114,7 +114,7 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 
 			// Calculate concrete strains
 			var cStrains = AverageStrains - CrackSlipStrains;
-			
+
 			// Calculate and set concrete and steel stresses
 			Concrete.Calculate(cStrains, Reinforcement, ReferenceLength);
 			Reinforcement?.Calculate(AverageStrains);
@@ -260,7 +260,7 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 
 			var rx = Reinforcement?.DirectionX?.Clone();
 			var ry = Reinforcement?.DirectionY?.Clone();
-			
+
 			// Get the average strains
 			double
 				ex = AverageStrains.EpsilonX,
@@ -317,7 +317,7 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 				// Calculate reinforcement stresses
 				rx?.Calculate(esCrxIt);
 				ry?.Calculate(esCryIt);
-				
+
 				Pressure
 					fscrxIt = rx?.Stress ?? Pressure.Zero,
 					fscryIt = ry?.Stress ?? Pressure.Zero;
@@ -382,6 +382,8 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 				ds / s;
 		}
 
+		#endregion
+
 		#region Object override
 
 		/// <inheritdoc />
@@ -389,8 +391,6 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 
 		/// <inheritdoc />
 		public override int GetHashCode() => base.GetHashCode();
-
-		#endregion
 
 		#endregion
 

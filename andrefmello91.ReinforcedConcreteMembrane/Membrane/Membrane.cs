@@ -6,7 +6,6 @@ using andrefmello91.Material.Concrete;
 using andrefmello91.Material.Reinforcement;
 using andrefmello91.OnPlaneComponents;
 using MathNet.Numerics;
-using MathNet.Numerics.LinearAlgebra;
 using MathNet.Numerics.LinearAlgebra.Double;
 using UnitsNet;
 using UnitsNet.Units;
@@ -21,6 +20,7 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 	/// </summary>
 	public abstract class Membrane : IBiaxialMaterial, IEquatable<Membrane>, ICloneable<Membrane>
 	{
+
 		#region Properties
 
 		/// <summary>
@@ -63,6 +63,18 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 		/// </summary>
 		public WebReinforcement? Reinforcement { get; }
 
+		/// <summary>
+		///     Get the width of the membrane element.
+		/// </summary>
+		public Length Width { get; }
+
+		/// <summary>
+		///     Get current <see cref="Membrane" /> stiffness <see cref="Matrix" />.
+		/// </summary>
+		public MaterialMatrix Stiffness => Reinforcement is null
+			? Concrete.Stiffness
+			: (MaterialMatrix) (Concrete.Stiffness + Reinforcement.Stiffness);
+
 		/// <inheritdoc />
 		PrincipalStrainState IBiaxialMaterial.PrincipalStrains => AveragePrincipalStrains;
 
@@ -74,18 +86,6 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 
 		/// <inheritdoc />
 		StressState IBiaxialMaterial.Stresses => AverageStresses;
-
-		/// <summary>
-		///     Get current <see cref="Membrane" /> stiffness <see cref="Matrix" />.
-		/// </summary>
-		public MaterialMatrix Stiffness => Reinforcement is null
-			? Concrete.Stiffness
-			: (MaterialMatrix) (Concrete.Stiffness + Reinforcement.Stiffness);
-
-		/// <summary>
-		///     Get the width of the membrane element.
-		/// </summary>
-		public Length Width { get; }
 
 		#endregion
 
@@ -182,12 +182,6 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 		}
 
 		/// <summary>
-		///     Calculate <see cref="AverageStresses" /> and <see cref="Stiffness" />, given a known <see cref="StrainState" />.
-		/// </summary>
-		/// <param name="appliedStrains">Current applied <see cref="StrainState" />.</param>
-		public abstract void Calculate(StrainState appliedStrains);
-
-		/// <summary>
 		///     Limit tensile principal stress by crack check procedure, by Bentz (2000).
 		/// </summary>
 		protected void CrackCheck()
@@ -255,6 +249,28 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 		/// </summary>
 		protected Pressure MaximumShearOnCrack() => MaximumShearOnCrack(CrackOpening(), Concrete.Parameters);
 
+		/// <summary>
+		///     Calculate <see cref="AverageStresses" /> and <see cref="Stiffness" />, given a known <see cref="StrainState" />.
+		/// </summary>
+		/// <param name="appliedStrains">Current applied <see cref="StrainState" />.</param>
+		public abstract void Calculate(StrainState appliedStrains);
+
+		#endregion
+
+		#region Operators
+
+		/// <summary>
+		///     Returns true if parameters and constitutive model are equal.
+		/// </summary>
+		public static bool operator ==(Membrane? left, Membrane? right) => left.IsEqualTo(right);
+
+		/// <summary>
+		///     Returns true if parameters and constitutive model are different.
+		/// </summary>
+		public static bool operator !=(Membrane? left, Membrane? right) => left.IsNotEqualTo(right);
+
+		#endregion
+
 		#region Interface Implementations
 
 		/// <inheritdoc />
@@ -283,22 +299,6 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 			$"Width = {Width}\n" +
 			$"{Concrete}\n" +
 			$"{Reinforcement}\n";
-
-		#endregion
-
-		#endregion
-
-		#region Operators
-
-		/// <summary>
-		///     Returns true if parameters and constitutive model are equal.
-		/// </summary>
-		public static bool operator ==(Membrane? left, Membrane? right) => left.IsEqualTo(right);
-
-		/// <summary>
-		///     Returns true if parameters and constitutive model are different.
-		/// </summary>
-		public static bool operator !=(Membrane? left, Membrane? right) => left.IsNotEqualTo(right);
 
 		#endregion
 
