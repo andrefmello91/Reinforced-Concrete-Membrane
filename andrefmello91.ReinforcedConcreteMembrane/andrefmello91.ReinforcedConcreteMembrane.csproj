@@ -22,21 +22,21 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="MathNet.Numerics" Version="4.15.0" />
-        <PackageReference Include="MathNet.Numerics.Data.Text" Version="4.1.0" />
-        <PackageReference Include="UnitsNet" Version="4.102.0" />
+        <PackageReference Include="MathNet.Numerics" Version="4.15.0"/>
+        <PackageReference Include="MathNet.Numerics.Data.Text" Version="4.1.0"/>
+        <PackageReference Include="UnitsNet" Version="4.102.0"/>
     </ItemGroup>
 
     <ItemGroup Condition="'$(Configuration)'=='Release'">
-        <PackageReference Include="andrefmello91.Extensions" Version="1.0.9" />
-        <PackageReference Include="andrefmello91.Material" Version="1.1.1" />
-        <PackageReference Include="andrefmello91.OnPlaneComponents" Version="1.1.5" />
+        <PackageReference Include="andrefmello91.Extensions" Version="1.0.9"/>
+        <PackageReference Include="andrefmello91.Material" Version="1.1.1"/>
+        <PackageReference Include="andrefmello91.OnPlaneComponents" Version="1.1.5"/>
     </ItemGroup>
 
     <ItemGroup Condition="'$(Configuration)'=='Debug'">
-        <ProjectReference Include="..\..\Extensions\andrefmello91.Extensions\andrefmello91.Extensions.csproj" />
-        <ProjectReference Include="..\..\On-Plane-Components\andrefmello91.OnPlaneComponents\andrefmello91.OnPlaneComponents.csproj" />
-        <ProjectReference Include="..\..\Material\andrefmello91.Material\andrefmello91.Material.csproj" />
+        <ProjectReference Include="..\..\Extensions\andrefmello91.Extensions\andrefmello91.Extensions.csproj"/>
+        <ProjectReference Include="..\..\On-Plane-Components\andrefmello91.OnPlaneComponents\andrefmello91.OnPlaneComponents.csproj"/>
+        <ProjectReference Include="..\..\Material\andrefmello91.Material\andrefmello91.Material.csproj"/>
     </ItemGroup>
 
 
