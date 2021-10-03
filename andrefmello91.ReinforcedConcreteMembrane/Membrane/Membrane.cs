@@ -248,13 +248,11 @@ namespace andrefmello91.ReinforcedConcreteMembrane
 		/// <summary>
 		///     Calculate the average crack opening.
 		/// </summary>
-		/// <param name="membrane">The <see cref="Membrane" /> object.</param>
 		protected Length CrackOpening() => CrackOpening(Reinforcement, Concrete.PrincipalStrains);
 
 		/// <summary>
 		///     Calculate the crack spacing in principal strain direction.
 		/// </summary>
-		/// <inheritdoc cref="CrackOpening(Membrane)" />
 		protected Length CrackSpacing() => CrackSpacing(Reinforcement, Concrete.PrincipalStrains);
 
 		/// <summary>
