@@ -136,16 +136,16 @@ public abstract class Membrane : IBiaxialMaterial, IEquatable<Membrane>, IClonea
 	/// </summary>
 	/// <param name="considerCrackSlip">Consider crack slip? Only for <see cref="DSFMMembrane" /> (default: true)</param>
 	/// <inheritdoc cref="Membrane(IConcreteParameters, WebReinforcement, double, ConstitutiveModel, LengthUnit)" />
-	public static Membrane From(IConcreteParameters concreteParameters, WebReinforcement? reinforcement, double width, ConstitutiveModel model = ConstitutiveModel.MCFT, LengthUnit unit = LengthUnit.Millimeter, bool considerCrackSlip = true) =>
+	public static Membrane From(IConcreteParameters concreteParameters, WebReinforcement? reinforcement, double width, ConstitutiveModel model = ConstitutiveModel.SMM, LengthUnit unit = LengthUnit.Millimeter, bool considerCrackSlip = true) =>
 		From(concreteParameters, reinforcement, (Length) width.As(unit), model, considerCrackSlip);
 
 	/// <inheritdoc cref="From(IConcreteParameters, WebReinforcement?, double, ConstitutiveModel, LengthUnit, bool)" />
-	public static Membrane From(IConcreteParameters concreteParameters, WebReinforcement? reinforcement, Length width, ConstitutiveModel model = ConstitutiveModel.MCFT, bool considerCrackSlip = true) =>
+	public static Membrane From(IConcreteParameters concreteParameters, WebReinforcement? reinforcement, Length width, ConstitutiveModel model = ConstitutiveModel.SMM, bool considerCrackSlip = true) =>
 		model switch
 		{
+			ConstitutiveModel.SMM  => new SMMMembrane(concreteParameters, reinforcement, width),
 			ConstitutiveModel.MCFT => new MCFTMembrane(concreteParameters, reinforcement, width),
-			ConstitutiveModel.DSFM => new DSFMMembrane(concreteParameters, reinforcement, width, considerCrackSlip),
-			_                      => new SMMMembrane(concreteParameters, reinforcement, width)
+			_                      => new DSFMMembrane(concreteParameters, reinforcement, width, considerCrackSlip)
 		};
 
 	/// <summary>
