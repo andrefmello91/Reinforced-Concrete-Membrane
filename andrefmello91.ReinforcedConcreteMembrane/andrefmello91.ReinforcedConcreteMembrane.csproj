@@ -4,7 +4,7 @@
         <TargetFrameworks>net5.0;netcoreapp3.1;netstandard2.0</TargetFrameworks>
         <LangVersion>default</LangVersion>
         <Nullable>enable</Nullable>
-        <Version>1.1.2</Version>
+        <Version>1.1.3</Version>
         <Authors>andrefmello91</Authors>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile>
@@ -18,7 +18,7 @@
         <PackageId>andrefmello91.ReinforcedConcreteMembrane</PackageId>
         <PackageDescription>Library for nonlinear analysis of reinforced concrete membrane elements by Modified Compression Field Theory (VECCHIO; COLLINS, 1986) and Disturbed Stress Field Model (VECCHIO, 2000)..</PackageDescription>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-        <PackageReleaseNotes>Updated code for Newton-Raphson and updated packages.</PackageReleaseNotes>
+        <PackageReleaseNotes>Set SMM as default constitutive model.</PackageReleaseNotes>
     </PropertyGroup>
 
     <ItemGroup>
@@ -28,9 +28,9 @@
     </ItemGroup>
 
     <ItemGroup Condition="'$(Configuration)'=='Release'">
-        <PackageReference Include="andrefmello91.Extensions" Version="1.0.9"/>
-        <PackageReference Include="andrefmello91.Material" Version="1.1.1"/>
-        <PackageReference Include="andrefmello91.OnPlaneComponents" Version="1.1.5"/>
+        <PackageReference Include="andrefmello91.Extensions" Version="1.1.0"/>
+        <PackageReference Include="andrefmello91.Material" Version="1.1.2"/>
+        <PackageReference Include="andrefmello91.OnPlaneComponents" Version="1.1.6"/>
     </ItemGroup>
 
     <ItemGroup Condition="'$(Configuration)'=='Debug'">
