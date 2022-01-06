@@ -210,7 +210,7 @@ public class MembraneSolver
 	/// <remarks>
 	///     Default: 1E-8
 	/// </remarks>
-	public double StrainTolerance { get; set; } = 1E-8;
+	public double StrainTolerance { get; set; } = 1E-12;
 
 	/// <summary>
 	///     Convergence tolerance for stresses.
