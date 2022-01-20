@@ -15,3 +15,13 @@ This library uses:
 - [OnPlaneComponents](https://github.com/andrefmello91/On-Plane-Components) for stress and strain transformations;
 
 - [Extensions](https://github.com/andrefmello91/Extensions) for some numeric extensions.
+
+## Usage
+
+### Package reference:
+
+`<PackageReference Include="andrefmello91.ReinforcedConcreteMembrane" Version="1.X.X" />`
+
+### .NET CLI:
+
+`dotnet add package andrefmello91.ReinforcedConcreteMembrane --version 1.X.X`
