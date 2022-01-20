@@ -16,6 +16,26 @@ This library uses:
 
 - [Extensions](https://github.com/andrefmello91/Extensions) for some numeric extensions.
 
+## Class Membrane
+
+The membrane object can be initiated by static typing:
+
+`var membrane = Membrane.From([Concrete Parameters], [Web Reinforcement], [Width], [Constitutive Model])`
+
+## Class MembraneSolver
+
+The MembraneSolver class implements a nonlinear solution algorithm for solving a membrane element with known applied stresses.
+
+Example:
+
+`var solver = new MembraneSolver([Membrane Element], [Nonlinear Solution Method])`
+
+`solver.Solve([Applied Stresses], [Simulate until failure?])`
+
+`solver.OutputResults(out [File Path], [Location to write file])`
+
+A csv file will be saved in the output location.
+
 ## Usage
 
 ### Package reference:
