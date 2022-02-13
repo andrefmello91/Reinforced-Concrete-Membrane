@@ -21,8 +21,6 @@ namespace andrefmello91.ReinforcedConcreteMembrane;
 public abstract class Membrane : IBiaxialMaterial, IEquatable<Membrane>, ICloneable<Membrane>
 {
 
-	#region Properties
-
 	/// <summary>
 	///     Get/set the average <see cref="PrincipalStrainState" />.
 	/// </summary>
@@ -87,10 +85,6 @@ public abstract class Membrane : IBiaxialMaterial, IEquatable<Membrane>, IClonea
 	/// <inheritdoc />
 	StressState IBiaxialMaterial.Stresses => AverageStresses;
 
-	#endregion
-
-	#region Constructors
-
 	/// <inheritdoc cref="Membrane(IConcreteParameters, WebReinforcement?, Length, ConstitutiveModel)" />
 	/// <param name="unit">The <see cref="LengthUnit" /> of <paramref name="width" /></param>
 	protected Membrane(IConcreteParameters concreteParameters, WebReinforcement? reinforcement, double width, ConstitutiveModel model, LengthUnit unit = LengthUnit.Millimeter)
@@ -116,10 +110,6 @@ public abstract class Membrane : IBiaxialMaterial, IEquatable<Membrane>, IClonea
 		// Set initial strains
 		AverageStrains = StrainState.Zero;
 	}
-
-	#endregion
-
-	#region Methods
 
 	/// <summary>
 	///     Calculate the average crack opening.
@@ -276,10 +266,6 @@ public abstract class Membrane : IBiaxialMaterial, IEquatable<Membrane>, IClonea
 	/// <param name="other">The other <see cref="Membrane" /> object.</param>
 	public bool Equals(Membrane? other) => other is not null && Concrete == other.Concrete && Reinforcement == other.Reinforcement;
 
-	#endregion
-
-	#region Operators
-
 	/// <summary>
 	///     Returns true if parameters and constitutive model are equal.
 	/// </summary>
@@ -289,7 +275,4 @@ public abstract class Membrane : IBiaxialMaterial, IEquatable<Membrane>, IClonea
 	///     Returns true if parameters and constitutive model are different.
 	/// </summary>
 	public static bool operator !=(Membrane? left, Membrane? right) => left.IsNotEqualTo(right);
-
-	#endregion
-
 }

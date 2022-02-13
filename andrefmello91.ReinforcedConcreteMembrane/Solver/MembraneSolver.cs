@@ -19,8 +19,6 @@ namespace andrefmello91.ReinforcedConcreteMembrane.Solver;
 public class MembraneSolver
 {
 
-	#region Fields
-
 	/// <summary>
 	///     Default save location for output file.
 	/// </summary>
@@ -164,10 +162,6 @@ public class MembraneSolver
 	/// </summary>
 	private bool _writeInConsole = true;
 
-	#endregion
-
-	#region Properties
-
 	/// <summary>
 	///     The type of analysis control.
 	/// </summary>
@@ -245,10 +239,6 @@ public class MembraneSolver
 	/// </summary>
 	private double StressConvergence => CalculateConvergence(_currentResidual.AsVector(), _stepStresses.AsVector());
 
-	#endregion
-
-	#region Constructors
-
 	/// <summary>
 	///     Default constructor.
 	/// </summary>
@@ -261,10 +251,6 @@ public class MembraneSolver
 		Solver  = solver;
 		Control = control;
 	}
-
-	#endregion
-
-	#region Methods
 
 	/// <summary>
 	///     Simple console solver example.
@@ -673,9 +659,6 @@ public class MembraneSolver
 		_lastStrains    =  _currentStrains.Clone();
 		_currentStrains += _currentIncrement;
 	}
-
-	#endregion
-
 }
 
 /// <summary>

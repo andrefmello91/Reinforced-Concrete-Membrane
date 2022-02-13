@@ -15,8 +15,6 @@ namespace andrefmello91.ReinforcedConcreteMembrane;
 internal class SMMMembrane : Membrane
 {
 
-	#region Constructors
-
 	/// <inheritdoc cref="MCFTMembrane(IConcreteParameters, WebReinforcement, Length)" />
 	/// <param name="unit">The <see cref="LengthUnit" /> of <paramref name="width" /></param>
 	internal SMMMembrane(IConcreteParameters concreteParameters, WebReinforcement? reinforcement, double width, LengthUnit unit = LengthUnit.Millimeter)
@@ -32,10 +30,6 @@ internal class SMMMembrane : Membrane
 		: base(concreteParameters, reinforcement, width, ConstitutiveModel.SMM)
 	{
 	}
-
-	#endregion
-
-	#region Methods
 
 	/// <summary>
 	///     Calculate the Poisson coefficients for SMM.
@@ -123,7 +117,4 @@ internal class SMMMembrane : Membrane
 
 	/// <inheritdoc />
 	public override int GetHashCode() => base.GetHashCode();
-
-	#endregion
-
 }

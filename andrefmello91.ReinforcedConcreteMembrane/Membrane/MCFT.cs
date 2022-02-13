@@ -14,14 +14,8 @@ namespace andrefmello91.ReinforcedConcreteMembrane;
 internal class MCFTMembrane : Membrane
 {
 
-	#region Properties
-
 	/// <inheritdoc />
 	public override PrincipalStrainState AveragePrincipalStrains => Concrete.PrincipalStrains;
-
-	#endregion
-
-	#region Constructors
 
 	/// <inheritdoc cref="MCFTMembrane(IConcreteParameters, WebReinforcement, Length)" />
 	/// <param name="unit">The <see cref="LengthUnit" /> of <paramref name="width" /></param>
@@ -38,10 +32,6 @@ internal class MCFTMembrane : Membrane
 		: base(concreteParameters, reinforcement, width, ConstitutiveModel.MCFT)
 	{
 	}
-
-	#endregion
-
-	#region Methods
 
 	/// <summary>
 	///     Calculate <see cref="StressState" /> and <see cref="Membrane.Stiffness" /> by MCFT, given a known
@@ -68,7 +58,4 @@ internal class MCFTMembrane : Membrane
 
 	/// <inheritdoc />
 	public override int GetHashCode() => base.GetHashCode();
-
-	#endregion
-
 }

@@ -17,18 +17,12 @@ namespace andrefmello91.ReinforcedConcreteMembrane;
 internal class DSFMMembrane : Membrane
 {
 
-	#region Fields
-
 	public string SlipApproach;
 
 	/// <summary>
 	///     Initial cracking angle.
 	/// </summary>
 	private double? _thetaIc;
-
-	#endregion
-
-	#region Properties
 
 	/// <summary>
 	///     Get/set crack slip consideration.
@@ -52,10 +46,6 @@ internal class DSFMMembrane : Membrane
 		? StressState.Zero
 		: Concrete.Stiffness.Solve(CrackSlipStrains);
 
-	#endregion
-
-	#region Constructors
-
 	/// <inheritdoc cref="DSFMMembrane(IConcreteParameters, WebReinforcement, Length, bool)" />
 	/// <param name="unit">The <see cref="LengthUnit" /> of <paramref name="width" /></param>
 	internal DSFMMembrane(IConcreteParameters concreteParameters, WebReinforcement? reinforcement, double width, LengthUnit unit = LengthUnit.Millimeter, bool considerCrackSlip = true)
@@ -75,10 +65,6 @@ internal class DSFMMembrane : Membrane
 		ConsiderCrackSlip = considerCrackSlip;
 		CrackSlipStrains  = StrainState.Zero;
 	}
-
-	#endregion
-
-	#region Methods
 
 	/// <summary>
 	///     Calculate Cs coefficient for concrete softening basing on the applied <see cref="StressState" />.
@@ -387,7 +373,4 @@ internal class DSFMMembrane : Membrane
 		return
 			ds / s;
 	}
-
-	#endregion
-
 }
