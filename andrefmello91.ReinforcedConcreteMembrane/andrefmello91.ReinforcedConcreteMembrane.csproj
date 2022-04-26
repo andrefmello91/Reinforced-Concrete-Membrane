@@ -22,9 +22,9 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="MathNet.Numerics" Version="4.15.0"/>
-        <PackageReference Include="MathNet.Numerics.Data.Text" Version="4.1.0"/>
-        <PackageReference Include="UnitsNet" Version="4.102.0"/>
+        <PackageReference Include="MathNet.Numerics" Version="5.0.0"/>
+        <PackageReference Include="MathNet.Numerics.Data.Text" Version="5.0.0"/>
+        <PackageReference Include="UnitsNet" Version="4.128.0"/>
     </ItemGroup>
 
     <ItemGroup Condition="'$(Configuration)'=='Release'">
