@@ -13,18 +13,8 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v1
+    - name: Publish
+      uses: Squazz/publish-nuget@v2.5.6
       with:
-        dotnet-version: 6.0.x
-    - name: PublishGitHub  
-      uses: Rebel028/publish-nuget@2.6.1  
-      with:   
        PROJECT_FILE_PATH: andrefmello91.ReinforcedConcreteMembrane/andrefmello91.ReinforcedConcreteMembrane.csproj
-       NUGET_SOURCE: https://nuget.pkg.github.com/andrefmello91
-       NUGET_KEY: ${{secrets.NUGET_GITHUB_KEY}}
-    - name: Publish  
-      uses: brandedoutcast/publish-nuget@v2.5.5  
-      with:   
-       PROJECT_FILE_PATH: andrefmello91.ReinforcedConcreteMembrane/andrefmello91.ReinforcedConcreteMembrane.csproj 
        NUGET_KEY: ${{secrets.NUGET_API_KEY}}
